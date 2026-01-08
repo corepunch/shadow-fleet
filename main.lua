@@ -260,11 +260,11 @@ local function render_submenu(menu_index, selected_index)
     end
     
     -- Submenu header
+    local menu_start_row = row
     widgets.section_header(row, menu.name:upper() .. " MENU (Use ↑↓ arrows to select, Enter to confirm)")
     row = row + 1
     
     -- Submenu items
-    local menu_start_row = row
     for i, item in ipairs(menu.submenus) do
         widgets.menu_item_highlighted(row, i, item, i == selected_index)
         row = row + 1
