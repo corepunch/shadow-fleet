@@ -61,7 +61,7 @@ lua5.3 main.lua
 ```
 
 **Controls:**
-- Use ↑↓ arrow keys to navigate menu options
+- Use ←→ arrow keys to navigate menu options
 - Press Enter to select an option
 - Press 'q' to quit
 - Numbers 1-8 also work for direct selection

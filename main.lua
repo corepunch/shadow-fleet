@@ -187,7 +187,7 @@ local menu_structure = {
 
 -- Quick actions menu
 function sections.quick_actions(start_row, selected_index)
-    widgets.section_header(start_row, "QUICK ACTIONS (Use ↑↓ arrows to select, Enter to confirm, 'q' to quit)")
+    widgets.section_header(start_row, "QUICK ACTIONS (Use ←→ arrows to select, Enter to confirm, 'q' to quit)")
     local row = start_row + 1
     
     local actions = {}
@@ -195,10 +195,8 @@ function sections.quick_actions(start_row, selected_index)
         table.insert(actions, menu.name)
     end
     
-    for i, action in ipairs(actions) do
-        widgets.menu_item_highlighted(row, i, action, i == selected_index)
-        row = row + 1
-    end
+    -- Render horizontal menu
+    widgets.horizontal_menu(row, 1, actions, selected_index)
     
     return row + 2, actions  -- Return actions list for partial updates
 end
@@ -207,15 +205,8 @@ end
 function sections.update_menu_items(start_row, prev_index, new_index, actions)
     local row = start_row + 1  -- Skip header
     
-    -- Redraw the previously selected item (now unselected)
-    if prev_index and prev_index >= 1 and prev_index <= #actions then
-        widgets.menu_item_highlighted(row + prev_index - 1, prev_index, actions[prev_index], false)
-    end
-    
-    -- Redraw the newly selected item
-    if new_index >= 1 and new_index <= #actions then
-        widgets.menu_item_highlighted(row + new_index - 1, new_index, actions[new_index], true)
-    end
+    -- For horizontal menu, redraw the entire menu line
+    widgets.horizontal_menu(row, 1, actions, new_index)
 end
 
 -- Main dashboard render function with selected menu index
@@ -237,7 +228,7 @@ local function render_dashboard(selected_index)
     widgets.separator(row, 120)
     row = row + 1
     
-    term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
+    term.write_at(row, 1, "> USE ←→ ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
     
     return menu_start_row, actions
 end
@@ -261,20 +252,18 @@ local function render_submenu(menu_index, selected_index)
     
     -- Submenu header
     local menu_start_row = row
-    widgets.section_header(row, menu.name:upper() .. " MENU (Use ↑↓ arrows to select, Enter to confirm)")
+    widgets.section_header(row, menu.name:upper() .. " MENU (Use ←→ arrows to select, Enter to confirm)")
     row = row + 1
     
-    -- Submenu items
-    for i, item in ipairs(menu.submenus) do
-        widgets.menu_item_highlighted(row, i, item, i == selected_index)
-        row = row + 1
-    end
+    -- Submenu items (horizontal)
+    widgets.horizontal_menu(row, 1, menu.submenus, selected_index)
+    row = row + 1
     
     row = row + 2
     widgets.separator(row, 120)
     row = row + 1
     
-    term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
+    term.write_at(row, 1, "> USE ←→ ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
     
     return menu_start_row, menu.submenus
 end
@@ -314,12 +303,12 @@ local function handle_submenu_navigation(menu_index)
         if submenu_key == input.keys.Q then
             -- Return to main menu
             return true  -- needs_full_redraw
-        elseif submenu_key == input.keys.UP then
+        elseif submenu_key == input.keys.LEFT then
             submenu_index = submenu_index - 1
             if submenu_index < 1 then
                 submenu_index = num_submenu_options
             end
-        elseif submenu_key == input.keys.DOWN then
+        elseif submenu_key == input.keys.RIGHT then
             submenu_index = submenu_index + 1
             if submenu_index > num_submenu_options then
                 submenu_index = 1
@@ -378,12 +367,12 @@ local function main()
                 term.show_cursor()
                 print("Thank you for playing Shadow Fleet!")
                 break
-            elseif key == input.keys.UP then
+            elseif key == input.keys.LEFT then
                 selected_index = selected_index - 1
                 if selected_index < 1 then
                     selected_index = num_options
                 end
-            elseif key == input.keys.DOWN then
+            elseif key == input.keys.RIGHT then
                 selected_index = selected_index + 1
                 if selected_index > num_options then
                     selected_index = 1

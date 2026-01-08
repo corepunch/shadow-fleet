@@ -89,7 +89,7 @@ function widgets.menu_item(row, number, text)
     term.write_at(row, 2, ". " .. text, "fg_white")
 end
 
--- Widget: Menu item with highlight support
+-- Widget: Menu item with highlight support (vertical layout)
 function widgets.menu_item_highlighted(row, number, text, is_selected)
     local highlight_width = 60  -- Width of highlight background
     
@@ -110,6 +110,29 @@ function widgets.menu_item_highlighted(row, number, text, is_selected)
         term.write_colored(padding, "fg_white", "bg_black")
         term.reset()
     end
+end
+
+-- Widget: Horizontal menu items
+-- Renders menu items horizontally on a single row with 2-space padding between items
+function widgets.horizontal_menu(row, col, actions, selected_index)
+    term.write_at(row, col, "", "fg_white")  -- Position cursor
+    
+    for i, action in ipairs(actions) do
+        if i == selected_index then
+            -- Draw highlighted item
+            term.write_colored(action, "fg_bright_white", "bg_blue")
+        else
+            -- Draw unselected item
+            term.write_colored(action, "fg_white")
+        end
+        
+        -- Add 2-space padding between items (except after the last item)
+        if i < #actions then
+            term.write_colored("  ", "fg_white")
+        end
+    end
+    
+    term.reset()
 end
 
 -- Utility: Format number with thousands separator

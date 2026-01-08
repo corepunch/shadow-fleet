@@ -20,38 +20,40 @@ local function test_menu_rendering()
         "Help"
     }
     
-    -- Test that menu_item_highlighted function exists
+    -- Test that menu_item_highlighted function exists (vertical layout)
     assert(type(widgets.menu_item_highlighted) == "function", 
            "widgets.menu_item_highlighted should be a function")
     
     print("✓ menu_item_highlighted function exists")
+    
+    -- Test that horizontal_menu function exists
+    assert(type(widgets.horizontal_menu) == "function", 
+           "widgets.horizontal_menu should be a function")
+    
+    print("✓ horizontal_menu function exists")
     
     -- Test rendering with different selections
     term.init()
     term.clear()
     
     local row = 1
-    widgets.section_header(row, "TEST MENU WITH SELECTION 1")
+    widgets.section_header(row, "TEST HORIZONTAL MENU WITH SELECTION 1")
     row = row + 1
     
-    for i, action in ipairs(actions) do
-        widgets.menu_item_highlighted(row, i, action, i == 1)
-        row = row + 1
-    end
+    widgets.horizontal_menu(row, 1, actions, 1)
+    row = row + 1
     
-    print("✓ Menu rendered successfully with item 1 highlighted")
+    print("✓ Horizontal menu rendered successfully with item 1 highlighted")
     
     -- Test with different selection
     row = row + 2
-    widgets.section_header(row, "TEST MENU WITH SELECTION 5")
+    widgets.section_header(row, "TEST HORIZONTAL MENU WITH SELECTION 5")
     row = row + 1
     
-    for i, action in ipairs(actions) do
-        widgets.menu_item_highlighted(row, i, action, i == 5)
-        row = row + 1
-    end
+    widgets.horizontal_menu(row, 1, actions, 5)
+    row = row + 1
     
-    print("✓ Menu rendered successfully with item 5 highlighted")
+    print("✓ Horizontal menu rendered successfully with item 5 highlighted")
     
     term.cleanup()
 end
@@ -69,6 +71,8 @@ local function test_input_module()
     -- Test that key constants exist
     assert(input.keys.UP == "up", "UP key constant should exist")
     assert(input.keys.DOWN == "down", "DOWN key constant should exist")
+    assert(input.keys.LEFT == "left", "LEFT key constant should exist")
+    assert(input.keys.RIGHT == "right", "RIGHT key constant should exist")
     assert(input.keys.ENTER == "enter", "ENTER key constant should exist")
     assert(input.keys.Q == "q", "Q key constant should exist")
     print("✓ All key constants exist")
@@ -98,6 +102,7 @@ print("")
 print("The arrow key navigation system provides:")
 print("  • Arrow key detection (UP/DOWN/LEFT/RIGHT)")
 print("  • Enter key confirmation")
+print("  • Horizontal menu layout with 2-space padding")
 print("  • Highlighted menu items")
 print("  • Visual selection feedback")
 print("")
