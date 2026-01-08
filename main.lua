@@ -114,7 +114,7 @@ function sections.fleet_status(start_row)
         
         -- Risk column with color coding
         local risk_color = ship.risk == "None" and "fg_green" or 
-                          (ship.risk:match("LOW") and "fg_yellow" or "fg_bright_yellow")
+                          (ship.risk:match("LOW") or ship.risk:match("MED")) and "fg_yellow" or "fg_bright_yellow"
         term.write_at(row, 112, ship.risk, risk_color)
         
         row = row + 1
