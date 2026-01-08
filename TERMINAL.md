@@ -200,7 +200,7 @@ chmod +x terminal_demo.lua
 Run the test suite to verify functionality:
 
 ```bash
-lua5.3 test_terminal.lua
+lua5.3 tests/test_terminal.lua
 ```
 
 ## Compatibility
