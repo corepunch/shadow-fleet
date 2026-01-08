@@ -22,6 +22,7 @@ Features:
 - Predefined color schemes for common UI elements
 - Box drawing and text styling
 - Full ANSI escape code support
+- Keyboard input handling with arrow key support
 
 See [TERMINAL.md](TERMINAL.md) for complete documentation.
 
@@ -59,6 +60,12 @@ local game = gamestate.new()
 lua5.3 main.lua
 ```
 
+**Controls:**
+- Use ↑↓ arrow keys to navigate menu options
+- Press Enter to select an option
+- Press 'q' to quit
+- Numbers 1-8 also work for direct selection
+
 **Run demos:**
 ```bash
 lua5.3 terminal_demo.lua
@@ -69,3 +76,10 @@ lua5.3 game_ui_example.lua
 ```bash
 make test
 ```
+
+## Features
+
+- **Arrow Key Navigation** - Intuitive menu navigation using arrow keys (see [NAVIGATION.md](NAVIGATION.md))
+- **Visual Feedback** - Highlighted menu items with color-coded selection
+- **Terminal Framework** - Comprehensive ANSI terminal control
+- **Widget System** - Reusable UI components for building interfaces

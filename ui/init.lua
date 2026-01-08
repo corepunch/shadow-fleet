@@ -89,6 +89,29 @@ function widgets.menu_item(row, number, text)
     term.write_at(row, 2, ". " .. text, "fg_white")
 end
 
+-- Widget: Menu item with highlight support
+function widgets.menu_item_highlighted(row, number, text, is_selected)
+    local highlight_width = 60  -- Width of highlight background
+    
+    if is_selected then
+        -- Draw highlighted background
+        term.write_at(row, 1, "> ", "fg_bright_yellow")
+        term.write_at(row, 3, text, "fg_bright_white", "bg_blue")
+        -- Fill rest of line with background color for full highlight
+        local padding = string.rep(" ", highlight_width - #text)
+        term.write_colored(padding, "fg_white", "bg_blue")
+        term.reset()
+    else
+        -- Draw unselected item and clear to end of line
+        term.write_at(row, 1, "  ", "fg_white")
+        term.write_at(row, 3, text, "fg_white")
+        -- Fill rest of line with spaces to clear any previous highlight
+        local padding = string.rep(" ", highlight_width - #text)
+        term.write_colored(padding, "fg_white", "bg_black")
+        term.reset()
+    end
+end
+
 -- Utility: Format number with thousands separator
 function widgets.format_number(num)
     local formatted = tostring(num)

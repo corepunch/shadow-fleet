@@ -6,6 +6,7 @@
 local term = require("terminal")
 local gamestate = require("game")
 local widgets = require("ui")
+local input = require("terminal.input")
 
 -- Initialize game state
 local game = gamestate.new()
@@ -149,8 +150,8 @@ function sections.heat_meter_section(start_row)
 end
 
 -- Quick actions menu
-function sections.quick_actions(start_row)
-    widgets.section_header(start_row, "QUICK ACTIONS (Enter 1-8 or 'q' to quit)")
+function sections.quick_actions(start_row, selected_index)
+    widgets.section_header(start_row, "QUICK ACTIONS (Use ↑↓ arrows to select, Enter to confirm, 'q' to quit)")
     local row = start_row + 1
     
     local actions = {
@@ -165,15 +166,31 @@ function sections.quick_actions(start_row)
     }
     
     for i, action in ipairs(actions) do
-        widgets.menu_item(row, i, action)
+        widgets.menu_item_highlighted(row, i, action, i == selected_index)
         row = row + 1
     end
     
-    return row + 2
+    return row + 2, actions  -- Return actions list for partial updates
 end
 
--- Main dashboard render function
-local function render_dashboard()
+-- Update only specific menu items without full redraw
+function sections.update_menu_items(start_row, prev_index, new_index, actions)
+    local row = start_row + 1  -- Skip header
+    
+    -- Redraw the previously selected item (now unselected)
+    if prev_index and prev_index >= 1 and prev_index <= #actions then
+        widgets.menu_item_highlighted(row + prev_index - 1, prev_index, actions[prev_index], false)
+    end
+    
+    -- Redraw the newly selected item
+    if new_index >= 1 and new_index <= #actions then
+        widgets.menu_item_highlighted(row + new_index - 1, new_index, actions[new_index], true)
+    end
+end
+
+-- Main dashboard render function with selected menu index
+local function render_dashboard(selected_index)
+    selected_index = selected_index or 1
     term.clear()
     term.hide_cursor()
     
@@ -184,32 +201,101 @@ local function render_dashboard()
     row = sections.market_snapshot(row)
     row = sections.active_events(row)
     row = sections.heat_meter_section(row)
-    row = sections.quick_actions(row)
+    
+    local menu_start_row = row
+    row, actions = sections.quick_actions(row, selected_index)
     
     widgets.separator(row, 120)
     row = row + 1
     
-    term.write_at(row, 1, "> YOUR MOVE (1-8): ", "fg_bright_green")
-    term.show_cursor()
+    term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
+    
+    return menu_start_row, actions
 end
 
 -- Main game loop
 local function main()
-    while true do
-        render_dashboard()
-        local input = io.read()
+    local selected_index = 1
+    local num_options = 8
+    local menu_start_row = nil  -- Will be set after first render
+    local actions = nil  -- Will store menu actions list
+    
+    -- Set terminal to raw mode once before the loop
+    input.set_raw_mode()
+    
+    -- Use xpcall to ensure terminal is restored even on error
+    local function game_loop()
+        -- Initial full render
+        menu_start_row, actions = render_dashboard(selected_index)
         
-        if input == "q" or input == "Q" then
-            term.clear()
-            term.show_cursor()
-            print("Thank you for playing Shadow Fleet!")
-            break
-        elseif tonumber(input) and tonumber(input) >= 1 and tonumber(input) <= 8 then
-            term.clear()
-            print("Menu option " .. input .. " not yet implemented.")
-            print("Press Enter to return to dashboard...")
-            io.read()
+        while true do
+            local key = input.read_key()
+            local prev_index = selected_index
+            local needs_full_redraw = false
+            
+            if key == input.keys.Q then
+                term.clear()
+                term.show_cursor()
+                print("Thank you for playing Shadow Fleet!")
+                break
+            elseif key == input.keys.UP then
+                selected_index = selected_index - 1
+                if selected_index < 1 then
+                    selected_index = num_options
+                end
+            elseif key == input.keys.DOWN then
+                selected_index = selected_index + 1
+                if selected_index > num_options then
+                    selected_index = 1
+                end
+            elseif key == input.keys.ENTER then
+                -- Temporarily restore mode for submenu interaction
+                input.restore_mode()
+                term.clear()
+                term.show_cursor()
+                print("Menu option " .. selected_index .. " not yet implemented.")
+                print("Press Enter to return to dashboard...")
+                io.read()  -- Use regular read when not in raw mode
+                input.set_raw_mode()  -- Re-enable raw mode
+                needs_full_redraw = true
+            elseif key:match('[1-8]') then
+                -- Still support direct number input for convenience
+                selected_index = tonumber(key)
+                input.restore_mode()
+                term.clear()
+                term.show_cursor()
+                print("Menu option " .. selected_index .. " not yet implemented.")
+                print("Press Enter to return to dashboard...")
+                io.read()  -- Use regular read when not in raw mode
+                input.set_raw_mode()  -- Re-enable raw mode
+                needs_full_redraw = true
+            end
+            
+            -- Update display
+            if needs_full_redraw then
+                -- Full redraw after submenu
+                menu_start_row, actions = render_dashboard(selected_index)
+            elseif prev_index ~= selected_index then
+                -- Partial update for arrow key navigation
+                sections.update_menu_items(menu_start_row, prev_index, selected_index, actions)
+            end
         end
+    end
+    
+    local function error_handler(err)
+        -- Ensure terminal is restored on error
+        input.restore_mode()
+        term.cleanup()
+        return debug.traceback(err, 2)
+    end
+    
+    local success, err = xpcall(game_loop, error_handler)
+    
+    -- Always restore terminal mode on exit
+    input.restore_mode()
+    
+    if not success then
+        print("\nError occurred: " .. tostring(err))
     end
 end
 
