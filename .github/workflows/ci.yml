@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Lua 5.3
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lua5.3
+        
+    - name: Verify Lua installation
+      run: lua5.3 -v
+      
+    - name: Run tests
+      run: make test
