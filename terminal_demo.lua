@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/usr/bin/env lua5.3
 -- Terminal Framework Demo
 -- Demonstrates the capabilities of the terminal framework
 

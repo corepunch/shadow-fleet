@@ -1,9 +1,6 @@
 #!/usr/bin/env lua5.3
 -- Simple test to verify terminal.lua module works correctly
 
--- Set package path to find terminal.lua
-package.path = "/home/runner/work/shadow-fleet/shadow-fleet/?.lua;" .. package.path
-
 local terminal = require("terminal")
 
 print("Testing Terminal Framework...")

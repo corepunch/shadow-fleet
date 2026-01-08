@@ -240,7 +240,7 @@ function terminal.get_size()
         local result = handle:read("*a")
         handle:close()
         if result and result ~= "" then
-            width = tonumber(result)
+            width = tonumber(result) or width
         end
     end
     
@@ -249,7 +249,7 @@ function terminal.get_size()
         local result = handle:read("*a")
         handle:close()
         if result and result ~= "" then
-            height = tonumber(result)
+            height = tonumber(result) or height
         end
     end
     
