@@ -115,7 +115,7 @@ end
 -- Widget: Horizontal menu items
 -- Renders menu items horizontally on a single row with 2-space padding between items
 function widgets.horizontal_menu(row, col, actions, selected_index)
-    term.write_at(row, col, "", "fg_white")  -- Position cursor
+    term.move_to(row, col)  -- Position cursor
     
     for i, action in ipairs(actions) do
         if i == selected_index then
