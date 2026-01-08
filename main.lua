@@ -280,14 +280,31 @@ local function render_submenu(menu_index, selected_index)
     return menu_start_row, menu.submenus
 end
 
+-- Handle a submenu action selection (extracted to avoid duplication)
+local function handle_submenu_action(menu_index, submenu_index, submenu_actions)
+    local selected_action = submenu_actions[submenu_index]
+    if selected_action == "Back" then
+        -- Return to main menu
+        return true, nil, nil  -- should_exit, submenu_start_row, submenu_actions
+    else
+        -- Handle submenu action
+        input.restore_mode()
+        term.clear()
+        term.show_cursor()
+        print("Action '" .. selected_action .. "' not yet implemented.")
+        print("Press Enter to return to submenu...")
+        io.read()
+        input.set_raw_mode()
+        local submenu_start_row, new_submenu_actions = render_submenu(menu_index, submenu_index)
+        return false, submenu_start_row, new_submenu_actions  -- should_exit, submenu_start_row, submenu_actions
+    end
+end
+
 -- Handle submenu navigation (extracted to avoid duplication)
 local function handle_submenu_navigation(menu_index)
     local submenu_index = 1
-    local submenu_actions = menu_structure[menu_index].submenus
-    local num_submenu_options = #submenu_actions
-    local submenu_start_row
-    
-    submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
+    local num_submenu_options = #menu_structure[menu_index].submenus
+    local submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
     
     -- Submenu loop
     while true do
@@ -308,37 +325,23 @@ local function handle_submenu_navigation(menu_index)
                 submenu_index = 1
             end
         elseif submenu_key == input.keys.ENTER then
-            local selected_action = submenu_actions[submenu_index]
-            if selected_action == "Back" then
-                -- Return to main menu
+            local should_exit, new_start_row, new_actions = handle_submenu_action(menu_index, submenu_index, submenu_actions)
+            if should_exit then
                 return true  -- needs_full_redraw
             else
-                -- Handle submenu action
-                input.restore_mode()
-                term.clear()
-                term.show_cursor()
-                print("Action '" .. selected_action .. "' not yet implemented.")
-                print("Press Enter to return to submenu...")
-                io.read()
-                input.set_raw_mode()
-                submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
+                submenu_start_row = new_start_row
+                submenu_actions = new_actions
             end
         elseif submenu_key:match('[1-9]') then
             local num = tonumber(submenu_key)
             if num <= num_submenu_options then
                 submenu_index = num
-                local selected_action = submenu_actions[submenu_index]
-                if selected_action == "Back" then
+                local should_exit, new_start_row, new_actions = handle_submenu_action(menu_index, submenu_index, submenu_actions)
+                if should_exit then
                     return true  -- needs_full_redraw
                 else
-                    input.restore_mode()
-                    term.clear()
-                    term.show_cursor()
-                    print("Action '" .. selected_action .. "' not yet implemented.")
-                    print("Press Enter to return to submenu...")
-                    io.read()
-                    input.set_raw_mode()
-                    submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
+                    submenu_start_row = new_start_row
+                    submenu_actions = new_actions
                 end
             end
         end
