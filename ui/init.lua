@@ -68,7 +68,7 @@ function widgets.heat_meter(row, game)
     local heat = game.heat
     local max_heat = game.heat_max
     
-    term.write_at(row, 1, "[", "fg_white")
+    term.write_at(row, 3, "[", "fg_white")
     
     for i = 1, max_heat do
         if i <= heat then
@@ -79,14 +79,14 @@ function widgets.heat_meter(row, game)
     end
     
     term.write_colored("] " .. heat .. "/" .. max_heat, gamestate.get_heat_color(game))
-    term.write_at(row, 20, " - ", "fg_white")
-    term.write_at(row, 23, gamestate.get_heat_message(game), heat > 7 and "fg_bright_red" or "fg_white")
+    term.write_at(row, 25, " - ", "fg_white")
+    term.write_at(row, 28, gamestate.get_heat_message(game), heat > 7 and "fg_bright_red" or "fg_white")
 end
 
 -- Widget: Menu item
 function widgets.menu_item(row, number, text)
-    term.write_at(row, 1, tostring(number), "fg_bright_cyan")
-    term.write_at(row, 2, ". " .. text, "fg_white")
+    term.write_at(row, 3, tostring(number), "fg_bright_cyan")
+    term.write_at(row, 4, ". " .. text, "fg_white")
 end
 
 -- Utility: Format number with thousands separator
@@ -98,6 +98,41 @@ function widgets.format_number(num)
         if k == 0 then break end
     end
     return formatted
+end
+
+-- Widget: Information box with title and border
+-- Draws a box at specified position with title and returns the row where content should start
+function widgets.info_box(row, col, width, height, title, border_color)
+    border_color = border_color or "fg_cyan"
+    
+    -- Draw the box
+    term.draw_box(row, col, width, height, border_color, "bg_black")
+    
+    -- Draw title if provided
+    if title then
+        term.write_at(row, col + 2, "[ " .. title .. " ]", "fg_bright_white", "bg_black")
+    end
+    
+    -- Return the starting row for content (inside the box)
+    return row + 1
+end
+
+-- Widget: Stat box - displays a labeled value in a small box
+function widgets.stat_box(row, col, width, label, value, value_color, border_color)
+    border_color = border_color or "fg_white"
+    value_color = value_color or "fg_bright_white"
+    
+    -- Draw small box (3 rows tall)
+    term.draw_box(row, col, width, 3, border_color, "bg_black")
+    
+    -- Draw label centered on first line
+    local label_padding = math.floor((width - #label - 2) / 2)
+    term.write_at(row + 1, col + 1 + label_padding, label, "fg_white", "bg_black")
+    
+    -- Draw value centered on second line
+    local value_str = tostring(value)
+    local value_padding = math.floor((width - #value_str - 2) / 2)
+    term.write_at(row + 2, col + 1 + value_padding, value_str, value_color, "bg_black")
 end
 
 return widgets
