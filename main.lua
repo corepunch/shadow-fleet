@@ -280,6 +280,76 @@ local function render_submenu(menu_index, selected_index)
     return menu_start_row, menu.submenus
 end
 
+-- Handle submenu navigation (extracted to avoid duplication)
+local function handle_submenu_navigation(menu_index)
+    local submenu_index = 1
+    local submenu_actions = menu_structure[menu_index].submenus
+    local num_submenu_options = #submenu_actions
+    local submenu_start_row
+    
+    submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
+    
+    -- Submenu loop
+    while true do
+        local submenu_key = input.read_key()
+        local prev_submenu_index = submenu_index
+        
+        if submenu_key == input.keys.Q then
+            -- Return to main menu
+            return true  -- needs_full_redraw
+        elseif submenu_key == input.keys.UP then
+            submenu_index = submenu_index - 1
+            if submenu_index < 1 then
+                submenu_index = num_submenu_options
+            end
+        elseif submenu_key == input.keys.DOWN then
+            submenu_index = submenu_index + 1
+            if submenu_index > num_submenu_options then
+                submenu_index = 1
+            end
+        elseif submenu_key == input.keys.ENTER then
+            local selected_action = submenu_actions[submenu_index]
+            if selected_action == "Back" then
+                -- Return to main menu
+                return true  -- needs_full_redraw
+            else
+                -- Handle submenu action
+                input.restore_mode()
+                term.clear()
+                term.show_cursor()
+                print("Action '" .. selected_action .. "' not yet implemented.")
+                print("Press Enter to return to submenu...")
+                io.read()
+                input.set_raw_mode()
+                submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
+            end
+        elseif submenu_key:match('[1-9]') then
+            local num = tonumber(submenu_key)
+            if num <= num_submenu_options then
+                submenu_index = num
+                local selected_action = submenu_actions[submenu_index]
+                if selected_action == "Back" then
+                    return true  -- needs_full_redraw
+                else
+                    input.restore_mode()
+                    term.clear()
+                    term.show_cursor()
+                    print("Action '" .. selected_action .. "' not yet implemented.")
+                    print("Press Enter to return to submenu...")
+                    io.read()
+                    input.set_raw_mode()
+                    submenu_start_row, submenu_actions = render_submenu(menu_index, submenu_index)
+                end
+            end
+        end
+        
+        -- Update submenu display
+        if prev_submenu_index ~= submenu_index then
+            sections.update_menu_items(submenu_start_row, prev_submenu_index, submenu_index, submenu_actions)
+        end
+    end
+end
+
 -- Main game loop
 local function main()
     local selected_index = 1
@@ -317,144 +387,12 @@ local function main()
                 end
             elseif key == input.keys.ENTER then
                 -- Enter submenu
-                local submenu_index = 1
-                local submenu_actions = menu_structure[selected_index].submenus
-                local num_submenu_options = #submenu_actions
-                local submenu_start_row
-                
-                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
-                
-                -- Submenu loop
-                while true do
-                    local submenu_key = input.read_key()
-                    local prev_submenu_index = submenu_index
-                    
-                    if submenu_key == input.keys.Q then
-                        -- Return to main menu
-                        needs_full_redraw = true
-                        break
-                    elseif submenu_key == input.keys.UP then
-                        submenu_index = submenu_index - 1
-                        if submenu_index < 1 then
-                            submenu_index = num_submenu_options
-                        end
-                    elseif submenu_key == input.keys.DOWN then
-                        submenu_index = submenu_index + 1
-                        if submenu_index > num_submenu_options then
-                            submenu_index = 1
-                        end
-                    elseif submenu_key == input.keys.ENTER then
-                        local selected_action = submenu_actions[submenu_index]
-                        if selected_action == "Back" then
-                            -- Return to main menu
-                            needs_full_redraw = true
-                            break
-                        else
-                            -- Handle submenu action
-                            input.restore_mode()
-                            term.clear()
-                            term.show_cursor()
-                            print("Action '" .. selected_action .. "' not yet implemented.")
-                            print("Press Enter to return to submenu...")
-                            io.read()
-                            input.set_raw_mode()
-                            submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
-                        end
-                    elseif submenu_key:match('[1-9]') then
-                        local num = tonumber(submenu_key)
-                        if num <= num_submenu_options then
-                            submenu_index = num
-                            local selected_action = submenu_actions[submenu_index]
-                            if selected_action == "Back" then
-                                needs_full_redraw = true
-                                break
-                            else
-                                input.restore_mode()
-                                term.clear()
-                                term.show_cursor()
-                                print("Action '" .. selected_action .. "' not yet implemented.")
-                                print("Press Enter to return to submenu...")
-                                io.read()
-                                input.set_raw_mode()
-                                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
-                            end
-                        end
-                    end
-                    
-                    -- Update submenu display
-                    if prev_submenu_index ~= submenu_index then
-                        sections.update_menu_items(submenu_start_row, prev_submenu_index, submenu_index, submenu_actions)
-                    end
-                end
+                needs_full_redraw = handle_submenu_navigation(selected_index)
             elseif key:match('[1-8]') then
                 -- Still support direct number input for convenience
                 selected_index = tonumber(key)
                 -- Enter submenu directly
-                local submenu_index = 1
-                local submenu_actions = menu_structure[selected_index].submenus
-                local num_submenu_options = #submenu_actions
-                local submenu_start_row
-                
-                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
-                
-                -- Submenu loop (same as above)
-                while true do
-                    local submenu_key = input.read_key()
-                    local prev_submenu_index = submenu_index
-                    
-                    if submenu_key == input.keys.Q then
-                        needs_full_redraw = true
-                        break
-                    elseif submenu_key == input.keys.UP then
-                        submenu_index = submenu_index - 1
-                        if submenu_index < 1 then
-                            submenu_index = num_submenu_options
-                        end
-                    elseif submenu_key == input.keys.DOWN then
-                        submenu_index = submenu_index + 1
-                        if submenu_index > num_submenu_options then
-                            submenu_index = 1
-                        end
-                    elseif submenu_key == input.keys.ENTER then
-                        local selected_action = submenu_actions[submenu_index]
-                        if selected_action == "Back" then
-                            needs_full_redraw = true
-                            break
-                        else
-                            input.restore_mode()
-                            term.clear()
-                            term.show_cursor()
-                            print("Action '" .. selected_action .. "' not yet implemented.")
-                            print("Press Enter to return to submenu...")
-                            io.read()
-                            input.set_raw_mode()
-                            submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
-                        end
-                    elseif submenu_key:match('[1-9]') then
-                        local num = tonumber(submenu_key)
-                        if num <= num_submenu_options then
-                            submenu_index = num
-                            local selected_action = submenu_actions[submenu_index]
-                            if selected_action == "Back" then
-                                needs_full_redraw = true
-                                break
-                            else
-                                input.restore_mode()
-                                term.clear()
-                                term.show_cursor()
-                                print("Action '" .. selected_action .. "' not yet implemented.")
-                                print("Press Enter to return to submenu...")
-                                io.read()
-                                input.set_raw_mode()
-                                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
-                            end
-                        end
-                    end
-                    
-                    if prev_submenu_index ~= submenu_index then
-                        sections.update_menu_items(submenu_start_row, prev_submenu_index, submenu_index, submenu_actions)
-                    end
-                end
+                needs_full_redraw = handle_submenu_navigation(selected_index)
             end
             
             -- Update display
