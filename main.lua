@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/usr/bin/env lua5.3
 
 -- Shadow Fleet - Text-based Strategy Game
 -- Main screen dashboard
