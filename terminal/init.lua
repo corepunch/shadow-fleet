@@ -193,8 +193,10 @@ function terminal.set_style(style)
 end
 
 -- Reset all colors and styles
+-- Explicitly sets black background to avoid terminal default (white on some systems)
 function terminal.reset()
     io.write(CSI .. "0m")
+    terminal.set_bg("bg_black")
     io.flush()
 end
 
@@ -216,6 +218,9 @@ end
 
 -- Write colored text at current position
 function terminal.write_colored(text, fg, bg)
+    -- Default to black background if not specified
+    bg = bg or "bg_black"
+    
     if fg or bg then
         if fg and bg then
             terminal.set_colors(fg, bg)
