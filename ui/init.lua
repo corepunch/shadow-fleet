@@ -125,13 +125,13 @@ function widgets.stat_box(row, col, width, label, value, value_color, border_col
     -- Draw small box (3 rows tall)
     term.draw_box(row, col, width, 3, border_color, "bg_black")
     
-    -- Draw label centered on first line
-    local label_padding = math.floor((width - #label - 2) / 2)
+    -- Draw label centered on first line (ensure non-negative padding)
+    local label_padding = math.max(0, math.floor((width - #label - 2) / 2))
     term.write_at(row + 1, col + 1 + label_padding, label, "fg_white", "bg_black")
     
-    -- Draw value centered on second line
+    -- Draw value centered on second line (ensure non-negative padding)
     local value_str = tostring(value)
-    local value_padding = math.floor((width - #value_str - 2) / 2)
+    local value_padding = math.max(0, math.floor((width - #value_str - 2) / 2))
     term.write_at(row + 2, col + 1 + value_padding, value_str, value_color, "bg_black")
 end
 

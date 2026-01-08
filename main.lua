@@ -44,8 +44,7 @@ function sections.status_line(start_row)
     term.write_colored(heat_desc, gamestate.get_heat_color(game))
     
     row = row + 1
-    term.write_at(row, 3, "", "fg_white")
-    term.write_colored(game.location, "fg_bright_cyan")
+    term.write_at(row, 3, game.location, "fg_bright_cyan")
     term.write_colored(" - " .. game.date .. " | Rubles: ", "fg_white")
     term.write_colored(widgets.format_number(game.rubles), "fg_bright_yellow")
     term.write_colored(" | Oil Stock: ", "fg_white")
@@ -144,16 +143,22 @@ end
 
 -- Active events section
 function sections.active_events(start_row)
-    local box_height = 3 + #game.events
+    -- Ensure minimum height for box even if no events
+    local num_events = math.max(#game.events, 1)
+    local box_height = 3 + num_events
     local box_width = 120
     local row = widgets.info_box(start_row, 1, box_width, box_height, "ACTIVE EVENTS", "fg_magenta")
     
-    for _, event in ipairs(game.events) do
-        term.write_at(row, 3, "• ", "fg_white")
-        local event_color = event.type == "Pending" and "fg_yellow" or "fg_green"
-        term.write_colored(event.type, event_color)
-        term.write_colored(": " .. event.description, "fg_white")
-        row = row + 1
+    if #game.events == 0 then
+        term.write_at(row, 3, "(No active events)", "fg_white")
+    else
+        for _, event in ipairs(game.events) do
+            term.write_at(row, 3, "• ", "fg_white")
+            local event_color = event.type == "Pending" and "fg_yellow" or "fg_green"
+            term.write_colored(event.type, event_color)
+            term.write_colored(": " .. event.description, "fg_white")
+            row = row + 1
+        end
     end
     
     return start_row + box_height + 1
