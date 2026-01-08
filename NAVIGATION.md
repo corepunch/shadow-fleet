@@ -4,7 +4,7 @@ This document describes the arrow key navigation feature added to Shadow Fleet.
 
 ## Overview
 
-The game now supports arrow key navigation for the main menu, replacing the previous numeric input system. Users can now use ↑↓ arrow keys to navigate through menu options and press Enter to confirm their selection.
+The game now supports arrow key navigation for the main menu, replacing the previous numeric input system. Users can now use ←→ arrow keys to navigate through horizontally-displayed menu options and press Enter to confirm their selection.
 
 ## Changes Made
 
@@ -33,13 +33,17 @@ A new module was created to handle raw keyboard input, including arrow keys:
 
 ### 2. Enhanced UI Widget (`ui/init.lua`)
 
-Added a new widget function for rendering menu items with highlight support:
+Added new widget functions for rendering menu items with highlight support:
 
-**New Function:**
-- `widgets.menu_item_highlighted(row, number, text, is_selected)` - Renders a menu item with visual highlighting when selected
+**New Functions:**
+- `widgets.menu_item_highlighted(row, number, text, is_selected)` - Renders a vertical menu item with visual highlighting when selected
   - Displays a `>` marker for selected items
   - Uses blue background for highlighted items
   - Uses bright yellow/white text for better visibility
+- `widgets.horizontal_menu(row, col, actions, selected_index)` - Renders menu items horizontally on a single row
+  - Uses exactly 2 spaces of padding between items
+  - Highlights selected item with blue background
+  - Displays all menu items on one line
 
 ### 3. Updated Main Game Loop (`main.lua`)
 
@@ -50,11 +54,11 @@ Modified the main game loop to support arrow key navigation:
 - Uses `xpcall` with error handler to ensure `input.restore_mode()` is always called
 - Added `selected_index` variable to track current menu selection
 - Updated `render_dashboard()` to accept and display the selected menu item
-- Modified `sections.quick_actions()` to render items with highlighting
+- Modified `sections.quick_actions()` to render items horizontally with highlighting
 - Replaced `io.read()` with `input.read_key()` for keyboard input
-- Added arrow key handling (UP/DOWN to navigate, ENTER to select)
+- Added arrow key handling (LEFT/RIGHT to navigate, ENTER to select)
 - Maintains backward compatibility with numeric keys (1-8)
-- Updated menu header text to indicate arrow key usage
+- Updated menu header text to indicate horizontal arrow key usage
 - Temporarily restores normal mode for submenu interactions
 
 ### 4. New Test Suite (`tests/test_navigation.lua`)
@@ -63,8 +67,9 @@ Added comprehensive tests for the navigation system:
 
 **Tests:**
 - Input module loading and function existence
-- Key constant definitions
-- Menu rendering with different selections
+- Key constant definitions (UP, DOWN, LEFT, RIGHT)
+- Horizontal menu rendering with different selections
+- Horizontal menu widget functionality
 - Highlighted menu item widget functionality
 
 ## Usage
@@ -72,16 +77,17 @@ Added comprehensive tests for the navigation system:
 ### For Players
 
 **Navigation:**
-1. Use ↑ (Up Arrow) to move to the previous menu item
-2. Use ↓ (Down Arrow) to move to the next menu item
+1. Use ← (Left Arrow) to move to the previous menu item
+2. Use → (Right Arrow) to move to the next menu item
 3. Press Enter to select the highlighted option
 4. Press 'q' to quit the game
 5. (Optional) Still works with numeric keys 1-8 for direct selection
 
 **Visual Feedback:**
+- Menu items are displayed horizontally with 2-space padding between them
 - Selected menu items are highlighted with:
-  - A `>` marker on the left
   - Blue background
+  - Bright white text
   - Bright yellow/white text
 
 ### For Developers
@@ -97,10 +103,10 @@ input.set_raw_mode()
 local function main_loop()
     while true do
         local key = input.read_key()  -- No overhead, reads immediately
-        if key == input.keys.UP then
-            -- Handle up arrow
-        elseif key == input.keys.DOWN then
-            -- Handle down arrow
+        if key == input.keys.LEFT then
+            -- Handle left arrow (previous item)
+        elseif key == input.keys.RIGHT then
+            -- Handle right arrow (next item)
         elseif key == input.keys.ENTER then
             -- Handle enter
         elseif key == input.keys.Q then
@@ -118,11 +124,22 @@ xpcall(main_loop, error_handler)
 input.restore_mode()  -- Restore on normal exit
 ```
 
-**Using the Highlighted Menu Widget:**
+**Using the Horizontal Menu Widget:**
 ```lua
 local widgets = require("ui")
 
--- Render menu items with item 3 highlighted
+-- Render horizontal menu with item 3 highlighted
+local actions = {"Fleet", "Route", "Trade", "Evade", "Events", "Market", "Status", "Help"}
+widgets.horizontal_menu(row, 1, actions, 3)
+-- Result: "Fleet  Route  Trade  Evade  Events  Market  Status  Help"
+--         (with "Trade" highlighted in blue background)
+```
+
+**Using the Vertical Menu Widget:**
+```lua
+local widgets = require("ui")
+
+-- Render menu items vertically with item 3 highlighted
 for i = 1, 8 do
     widgets.menu_item_highlighted(row, i, "Menu Item " .. i, i == 3)
     row = row + 1
@@ -150,12 +167,12 @@ This allows:
 
 To eliminate screen flicker/blinking during arrow key navigation:
 - Full screen clear and redraw only happens on initial render or after submenu interactions
-- Arrow key navigation uses **partial updates** - only the changed menu items are redrawn
+- Arrow key navigation uses **partial updates** - for horizontal menus, the entire menu line is redrawn
 - This provides smooth, flicker-free navigation with instant visual feedback
 
 **Implementation:**
 - `render_dashboard()` returns the menu position and actions list
-- `update_menu_items()` redraws only the previously selected and newly selected items
+- `update_menu_items()` redraws the entire horizontal menu line with the new selection
 - No `term.clear()` is called during normal arrow key navigation
 
 ### Arrow Key Detection
@@ -171,8 +188,8 @@ The input module properly detects these sequences and returns user-friendly key 
 ### Menu Selection Wrapping
 
 The menu selection wraps around:
-- Pressing ↑ on the first item moves to the last item
-- Pressing ↓ on the last item moves to the first item
+- Pressing ← on the first item moves to the last item
+- Pressing → on the last item moves to the first item
 
 This provides a smooth, circular navigation experience.
 
@@ -193,6 +210,6 @@ lua5.3 tests/test_navigation.lua
 Possible improvements for the navigation system:
 - Add support for Page Up/Page Down for faster navigation
 - Add support for Home/End keys to jump to first/last item
-- Add visual scroll indicators for long menus
-- Support horizontal navigation for multi-column menus
+- Add visual scroll indicators for very long menus
 - Add keyboard shortcuts (e.g., 'f' for Fleet)
+- Support multi-line horizontal menus for many items
