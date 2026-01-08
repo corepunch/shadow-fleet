@@ -218,7 +218,7 @@ function sections.update_menu_items(start_row, prev_index, new_index, actions)
     end
 end
 
--- Main dashboard render function with selected menu index (without fleet status)
+-- Main dashboard render function with selected menu index
 local function render_dashboard(selected_index)
     selected_index = selected_index or 1
     term.clear()
@@ -227,7 +227,6 @@ local function render_dashboard(selected_index)
     local row = 1
     row = sections.header(row)
     row = sections.status_line(row)
-    -- Fleet status removed from main menu, will be shown in Fleet submenu
     row = sections.market_snapshot(row)
     row = sections.active_events(row)
     row = sections.heat_meter_section(row)
@@ -281,11 +280,12 @@ local function render_submenu(menu_index, selected_index)
 end
 
 -- Handle a submenu action selection (extracted to avoid duplication)
+-- Returns: should_exit (boolean), submenu_start_row (number or nil), submenu_actions (table or nil)
 local function handle_submenu_action(menu_index, submenu_index, submenu_actions)
     local selected_action = submenu_actions[submenu_index]
     if selected_action == "Back" then
         -- Return to main menu
-        return true, nil, nil  -- should_exit, submenu_start_row, submenu_actions
+        return true
     else
         -- Handle submenu action
         input.restore_mode()
@@ -296,7 +296,7 @@ local function handle_submenu_action(menu_index, submenu_index, submenu_actions)
         io.read()
         input.set_raw_mode()
         local submenu_start_row, new_submenu_actions = render_submenu(menu_index, submenu_index)
-        return false, submenu_start_row, new_submenu_actions  -- should_exit, submenu_start_row, submenu_actions
+        return false, submenu_start_row, new_submenu_actions
     end
 end
 
