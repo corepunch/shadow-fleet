@@ -4,63 +4,10 @@
 -- Main screen dashboard with widget-based UI
 
 local term = require("terminal")
+local gamestate = require("gamestate")
 
--- Game state
-local game = {
-    location = "Moscow Safehouse",
-    date = "Jan 08, 2026",
-    rubles = 5000000,
-    oil_stock = 0,
-    heat = 0,
-    heat_max = 10,
-    
-    fleet = {
-        {
-            name = "GHOST-01",
-            age = 22,
-            hull = 65,
-            fuel = 80,
-            status = "Docked",
-            location = "Ust-Luga (RU)",
-            cargo = "Empty",
-            route = "Idle",
-            risk = "None"
-        },
-        {
-            name = "SHADOW-03",
-            age = 18,
-            hull = 72,
-            fuel = 45,
-            status = "At Sea",
-            location = nil,
-            cargo = "500k bbls Crude",
-            route = "Ust-Luga -> STS off Malta",
-            eta = "2 days",
-            risk = "MED (AIS Spoof Active)"
-        }
-    },
-    
-    market = {
-        crude_price_cap = 60,
-        shadow_markup_percent = 25,
-        shadow_price = 75,
-        demand = "HIGH",
-        baltic_exports = 4.1,
-        sanctions_alert = "EU Patrols Up 15%",
-        news = "NATO eyes 92 new blacklisted hulls. Stay dark, comrades."
-    },
-    
-    events = {
-        {
-            type = "Pending",
-            description = "Crew Mutiny Risk on GHOST-01 (Resolve? Y/N)"
-        },
-        {
-            type = "Opportunity",
-            description = "Shady Auction - Buy \"RUST-07\" (Age 28y, 1M bbls cap) for 2M Rubles?"
-        }
-    }
-}
+-- Initialize game state
+local game = gamestate.new()
 
 -- UI Widgets Module
 local widgets = {}
@@ -134,8 +81,10 @@ function widgets.percentage_bar(row, col, label, value, max_value)
 end
 
 -- Widget: Heat meter
-function widgets.heat_meter(row, heat, max_heat)
-    local bar_length = max_heat
+function widgets.heat_meter(row, game)
+    local heat = game.heat
+    local max_heat = game.heat_max
+    
     term.write_at(row, 1, "[", "fg_white")
     
     for i = 1, max_heat do
@@ -146,29 +95,9 @@ function widgets.heat_meter(row, heat, max_heat)
         end
     end
     
-    local heat_color
-    if heat == 0 then
-        heat_color = "fg_green"
-    elseif heat <= 3 then
-        heat_color = "fg_yellow"
-    elseif heat <= 7 then
-        heat_color = "fg_bright_yellow"
-    else
-        heat_color = "fg_red"
-    end
-    
-    term.write_colored("] " .. heat .. "/" .. max_heat, heat_color)
+    term.write_colored("] " .. heat .. "/" .. max_heat, gamestate.get_heat_color(game))
     term.write_at(row, 20, " - ", "fg_white")
-    
-    if heat == 0 then
-        term.write_at(row, 23, "No eyes on you yet. One slip, and drones swarm.", "fg_white")
-    elseif heat <= 3 then
-        term.write_at(row, 23, "Low profile. Keep it that way.", "fg_white")
-    elseif heat <= 7 then
-        term.write_at(row, 23, "Authorities are watching. Lay low.", "fg_white")
-    else
-        term.write_at(row, 23, "DANGER! Active pursuit in progress!", "fg_bright_red")
-    end
+    term.write_at(row, 23, gamestate.get_heat_message(game), heat > 7 and "fg_bright_red" or "fg_white")
 end
 
 -- Widget: Menu item
@@ -190,13 +119,13 @@ end
 
 -- Status line
 function sections.status_line(start_row)
-    local heat_desc = game.heat == 0 and "LOW (0/10)" or "MEDIUM (" .. game.heat .. "/10)"
+    local heat_desc = gamestate.get_heat_description(game)
     term.write_at(start_row, 1, "[", "fg_white")
     term.write_colored("Dark Terminal v0.1", "fg_cyan")
     term.write_colored("] - ", "fg_white")
     term.write_colored("Rogue Operator Mode", "fg_yellow")
     term.write_colored(" | Heat: ", "fg_white")
-    term.write_colored(heat_desc, game.heat == 0 and "fg_green" or "fg_yellow")
+    term.write_colored(heat_desc, gamestate.get_heat_color(game))
     
     start_row = start_row + 1
     term.write_colored(game.location, "fg_bright_cyan")
@@ -254,15 +183,11 @@ function sections.fleet_status(start_row)
     end
     
     row = row + 1
-    local total_age = 0
-    for _, ship in ipairs(game.fleet) do
-        total_age = total_age + ship.age
-    end
-    local avg_age = #game.fleet > 0 and math.floor(total_age / #game.fleet) or 0
+    local stats = gamestate.get_fleet_stats(game)
     
     term.write_at(row, 1, "Total Fleet: ", "fg_white")
-    term.write_colored(#game.fleet .. "/50", "fg_bright_white")
-    term.write_colored(" | Avg Age: " .. avg_age .. "y | Uninsured Losses: 0", "fg_white")
+    term.write_colored(stats.total .. "/" .. stats.max, "fg_bright_white")
+    term.write_colored(" | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses, "fg_white")
     
     return row + 2
 end
@@ -315,7 +240,7 @@ end
 -- Heat meter section
 function sections.heat_meter_section(start_row)
     widgets.section_header(start_row, "HEAT METER")
-    widgets.heat_meter(start_row + 1, game.heat, game.heat_max)
+    widgets.heat_meter(start_row + 1, game)
     return start_row + 3
 end
 
