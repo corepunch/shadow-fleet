@@ -10,14 +10,14 @@ local function test_menu_rendering()
     print("Testing menu item highlighting...")
     
     local actions = {
-        "Fleet (View/Buy/Upgrade/Scrap)",
-        "Route (Plot Ghost Path/Load Cargo)",
-        "Trade (Sell/Launder Oil)",
-        "Evade (Spoof AIS/Flag Swap/Bribe)",
-        "Events (Resolve Pending Dilemmas)",
-        "Market (Check Prices/Speculate/Auction Dive)",
-        "Status (Quick Recap/News Refresh)",
-        "Help (Command Details)"
+        "Fleet",
+        "Route",
+        "Trade",
+        "Evade",
+        "Events",
+        "Market",
+        "Status",
+        "Help"
     }
     
     -- Test that menu_item_highlighted function exists

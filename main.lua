@@ -149,21 +149,51 @@ function sections.heat_meter_section(start_row)
     return start_row + 3
 end
 
+-- Menu structure with submenus
+local menu_structure = {
+    {
+        name = "Fleet",
+        submenus = {"View", "Buy", "Upgrade", "Scrap", "Back"}
+    },
+    {
+        name = "Route",
+        submenus = {"Plot Ghost Path", "Load Cargo", "Back"}
+    },
+    {
+        name = "Trade",
+        submenus = {"Sell", "Launder Oil", "Back"}
+    },
+    {
+        name = "Evade",
+        submenus = {"Spoof AIS", "Flag Swap", "Bribe", "Back"}
+    },
+    {
+        name = "Events",
+        submenus = {"Resolve Pending Dilemmas", "Back"}
+    },
+    {
+        name = "Market",
+        submenus = {"Check Prices", "Speculate", "Auction Dive", "Back"}
+    },
+    {
+        name = "Status",
+        submenus = {"Quick Recap", "News Refresh", "Back"}
+    },
+    {
+        name = "Help",
+        submenus = {"Command Details", "Back"}
+    }
+}
+
 -- Quick actions menu
 function sections.quick_actions(start_row, selected_index)
     widgets.section_header(start_row, "QUICK ACTIONS (Use ↑↓ arrows to select, Enter to confirm, 'q' to quit)")
     local row = start_row + 1
     
-    local actions = {
-        "Fleet (View/Buy/Upgrade/Scrap)",
-        "Route (Plot Ghost Path/Load Cargo)",
-        "Trade (Sell/Launder Oil)",
-        "Evade (Spoof AIS/Flag Swap/Bribe)",
-        "Events (Resolve Pending Dilemmas)",
-        "Market (Check Prices/Speculate/Auction Dive)",
-        "Status (Quick Recap/News Refresh)",
-        "Help (Command Details)"
-    }
+    local actions = {}
+    for _, menu in ipairs(menu_structure) do
+        table.insert(actions, menu.name)
+    end
     
     for i, action in ipairs(actions) do
         widgets.menu_item_highlighted(row, i, action, i == selected_index)
@@ -188,7 +218,7 @@ function sections.update_menu_items(start_row, prev_index, new_index, actions)
     end
 end
 
--- Main dashboard render function with selected menu index
+-- Main dashboard render function with selected menu index (without fleet status)
 local function render_dashboard(selected_index)
     selected_index = selected_index or 1
     term.clear()
@@ -197,7 +227,7 @@ local function render_dashboard(selected_index)
     local row = 1
     row = sections.header(row)
     row = sections.status_line(row)
-    row = sections.fleet_status(row)
+    -- Fleet status removed from main menu, will be shown in Fleet submenu
     row = sections.market_snapshot(row)
     row = sections.active_events(row)
     row = sections.heat_meter_section(row)
@@ -211,6 +241,43 @@ local function render_dashboard(selected_index)
     term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
     
     return menu_start_row, actions
+end
+
+-- Render submenu screen
+local function render_submenu(menu_index, selected_index)
+    selected_index = selected_index or 1
+    term.clear()
+    term.hide_cursor()
+    
+    local menu = menu_structure[menu_index]
+    local row = 1
+    
+    row = sections.header(row)
+    row = sections.status_line(row)
+    
+    -- Show fleet status only in Fleet submenu
+    if menu.name == "Fleet" then
+        row = sections.fleet_status(row)
+    end
+    
+    -- Submenu header
+    widgets.section_header(row, menu.name:upper() .. " MENU (Use ↑↓ arrows to select, Enter to confirm)")
+    row = row + 1
+    
+    -- Submenu items
+    local menu_start_row = row
+    for i, item in ipairs(menu.submenus) do
+        widgets.menu_item_highlighted(row, i, item, i == selected_index)
+        row = row + 1
+    end
+    
+    row = row + 2
+    widgets.separator(row, 120)
+    row = row + 1
+    
+    term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
+    
+    return menu_start_row, menu.submenus
 end
 
 -- Main game loop
@@ -249,26 +316,145 @@ local function main()
                     selected_index = 1
                 end
             elseif key == input.keys.ENTER then
-                -- Temporarily restore mode for submenu interaction
-                input.restore_mode()
-                term.clear()
-                term.show_cursor()
-                print("Menu option " .. selected_index .. " not yet implemented.")
-                print("Press Enter to return to dashboard...")
-                io.read()  -- Use regular read when not in raw mode
-                input.set_raw_mode()  -- Re-enable raw mode
-                needs_full_redraw = true
+                -- Enter submenu
+                local submenu_index = 1
+                local submenu_actions = menu_structure[selected_index].submenus
+                local num_submenu_options = #submenu_actions
+                local submenu_start_row
+                
+                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
+                
+                -- Submenu loop
+                while true do
+                    local submenu_key = input.read_key()
+                    local prev_submenu_index = submenu_index
+                    
+                    if submenu_key == input.keys.Q then
+                        -- Return to main menu
+                        needs_full_redraw = true
+                        break
+                    elseif submenu_key == input.keys.UP then
+                        submenu_index = submenu_index - 1
+                        if submenu_index < 1 then
+                            submenu_index = num_submenu_options
+                        end
+                    elseif submenu_key == input.keys.DOWN then
+                        submenu_index = submenu_index + 1
+                        if submenu_index > num_submenu_options then
+                            submenu_index = 1
+                        end
+                    elseif submenu_key == input.keys.ENTER then
+                        local selected_action = submenu_actions[submenu_index]
+                        if selected_action == "Back" then
+                            -- Return to main menu
+                            needs_full_redraw = true
+                            break
+                        else
+                            -- Handle submenu action
+                            input.restore_mode()
+                            term.clear()
+                            term.show_cursor()
+                            print("Action '" .. selected_action .. "' not yet implemented.")
+                            print("Press Enter to return to submenu...")
+                            io.read()
+                            input.set_raw_mode()
+                            submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
+                        end
+                    elseif submenu_key:match('[1-9]') then
+                        local num = tonumber(submenu_key)
+                        if num <= num_submenu_options then
+                            submenu_index = num
+                            local selected_action = submenu_actions[submenu_index]
+                            if selected_action == "Back" then
+                                needs_full_redraw = true
+                                break
+                            else
+                                input.restore_mode()
+                                term.clear()
+                                term.show_cursor()
+                                print("Action '" .. selected_action .. "' not yet implemented.")
+                                print("Press Enter to return to submenu...")
+                                io.read()
+                                input.set_raw_mode()
+                                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
+                            end
+                        end
+                    end
+                    
+                    -- Update submenu display
+                    if prev_submenu_index ~= submenu_index then
+                        sections.update_menu_items(submenu_start_row, prev_submenu_index, submenu_index, submenu_actions)
+                    end
+                end
             elseif key:match('[1-8]') then
                 -- Still support direct number input for convenience
                 selected_index = tonumber(key)
-                input.restore_mode()
-                term.clear()
-                term.show_cursor()
-                print("Menu option " .. selected_index .. " not yet implemented.")
-                print("Press Enter to return to dashboard...")
-                io.read()  -- Use regular read when not in raw mode
-                input.set_raw_mode()  -- Re-enable raw mode
-                needs_full_redraw = true
+                -- Enter submenu directly
+                local submenu_index = 1
+                local submenu_actions = menu_structure[selected_index].submenus
+                local num_submenu_options = #submenu_actions
+                local submenu_start_row
+                
+                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
+                
+                -- Submenu loop (same as above)
+                while true do
+                    local submenu_key = input.read_key()
+                    local prev_submenu_index = submenu_index
+                    
+                    if submenu_key == input.keys.Q then
+                        needs_full_redraw = true
+                        break
+                    elseif submenu_key == input.keys.UP then
+                        submenu_index = submenu_index - 1
+                        if submenu_index < 1 then
+                            submenu_index = num_submenu_options
+                        end
+                    elseif submenu_key == input.keys.DOWN then
+                        submenu_index = submenu_index + 1
+                        if submenu_index > num_submenu_options then
+                            submenu_index = 1
+                        end
+                    elseif submenu_key == input.keys.ENTER then
+                        local selected_action = submenu_actions[submenu_index]
+                        if selected_action == "Back" then
+                            needs_full_redraw = true
+                            break
+                        else
+                            input.restore_mode()
+                            term.clear()
+                            term.show_cursor()
+                            print("Action '" .. selected_action .. "' not yet implemented.")
+                            print("Press Enter to return to submenu...")
+                            io.read()
+                            input.set_raw_mode()
+                            submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
+                        end
+                    elseif submenu_key:match('[1-9]') then
+                        local num = tonumber(submenu_key)
+                        if num <= num_submenu_options then
+                            submenu_index = num
+                            local selected_action = submenu_actions[submenu_index]
+                            if selected_action == "Back" then
+                                needs_full_redraw = true
+                                break
+                            else
+                                input.restore_mode()
+                                term.clear()
+                                term.show_cursor()
+                                print("Action '" .. selected_action .. "' not yet implemented.")
+                                print("Press Enter to return to submenu...")
+                                io.read()
+                                input.set_raw_mode()
+                                submenu_start_row, submenu_actions = render_submenu(selected_index, submenu_index)
+                            end
+                        end
+                    end
+                    
+                    if prev_submenu_index ~= submenu_index then
+                        sections.update_menu_items(submenu_start_row, prev_submenu_index, submenu_index, submenu_actions)
+                    end
+                end
             end
             
             -- Update display
