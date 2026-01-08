@@ -64,7 +64,9 @@ terminal.styles = {
 }
 
 -- Clear the entire screen
+-- Sets black background before clearing to ensure consistent background color
 function terminal.clear()
+    terminal.set_bg("bg_black")
     io.write(CSI .. "2J")
     io.flush()
 end
@@ -296,9 +298,11 @@ end
 
 -- Initialize terminal for game mode
 function terminal.init()
+    -- Clear the screen with black background
+    -- This fixes the issue on macOS/terminals with light mode where the
+    -- default background is white
     terminal.clear()
     terminal.hide_cursor()
-    terminal.reset()
 end
 
 -- Cleanup terminal (restore normal mode)
