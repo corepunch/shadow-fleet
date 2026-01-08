@@ -4,8 +4,8 @@
 -- Main screen dashboard with widget-based UI
 
 local term = require("terminal")
-local gamestate = require("gamestate")
-local widgets = require("widgets")
+local gamestate = require("game")
+local widgets = require("ui")
 
 -- Initialize game state
 local game = gamestate.new()
