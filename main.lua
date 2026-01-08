@@ -54,10 +54,11 @@ function sections.fleet_status(start_row)
     term.write_at(row, 23, "Fuel", "fg_white")
     term.write_at(row, 29, "Status", "fg_white")
     term.write_at(row, 40, "Cargo", "fg_white")
-    term.write_at(row, 58, "Route", "fg_white")
-    term.write_at(row, 85, "Location", "fg_white")
-    term.write_at(row, 104, "ETA", "fg_white")
-    term.write_at(row, 112, "Risk", "fg_white")
+    term.write_at(row, 58, "Origin", "fg_white")
+    term.write_at(row, 73, "Destination", "fg_white")
+    term.write_at(row, 95, "Location", "fg_white")
+    term.write_at(row, 114, "ETA", "fg_white")
+    term.write_at(row, 122, "Risk", "fg_white")
     row = row + 1
     
     -- Header separator
@@ -67,10 +68,11 @@ function sections.fleet_status(start_row)
     term.write_at(row, 23, "----", "fg_white")
     term.write_at(row, 29, "------", "fg_white")
     term.write_at(row, 40, "-----", "fg_white")
-    term.write_at(row, 58, "-----", "fg_white")
-    term.write_at(row, 85, "--------", "fg_white")
-    term.write_at(row, 104, "---", "fg_white")
-    term.write_at(row, 112, "----", "fg_white")
+    term.write_at(row, 58, "------", "fg_white")
+    term.write_at(row, 73, "-----------", "fg_white")
+    term.write_at(row, 95, "--------", "fg_white")
+    term.write_at(row, 114, "---", "fg_white")
+    term.write_at(row, 122, "----", "fg_white")
     row = row + 1
     
     -- Table rows
@@ -95,27 +97,38 @@ function sections.fleet_status(start_row)
         -- Cargo column
         term.write_at(row, 40, ship.cargo, "fg_bright_white")
         
-        -- Route column
-        term.write_at(row, 58, ship.route, "fg_white")
+        -- Origin column (if present)
+        if ship.origin then
+            term.write_at(row, 58, ship.origin, "fg_white")
+        else
+            term.write_at(row, 58, "-", "fg_white")
+        end
+        
+        -- Destination column (if present)
+        if ship.destination then
+            term.write_at(row, 73, ship.destination, "fg_white")
+        else
+            term.write_at(row, 73, "-", "fg_white")
+        end
         
         -- Location column (if present)
         if ship.location then
-            term.write_at(row, 85, ship.location, "fg_bright_white")
+            term.write_at(row, 95, ship.location, "fg_bright_white")
         else
-            term.write_at(row, 85, "-", "fg_white")
+            term.write_at(row, 95, "-", "fg_white")
         end
         
         -- ETA column (if present)
         if ship.eta then
-            term.write_at(row, 104, ship.eta, "fg_yellow")
+            term.write_at(row, 114, ship.eta, "fg_yellow")
         else
-            term.write_at(row, 104, "-", "fg_white")
+            term.write_at(row, 114, "-", "fg_white")
         end
         
         -- Risk column with color coding
         local risk_color = ship.risk == "None" and "fg_green" or 
                           (ship.risk:match("LOW") or ship.risk:match("MED")) and "fg_yellow" or "fg_bright_yellow"
-        term.write_at(row, 112, ship.risk, risk_color)
+        term.write_at(row, 122, ship.risk, risk_color)
         
         row = row + 1
     end

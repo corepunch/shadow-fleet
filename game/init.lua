@@ -26,7 +26,8 @@ function gamestate.new()
                 status = "Docked",
                 location = "Ust-Luga (RU)",
                 cargo = "Empty",
-                route = "Idle",
+                origin = nil,
+                destination = nil,
                 risk = "None"
             },
             {
@@ -37,7 +38,8 @@ function gamestate.new()
                 status = "At Sea",
                 location = nil,
                 cargo = "500k bbls Crude",
-                route = "Ust-Luga -> STS off Malta",
+                origin = "Ust-Luga",
+                destination = "STS off Malta",
                 eta = "2 days",
                 risk = "MED (AIS Spoof Active)"
             }
