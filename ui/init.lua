@@ -96,8 +96,7 @@ function widgets.menu_item_highlighted(row, number, text, is_selected)
     if is_selected then
         -- Draw highlighted background
         term.write_at(row, 1, "> ", "fg_bright_yellow")
-        term.write_at(row, 3, tostring(number), "fg_bright_yellow", "bg_blue")
-        term.write_at(row, 4, ". " .. text, "fg_bright_white", "bg_blue")
+        term.write_at(row, 3, text, "fg_bright_white", "bg_blue")
         -- Fill rest of line with background color for full highlight
         local padding = string.rep(" ", highlight_width - #text)
         term.write_colored(padding, "fg_white", "bg_blue")
@@ -105,8 +104,7 @@ function widgets.menu_item_highlighted(row, number, text, is_selected)
     else
         -- Draw unselected item and clear to end of line
         term.write_at(row, 1, "  ", "fg_white")
-        term.write_at(row, 3, tostring(number), "fg_bright_cyan")
-        term.write_at(row, 4, ". " .. text, "fg_white")
+        term.write_at(row, 3, text, "fg_white")
         -- Fill rest of line with spaces to clear any previous highlight
         local padding = string.rep(" ", highlight_width - #text)
         term.write_colored(padding, "fg_white", "bg_black")
