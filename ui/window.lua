@@ -14,7 +14,7 @@ function Window.new(row, col, width, height, title, border_color, bg_color)
     self.height = height
     self.title = title
     self.border_color = border_color or "fg_cyan"
-    self.bg_color = bg_color or "bg_black"
+    self.bg_color = bg_color or "bg_bright_black"  -- Dark grey background for windows
     self.content_row = row + 1  -- First row inside the box
     self.content_col = col + 2  -- First column inside the box (accounting for border)
     return self
