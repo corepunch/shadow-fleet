@@ -6,6 +6,7 @@
 local term = require("terminal")
 local gamestate = require("game")
 local widgets = require("ui")
+local input = require("terminal.input")
 
 -- Initialize game state
 local game = gamestate.new()
@@ -149,8 +150,8 @@ function sections.heat_meter_section(start_row)
 end
 
 -- Quick actions menu
-function sections.quick_actions(start_row)
-    widgets.section_header(start_row, "QUICK ACTIONS (Enter 1-8 or 'q' to quit)")
+function sections.quick_actions(start_row, selected_index)
+    widgets.section_header(start_row, "QUICK ACTIONS (Use ↑↓ arrows to select, Enter to confirm, 'q' to quit)")
     local row = start_row + 1
     
     local actions = {
@@ -165,15 +166,16 @@ function sections.quick_actions(start_row)
     }
     
     for i, action in ipairs(actions) do
-        widgets.menu_item(row, i, action)
+        widgets.menu_item_highlighted(row, i, action, i == selected_index)
         row = row + 1
     end
     
     return row + 2
 end
 
--- Main dashboard render function
-local function render_dashboard()
+-- Main dashboard render function with selected menu index
+local function render_dashboard(selected_index)
+    selected_index = selected_index or 1
     term.clear()
     term.hide_cursor()
     
@@ -184,31 +186,52 @@ local function render_dashboard()
     row = sections.market_snapshot(row)
     row = sections.active_events(row)
     row = sections.heat_meter_section(row)
-    row = sections.quick_actions(row)
+    row = sections.quick_actions(row, selected_index)
     
     widgets.separator(row, 120)
     row = row + 1
     
-    term.write_at(row, 1, "> YOUR MOVE (1-8): ", "fg_bright_green")
-    term.show_cursor()
+    term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
 end
 
 -- Main game loop
 local function main()
+    local selected_index = 1
+    local num_options = 8
+    
     while true do
-        render_dashboard()
-        local input = io.read()
+        render_dashboard(selected_index)
+        local key = input.read_key()
         
-        if input == "q" or input == "Q" then
+        if key == input.keys.Q then
             term.clear()
             term.show_cursor()
             print("Thank you for playing Shadow Fleet!")
             break
-        elseif tonumber(input) and tonumber(input) >= 1 and tonumber(input) <= 8 then
+        elseif key == input.keys.UP then
+            selected_index = selected_index - 1
+            if selected_index < 1 then
+                selected_index = num_options
+            end
+        elseif key == input.keys.DOWN then
+            selected_index = selected_index + 1
+            if selected_index > num_options then
+                selected_index = 1
+            end
+        elseif key == input.keys.ENTER then
             term.clear()
-            print("Menu option " .. input .. " not yet implemented.")
+            term.show_cursor()
+            print("Menu option " .. selected_index .. " not yet implemented.")
             print("Press Enter to return to dashboard...")
-            io.read()
+            input.wait_for_enter()
+        elseif key:match('[1-8]') then
+            -- Still support direct number input for convenience
+            selected_index = tonumber(key)
+            term.clear()
+            term.show_cursor()
+            print("Menu option " .. selected_index .. " not yet implemented.")
+            print("Press Enter to return to dashboard...")
+            input.wait_for_enter()
         end
     end
 end
