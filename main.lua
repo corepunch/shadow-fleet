@@ -57,7 +57,7 @@ local game = {
         },
         {
             type = "Opportunity",
-            description = 'Shady Auction - Buy "RUST-07" (Age 28y, 1M bbls cap) for 2M Rubles?'
+            description = "Shady Auction - Buy \"RUST-07\" (Age 28y, 1M bbls cap) for 2M Rubles?"
         }
     }
 }
@@ -104,8 +104,8 @@ end
 
 -- Widget: Section header
 function widgets.section_header(row, text)
-    term.write_at(row, 1, "--- " .. text .. " ---", "fg_bright_white")
     term.set_style("bold")
+    term.write_at(row, 1, "--- " .. text .. " ---", "fg_bright_white")
     term.reset()
 end
 
