@@ -1,9 +1,14 @@
 -- Terminal Input Module
 -- Provides raw keyboard input handling including arrow keys
+-- 
+-- Note: This module uses 'stty' to set terminal raw mode, which is standard
+-- on Unix-like systems (Linux, macOS, BSD). It may not work on Windows.
+-- For Windows compatibility, consider using a cross-platform terminal library.
 
 local input = {}
 
 -- Set terminal to raw mode (disable line buffering and echo)
+-- Uses stty command which is available on most Unix-like systems
 local function set_raw_mode()
     os.execute("stty raw -echo 2>/dev/null")
 end

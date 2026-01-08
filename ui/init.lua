@@ -91,13 +91,15 @@ end
 
 -- Widget: Menu item with highlight support
 function widgets.menu_item_highlighted(row, number, text, is_selected)
+    local highlight_width = 60  -- Width of highlight background
+    
     if is_selected then
         -- Draw highlighted background
         term.write_at(row, 1, "> ", "fg_bright_yellow")
         term.write_at(row, 3, tostring(number), "fg_bright_yellow", "bg_blue")
         term.write_at(row, 4, ". " .. text, "fg_bright_white", "bg_blue")
         -- Fill rest of line with background color for full highlight
-        local padding = string.rep(" ", 60 - #text)
+        local padding = string.rep(" ", highlight_width - #text)
         term.write_colored(padding, "fg_white", "bg_blue")
         term.reset()
     else
