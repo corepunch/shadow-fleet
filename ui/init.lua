@@ -119,8 +119,8 @@ function widgets.horizontal_menu(row, col, actions, selected_index)
     
     for i, action in ipairs(actions) do
         if i == selected_index then
-            -- Draw highlighted item
-            term.write_colored(action, "fg_bright_white", "bg_blue")
+            -- Draw highlighted item with 1 space padding before and after
+            term.write_colored(" " .. action .. " ", "fg_bright_white", "bg_blue")
         else
             -- Draw unselected item
             term.write_colored(action, "fg_white")
