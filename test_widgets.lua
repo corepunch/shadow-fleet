@@ -1,7 +1,7 @@
 #!/usr/bin/env lua5.3
--- Simple test to verify widgets.lua module works correctly
+-- Simple test to verify ui module works correctly
 
-local widgets = require("widgets")
+local widgets = require("ui")
 
 print("Testing Widgets Module...")
 print("")
@@ -56,4 +56,4 @@ print("  • heat_meter - visual heat level meter")
 print("  • menu_item - numbered menu item")
 print("  • format_number - number formatting utility")
 print("")
-print("Usage: local widgets = require('widgets')")
+print("Usage: local widgets = require('ui')")

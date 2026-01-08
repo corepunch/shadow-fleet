@@ -2,7 +2,7 @@
 -- Provides reusable UI components for terminal-based interfaces
 
 local term = require("terminal")
-local gamestate = require("gamestate")
+local gamestate = require("game")
 
 local widgets = {}
 
