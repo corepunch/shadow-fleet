@@ -146,6 +146,18 @@ This allows:
 
 **Note:** For submenu interactions that require line-based input, the code temporarily restores normal mode and re-enables raw mode after.
 
+### Screen Refresh Optimization
+
+To eliminate screen flicker/blinking during arrow key navigation:
+- Full screen clear and redraw only happens on initial render or after submenu interactions
+- Arrow key navigation uses **partial updates** - only the changed menu items are redrawn
+- This provides smooth, flicker-free navigation with instant visual feedback
+
+**Implementation:**
+- `render_dashboard()` returns the menu position and actions list
+- `update_menu_items()` redraws only the previously selected and newly selected items
+- No `term.clear()` is called during normal arrow key navigation
+
 ### Arrow Key Detection
 
 Arrow keys send ANSI escape sequences:

@@ -170,7 +170,22 @@ function sections.quick_actions(start_row, selected_index)
         row = row + 1
     end
     
-    return row + 2
+    return row + 2, actions  -- Return actions list for partial updates
+end
+
+-- Update only specific menu items without full redraw
+function sections.update_menu_items(start_row, prev_index, new_index, actions)
+    local row = start_row + 1  -- Skip header
+    
+    -- Redraw the previously selected item (now unselected)
+    if prev_index and prev_index >= 1 and prev_index <= #actions then
+        widgets.menu_item_highlighted(row + prev_index - 1, prev_index, actions[prev_index], false)
+    end
+    
+    -- Redraw the newly selected item
+    if new_index >= 1 and new_index <= #actions then
+        widgets.menu_item_highlighted(row + new_index - 1, new_index, actions[new_index], true)
+    end
 end
 
 -- Main dashboard render function with selected menu index
@@ -186,27 +201,37 @@ local function render_dashboard(selected_index)
     row = sections.market_snapshot(row)
     row = sections.active_events(row)
     row = sections.heat_meter_section(row)
-    row = sections.quick_actions(row, selected_index)
+    
+    local menu_start_row = row
+    row, actions = sections.quick_actions(row, selected_index)
     
     widgets.separator(row, 120)
     row = row + 1
     
     term.write_at(row, 1, "> USE ARROW KEYS TO SELECT, PRESS ENTER TO CONFIRM", "fg_bright_green")
+    
+    return menu_start_row, actions
 end
 
 -- Main game loop
 local function main()
     local selected_index = 1
     local num_options = 8
+    local menu_start_row = nil  -- Will be set after first render
+    local actions = nil  -- Will store menu actions list
     
     -- Set terminal to raw mode once before the loop
     input.set_raw_mode()
     
     -- Use xpcall to ensure terminal is restored even on error
     local function game_loop()
+        -- Initial full render
+        menu_start_row, actions = render_dashboard(selected_index)
+        
         while true do
-            render_dashboard(selected_index)
             local key = input.read_key()
+            local prev_index = selected_index
+            local needs_full_redraw = false
             
             if key == input.keys.Q then
                 term.clear()
@@ -232,6 +257,7 @@ local function main()
                 print("Press Enter to return to dashboard...")
                 io.read()  -- Use regular read when not in raw mode
                 input.set_raw_mode()  -- Re-enable raw mode
+                needs_full_redraw = true
             elseif key:match('[1-8]') then
                 -- Still support direct number input for convenience
                 selected_index = tonumber(key)
@@ -242,6 +268,16 @@ local function main()
                 print("Press Enter to return to dashboard...")
                 io.read()  -- Use regular read when not in raw mode
                 input.set_raw_mode()  -- Re-enable raw mode
+                needs_full_redraw = true
+            end
+            
+            -- Update display
+            if needs_full_redraw then
+                -- Full redraw after submenu
+                menu_start_row, actions = render_dashboard(selected_index)
+            elseif prev_index ~= selected_index then
+                -- Partial update for arrow key navigation
+                sections.update_menu_items(menu_start_row, prev_index, selected_index, actions)
             end
         end
     end
