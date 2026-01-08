@@ -14,7 +14,7 @@ assert(type(widgets) == "table", "widgets should be a table")
 local required_functions = {
     "separator", "title", "status_bar", "section_header",
     "labeled_value", "percentage_bar", "heat_meter", "menu_item",
-    "format_number", "info_box", "stat_box"
+    "format_number", "info_box", "stat_box", "window"
 }
 
 for _, func_name in ipairs(required_functions) do
@@ -57,5 +57,6 @@ print("  • menu_item - numbered menu item")
 print("  • format_number - number formatting utility")
 print("  • info_box - bordered box with title for sections")
 print("  • stat_box - small bordered box for stats")
+print("  • window - buffered window/panel object (TUI-style)")
 print("")
 print("Usage: local widgets = require('ui')")
