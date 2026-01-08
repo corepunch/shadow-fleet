@@ -4,25 +4,13 @@
 -- Note: This module uses 'stty' to set terminal raw mode, which is standard
 -- on Unix-like systems (Linux, macOS, BSD). It may not work on Windows.
 -- For Windows compatibility, consider using a cross-platform terminal library.
+--
+-- Usage:
+--   1. Call input.set_raw_mode() once before your main loop
+--   2. Call input.read_key() to read keypresses without lag
+--   3. Call input.restore_mode() on exit (use xpcall/finalizer)
 
 local input = {}
-
--- Set terminal to raw mode (disable line buffering and echo)
--- Uses stty command which is available on most Unix-like systems
-local function set_raw_mode()
-    os.execute("stty raw -echo 2>/dev/null")
-end
-
--- Restore terminal to normal mode
-local function restore_mode()
-    os.execute("stty sane 2>/dev/null")
-end
-
--- Read a single character from stdin
-local function read_char()
-    local char = io.read(1)
-    return char
-end
 
 -- Key codes
 input.keys = {
@@ -36,11 +24,29 @@ input.keys = {
     UNKNOWN = "unknown"
 }
 
+-- Set terminal to raw mode (disable line buffering and echo)
+-- Call this ONCE before your main loop
+-- Uses stty command which is available on most Unix-like systems
+function input.set_raw_mode()
+    os.execute("stty raw -echo 2>/dev/null")
+end
+
+-- Restore terminal to normal mode
+-- Call this on exit to restore terminal state
+function input.restore_mode()
+    os.execute("stty sane 2>/dev/null")
+end
+
+-- Read a single character from stdin
+local function read_char()
+    local char = io.read(1)
+    return char
+end
+
 -- Read a key press (handles escape sequences for arrow keys)
 -- Returns a key code from input.keys
+-- NOTE: Terminal must be in raw mode before calling this function
 function input.read_key()
-    set_raw_mode()
-    
     local char = read_char()
     local key = input.keys.UNKNOWN
     
@@ -72,20 +78,18 @@ function input.read_key()
         end
     end
     
-    restore_mode()
     return key
 end
 
 -- Wait for Enter key
+-- NOTE: Terminal must be in raw mode before calling this function
 function input.wait_for_enter()
-    set_raw_mode()
     while true do
         local char = read_char()
         if char == '\n' or char == '\r' then
             break
         end
     end
-    restore_mode()
 end
 
 return input

@@ -199,40 +199,67 @@ local function main()
     local selected_index = 1
     local num_options = 8
     
-    while true do
-        render_dashboard(selected_index)
-        local key = input.read_key()
-        
-        if key == input.keys.Q then
-            term.clear()
-            term.show_cursor()
-            print("Thank you for playing Shadow Fleet!")
-            break
-        elseif key == input.keys.UP then
-            selected_index = selected_index - 1
-            if selected_index < 1 then
-                selected_index = num_options
+    -- Set terminal to raw mode once before the loop
+    input.set_raw_mode()
+    
+    -- Use xpcall to ensure terminal is restored even on error
+    local function game_loop()
+        while true do
+            render_dashboard(selected_index)
+            local key = input.read_key()
+            
+            if key == input.keys.Q then
+                term.clear()
+                term.show_cursor()
+                print("Thank you for playing Shadow Fleet!")
+                break
+            elseif key == input.keys.UP then
+                selected_index = selected_index - 1
+                if selected_index < 1 then
+                    selected_index = num_options
+                end
+            elseif key == input.keys.DOWN then
+                selected_index = selected_index + 1
+                if selected_index > num_options then
+                    selected_index = 1
+                end
+            elseif key == input.keys.ENTER then
+                -- Temporarily restore mode for submenu interaction
+                input.restore_mode()
+                term.clear()
+                term.show_cursor()
+                print("Menu option " .. selected_index .. " not yet implemented.")
+                print("Press Enter to return to dashboard...")
+                io.read()  -- Use regular read when not in raw mode
+                input.set_raw_mode()  -- Re-enable raw mode
+            elseif key:match('[1-8]') then
+                -- Still support direct number input for convenience
+                selected_index = tonumber(key)
+                input.restore_mode()
+                term.clear()
+                term.show_cursor()
+                print("Menu option " .. selected_index .. " not yet implemented.")
+                print("Press Enter to return to dashboard...")
+                io.read()  -- Use regular read when not in raw mode
+                input.set_raw_mode()  -- Re-enable raw mode
             end
-        elseif key == input.keys.DOWN then
-            selected_index = selected_index + 1
-            if selected_index > num_options then
-                selected_index = 1
-            end
-        elseif key == input.keys.ENTER then
-            term.clear()
-            term.show_cursor()
-            print("Menu option " .. selected_index .. " not yet implemented.")
-            print("Press Enter to return to dashboard...")
-            input.wait_for_enter()
-        elseif key:match('[1-8]') then
-            -- Still support direct number input for convenience
-            selected_index = tonumber(key)
-            term.clear()
-            term.show_cursor()
-            print("Menu option " .. selected_index .. " not yet implemented.")
-            print("Press Enter to return to dashboard...")
-            input.wait_for_enter()
         end
+    end
+    
+    local function error_handler(err)
+        -- Ensure terminal is restored on error
+        input.restore_mode()
+        term.cleanup()
+        return debug.traceback(err, 2)
+    end
+    
+    local success, err = xpcall(game_loop, error_handler)
+    
+    -- Always restore terminal mode on exit
+    input.restore_mode()
+    
+    if not success then
+        print("\nError occurred: " .. tostring(err))
     end
 end
 

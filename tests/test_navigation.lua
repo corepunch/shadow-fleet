@@ -76,7 +76,9 @@ local function test_input_module()
     -- Test that functions exist
     assert(type(input.read_key) == "function", "read_key should be a function")
     assert(type(input.wait_for_enter) == "function", "wait_for_enter should be a function")
-    print("✓ All input functions exist")
+    assert(type(input.set_raw_mode) == "function", "set_raw_mode should be a function")
+    assert(type(input.restore_mode) == "function", "restore_mode should be a function")
+    print("✓ All input functions exist (including set_raw_mode and restore_mode)")
 end
 
 -- Run tests

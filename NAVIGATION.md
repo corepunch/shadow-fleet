@@ -17,12 +17,19 @@ A new module was created to handle raw keyboard input, including arrow keys:
 - Detects arrow keys (UP, DOWN, LEFT, RIGHT)
 - Handles Enter, ESC, and character keys
 - Supports both arrow key and numeric (1-8) input for convenience
-- Properly manages terminal raw mode (stty)
+- Efficiently manages terminal raw mode (set once, not per-key)
 
 **Key Functions:**
-- `input.read_key()` - Reads a single keypress and returns a key code
+- `input.set_raw_mode()` - Set terminal to raw mode (call once before main loop)
+- `input.restore_mode()` - Restore terminal to normal mode (call on exit)
+- `input.read_key()` - Reads a single keypress and returns a key code (no stty overhead)
 - `input.wait_for_enter()` - Waits for Enter key press
 - `input.keys` - Table of key constants (UP, DOWN, ENTER, Q, etc.)
+
+**Performance:**
+- Terminal raw mode is set **once** before the main loop, not on every keypress
+- Eliminates per-key process spawn overhead
+- Provides immediate, lag-free input response
 
 ### 2. Enhanced UI Widget (`ui/init.lua`)
 
@@ -39,6 +46,8 @@ Added a new widget function for rendering menu items with highlight support:
 Modified the main game loop to support arrow key navigation:
 
 **Changes:**
+- Calls `input.set_raw_mode()` once before the main loop starts
+- Uses `xpcall` with error handler to ensure `input.restore_mode()` is always called
 - Added `selected_index` variable to track current menu selection
 - Updated `render_dashboard()` to accept and display the selected menu item
 - Modified `sections.quick_actions()` to render items with highlighting
@@ -46,6 +55,7 @@ Modified the main game loop to support arrow key navigation:
 - Added arrow key handling (UP/DOWN to navigate, ENTER to select)
 - Maintains backward compatibility with numeric keys (1-8)
 - Updated menu header text to indicate arrow key usage
+- Temporarily restores normal mode for submenu interactions
 
 ### 4. New Test Suite (`tests/test_navigation.lua`)
 
@@ -80,14 +90,32 @@ Added comprehensive tests for the navigation system:
 ```lua
 local input = require("terminal.input")
 
-local key = input.read_key()
-if key == input.keys.UP then
-    -- Handle up arrow
-elseif key == input.keys.DOWN then
-    -- Handle down arrow
-elseif key == input.keys.ENTER then
-    -- Handle enter
+-- Set raw mode ONCE before your main loop
+input.set_raw_mode()
+
+-- Use xpcall to ensure terminal is restored on error
+local function main_loop()
+    while true do
+        local key = input.read_key()  -- No overhead, reads immediately
+        if key == input.keys.UP then
+            -- Handle up arrow
+        elseif key == input.keys.DOWN then
+            -- Handle down arrow
+        elseif key == input.keys.ENTER then
+            -- Handle enter
+        elseif key == input.keys.Q then
+            break
+        end
+    end
 end
+
+local function error_handler(err)
+    input.restore_mode()  -- Always restore terminal
+    return debug.traceback(err, 2)
+end
+
+xpcall(main_loop, error_handler)
+input.restore_mode()  -- Restore on normal exit
 ```
 
 **Using the Highlighted Menu Widget:**
@@ -105,12 +133,18 @@ end
 
 ### Terminal Raw Mode
 
-The input module uses `stty` to temporarily set the terminal to raw mode when reading keys. This allows:
+The input module uses `stty` to set the terminal to raw mode. **Critical performance improvement:**
+- Raw mode is set **once** before the main loop (not per-keypress)
+- Eliminates process spawn overhead on every key read
+- Provides immediate, lag-free input response
+- Uses `xpcall` to ensure terminal is always restored on exit
+
+This allows:
 - Reading single characters without waiting for Enter
 - Detecting arrow key escape sequences
 - Immediate response to user input
 
-The terminal is automatically restored to normal mode after each key read to prevent issues.
+**Note:** For submenu interactions that require line-based input, the code temporarily restores normal mode and re-enables raw mode after.
 
 ### Arrow Key Detection
 
