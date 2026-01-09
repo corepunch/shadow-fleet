@@ -284,14 +284,12 @@ local function format_menu_item(item_name)
     end
 end
 
--- Generic function to print a menu with a title and list of items
--- Uses double-lined box-drawing characters
--- items: array of item names, hotkeys are looked up from menu_structure
-local function print_menu(title, items)
+-- Generic function to draw a box with title and items
+-- items: array of strings with format "(X) Item Name" or just "Item Name"
+local function draw_boxed_menu(title, formatted_items)
     -- Calculate box width based on longest item
     local max_width = #title
-    for _, item_name in ipairs(items) do
-        local line_text = format_menu_item(item_name)
+    for _, line_text in ipairs(formatted_items) do
         if #line_text > max_width then
             max_width = #line_text
         end
@@ -320,8 +318,7 @@ local function print_menu(title, items)
     echo("╣\n")
     
     -- Menu items
-    for _, item_name in ipairs(items) do
-        local line_text = format_menu_item(item_name)
+    for _, line_text in ipairs(formatted_items) do
         echo("║  ")
         echo(line_text)
         echo(string.rep(" ", inner_width - #line_text))
@@ -334,6 +331,17 @@ local function print_menu(title, items)
     echo("╝\n\n")
     
     echo("Enter command: ")
+end
+
+-- Generic function to print a menu with a title and list of items
+-- Uses double-lined box-drawing characters
+-- items: array of item names, hotkeys are looked up from menu_structure
+local function print_menu(title, items)
+    local formatted_items = {}
+    for _, item_name in ipairs(items) do
+        table.insert(formatted_items, format_menu_item(item_name))
+    end
+    draw_boxed_menu(title, formatted_items)
 end
 
 -- Print main menu
@@ -355,11 +363,9 @@ end
 local function print_submenu(menu_name, options)
     echo("\n")
     
-    -- Convert options table to list format for print_menu
-    -- We need to build a list of items with their hotkeys
+    -- Convert options table to list of formatted items
     local items = {}
     for key, option in pairs(options) do
-        -- Store both the hotkey and the option text
         table.insert(items, {hotkey = key:upper(), name = option})
     end
     
@@ -369,53 +375,14 @@ local function print_submenu(menu_name, options)
     -- Add Back option
     table.insert(items, {hotkey = "B", name = "Back"})
     
-    -- Calculate box width based on longest item
-    local max_width = #menu_name + 5  -- " MENU" suffix
+    -- Format items with hotkeys
+    local formatted_items = {}
     for _, item in ipairs(items) do
-        local line_text = "(" .. item.hotkey .. ") " .. item.name
-        if #line_text > max_width then
-            max_width = #line_text
-        end
+        table.insert(formatted_items, "(" .. item.hotkey .. ") " .. item.name)
     end
     
-    -- Add padding for box
-    local box_width = max_width + 4  -- 2 chars padding on each side
-    local inner_width = max_width
-    
-    -- Top border: ╔═══╗
-    echo("╔")
-    echo(string.rep("═", box_width))
-    echo("╗\n")
-    
-    -- Title line centered
-    local title = menu_name:upper() .. " MENU"
-    local title_padding = math.floor((inner_width - #title) / 2)
-    echo("║  ")
-    echo(string.rep(" ", title_padding))
-    echo(title)
-    echo(string.rep(" ", inner_width - #title - title_padding))
-    echo("  ║\n")
-    
-    -- Separator after title
-    echo("╠")
-    echo(string.rep("═", box_width))
-    echo("╣\n")
-    
-    -- Menu items
-    for _, item in ipairs(items) do
-        local line_text = "(" .. item.hotkey .. ") " .. item.name
-        echo("║  ")
-        echo(line_text)
-        echo(string.rep(" ", inner_width - #line_text))
-        echo("  ║\n")
-    end
-    
-    -- Bottom border: ╚═══╝
-    echo("╚")
-    echo(string.rep("═", box_width))
-    echo("╝\n\n")
-    
-    echo("Enter command: ")
+    -- Use the generic box drawing function
+    draw_boxed_menu(menu_name:upper() .. " MENU", formatted_items)
 end
 
 -- Main dashboard display
