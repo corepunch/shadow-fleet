@@ -476,51 +476,16 @@ end
 
 -- Get the keymap for a given context
 local function get_context_keymap(context)
-    if context == "main" then
-        return keymap.main
-    elseif context == "fleet" then
-        return keymap.fleet
-    elseif context == "route" then
-        return keymap.route
-    elseif context == "trade" then
-        return keymap.trade
-    elseif context == "evade" then
-        return keymap.evade
-    elseif context == "events" then
-        return keymap.events
-    elseif context == "market" then
-        return keymap.market
-    elseif context == "status" then
-        return keymap.status
-    elseif context == "help" then
-        return keymap.help
-    else
-        return keymap.main  -- Default to main menu
-    end
+    return keymap[context] or keymap.main  -- Default to main menu if context not found
 end
 
 -- Get the display name for a context
 local function get_context_name(context)
+    -- Capitalize first letter of context name
     if context == "main" then
         return "Main Menu"
-    elseif context == "fleet" then
-        return "Fleet"
-    elseif context == "route" then
-        return "Route"
-    elseif context == "trade" then
-        return "Trade"
-    elseif context == "evade" then
-        return "Evade"
-    elseif context == "events" then
-        return "Events"
-    elseif context == "market" then
-        return "Market"
-    elseif context == "status" then
-        return "Status"
-    elseif context == "help" then
-        return "Help"
     else
-        return context
+        return context:sub(1,1):upper() .. context:sub(2)
     end
 end
 
