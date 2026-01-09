@@ -25,12 +25,24 @@ function widgets.status_bar(left_text, middle_text, right_text, width)
     width = width or 120
     io.write(left_text)
     if middle_text then
-        local mid_pos = math.floor((width - #left_text - #middle_text) / 2)
-        io.write(string.rep(" ", mid_pos) .. middle_text)
+        -- Calculate position for centered middle text
+        local left_len = #left_text
+        local mid_len = #middle_text
+        local right_len = right_text and #right_text or 0
+        local available_space = width - left_len - mid_len - right_len
+        local left_padding = math.max(0, math.floor(available_space / 2))
+        io.write(string.rep(" ", left_padding) .. middle_text)
     end
     if right_text then
-        -- Add spacing before right text
-        io.write(string.rep(" ", width - #left_text - #(middle_text or "") - #right_text) .. right_text)
+        -- Calculate remaining space for right text
+        local used_len = #left_text
+        if middle_text then
+            local mid_len = #middle_text
+            local left_padding = math.max(0, math.floor((width - #left_text - mid_len - #right_text) / 2))
+            used_len = used_len + left_padding + mid_len
+        end
+        local right_padding = math.max(0, width - used_len - #right_text)
+        io.write(string.rep(" ", right_padding) .. right_text)
     end
     io.flush()
 end
@@ -63,7 +75,11 @@ function widgets.heat_meter(game)
     io.write("[")
     
     for i = 1, max_heat do
-        io.write("|")
+        if i <= heat then
+            io.write("#")  -- Filled heat bar
+        else
+            io.write("|")  -- Empty heat bar
+        end
     end
     
     io.write("] " .. heat .. "/" .. max_heat)
