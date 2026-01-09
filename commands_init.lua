@@ -11,12 +11,12 @@
 
 local commands = require("commands")
 
-local M = {}
+local commands_init = {}
 
 -- Register all game commands
 -- @param handle_vessel_upgrade function - The vessel upgrade handler from main.lua
 -- @param handle_submenu_action function - The generic submenu action handler from main.lua
-function M.register_all(handle_vessel_upgrade, handle_submenu_action)
+function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action)
     
     -- Main Menu Commands (Context Switching)
     local menu_contexts = {
@@ -143,4 +143,4 @@ function M.register_all(handle_vessel_upgrade, handle_submenu_action)
     end)
 end
 
-return M
+return commands_init

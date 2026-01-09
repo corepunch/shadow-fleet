@@ -9,24 +9,24 @@
 local gamestate = require("game")
 local widgets = require("ui")
 
-local M = {}
+local display = {}
 
 --- Print separator line
-function M.separator(echo_fn)
+function display.separator(echo_fn)
     echo_fn(string.rep("=", 80) .. "\n")
 end
 
 --- Print game header
-function M.header(echo_fn)
-    M.separator(echo_fn)
+function display.header(echo_fn)
+    display.separator(echo_fn)
     echo_fn("PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE\n")
-    M.separator(echo_fn)
+    display.separator(echo_fn)
 end
 
 --- Print status line with player info
 --- @param game table Game state
 --- @param echo_fn function Output function
-function M.status(game, echo_fn)
+function display.status(game, echo_fn)
     local heat_desc = gamestate.get_heat_description(game)
     
     local parts = {
@@ -43,7 +43,7 @@ end
 --- Print fleet status table
 --- @param game table Game state
 --- @param echo_fn function Output function
-function M.fleet_status(game, echo_fn)
+function display.fleet_status(game, echo_fn)
     local columns = {
         {title = "Name", value_fn = function(ship) return ship.name end, width = 11},
         {title = "Age", value_fn = function(ship) return ship.age .. "y" end, width = 4},
@@ -73,7 +73,7 @@ end
 --- Print market snapshot
 --- @param game table Game state
 --- @param echo_fn function Output function
-function M.market_snapshot(game, echo_fn)
+function display.market_snapshot(game, echo_fn)
     local parts = {
         "--- MARKET SNAPSHOT ---\n",
         "Crude Price Cap: $", tostring(game.market.crude_price_cap), "/bbl",
@@ -91,7 +91,7 @@ end
 --- Print active events list
 --- @param game table Game state
 --- @param echo_fn function Output function
-function M.active_events(game, echo_fn)
+function display.active_events(game, echo_fn)
     local parts = {"--- ACTIVE EVENTS ---\n"}
     
     for _, event in ipairs(game.events) do
@@ -109,7 +109,7 @@ end
 --- Print heat meter visualization
 --- @param game table Game state
 --- @param echo_fn function Output function
-function M.heat_meter(game, echo_fn)
+function display.heat_meter(game, echo_fn)
     local parts = {"--- HEAT METER ---\n["}
     
     for i = 1, game.heat_max do
@@ -131,4 +131,4 @@ function M.heat_meter(game, echo_fn)
     echo_fn(table.concat(parts))
 end
 
-return M
+return display

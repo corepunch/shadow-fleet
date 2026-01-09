@@ -8,12 +8,12 @@
 
 local command_labels = require("command_labels")
 
-local M = {}
+local menu = {}
 
 --- Generate formatted menu items from a keymap
 --- @param context_keymap table The keymap for a specific context
 --- @return table Array of formatted menu items like "(F) Fleet"
-function M.generate_items(context_keymap)
+function menu.generate_items(context_keymap)
     local items = {}
     
     -- Collect all hotkey-command pairs
@@ -52,7 +52,7 @@ end
 --- @param title string Menu title
 --- @param formatted_items table Array of formatted menu items
 --- @param echo_fn function Output function to use
-function M.draw_boxed(title, formatted_items, echo_fn)
+function menu.draw_boxed(title, formatted_items, echo_fn)
     local max_width = #title
     for _, line_text in ipairs(formatted_items) do
         if #line_text > max_width then
@@ -81,9 +81,9 @@ end
 --- @param title string Menu title
 --- @param context_keymap table The keymap for this context
 --- @param echo_fn function Output function to use
-function M.print_from_keymap(title, context_keymap, echo_fn)
-    local formatted_items = M.generate_items(context_keymap)
-    M.draw_boxed(title, formatted_items, echo_fn)
+function menu.print_from_keymap(title, context_keymap, echo_fn)
+    local formatted_items = menu.generate_items(context_keymap)
+    menu.draw_boxed(title, formatted_items, echo_fn)
 end
 
-return M
+return menu

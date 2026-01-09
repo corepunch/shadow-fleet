@@ -25,18 +25,23 @@ This document summarizes the refactoring work done to improve code quality and m
 ### 2. Code Quality Improvements
 
 #### Module Pattern
-Changed from:
+Uses descriptive module names for clarity:
 ```lua
-local mymodule = {}
-function mymodule.func() end
-return mymodule
+local gamestate = {}
+function gamestate.new() end
+return gamestate
 ```
 
-To the standard Lua convention:
 ```lua
-local M = {}
-function M.func() end
-return M
+local widgets = {}
+function widgets.separator() end
+return widgets
+```
+
+```lua
+local terminal = {}
+function terminal.echo() end
+return terminal
 ```
 
 #### String Concatenation

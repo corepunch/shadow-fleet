@@ -9,10 +9,10 @@
 --   local keymap = require("keymap")
 --   local command_id = keymap.main["F"]  -- Returns "menu.open_fleet"
 
-local M = {}
+local keymap = {}
 
 -- Main menu keymap
-M.main = {
+keymap.main = {
     F = "menu.open_fleet",
     R = "menu.open_route",
     T = "menu.open_trade",
@@ -25,7 +25,7 @@ M.main = {
 }
 
 -- Fleet submenu keymap
-M.fleet = {
+keymap.fleet = {
     V = "fleet.view",
     Y = "fleet.buy",
     U = "fleet.upgrade",
@@ -34,21 +34,21 @@ M.fleet = {
 }
 
 -- Route submenu keymap
-M.route = {
+keymap.route = {
     P = "route.plot",
     L = "route.load",
     B = "menu.back"
 }
 
 -- Trade submenu keymap
-M.trade = {
+keymap.trade = {
     S = "trade.sell",
     L = "trade.launder",
     B = "menu.back"
 }
 
 -- Evade submenu keymap
-M.evade = {
+keymap.evade = {
     A = "evade.spoof_ais",
     F = "evade.flag_swap",
     I = "evade.bribe",
@@ -56,13 +56,13 @@ M.evade = {
 }
 
 -- Events submenu keymap
-M.events = {
+keymap.events = {
     R = "events.resolve",
     B = "menu.back"
 }
 
 -- Market submenu keymap
-M.market = {
+keymap.market = {
     C = "market.check_prices",
     P = "market.speculate",
     A = "market.auction",
@@ -70,16 +70,16 @@ M.market = {
 }
 
 -- Status submenu keymap
-M.status = {
+keymap.status = {
     R = "status.recap",
     N = "status.news",
     B = "menu.back"
 }
 
 -- Help submenu keymap
-M.help = {
+keymap.help = {
     C = "help.details",
     B = "menu.back"
 }
 
-return M
+return keymap

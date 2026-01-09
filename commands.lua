@@ -14,7 +14,7 @@
 --   end)
 --   local result = commands.run("menu.open_fleet", game, "main")
 
-local M = {}
+local commands = {}
 
 -- Registry of command handlers
 -- Maps command ID strings to handler functions
@@ -27,7 +27,7 @@ local registry = {}
 --                          - change_context: string to switch context
 --                          - quit: boolean to exit the game
 --                          - message: string to display to the user
-function M.register(id, handler)
+function commands.register(id, handler)
     assert(type(id) == "string", "Command ID must be a string")
     assert(type(handler) == "function", "Command handler must be a function")
     registry[id] = handler
@@ -39,7 +39,7 @@ end
 -- @param ctx string - Current context (e.g., "main", "fleet")
 -- @param ... any - Additional parameters to pass to handler
 -- @return table|nil - Result from command handler
-function M.run(id, game, ctx, ...)
+function commands.run(id, game, ctx, ...)
     local handler = registry[id]
     if not handler then
         return { message = "Unknown command: " .. tostring(id) }
@@ -56,7 +56,7 @@ end
 
 -- List all registered commands
 -- @return table - Array of command IDs
-function M.list()
+function commands.list()
     local command_list = {}
     for id in pairs(registry) do
         table.insert(command_list, id)
@@ -65,4 +65,4 @@ function M.list()
     return command_list
 end
 
-return M
+return commands

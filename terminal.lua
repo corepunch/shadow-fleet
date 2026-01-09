@@ -6,13 +6,13 @@
 ---
 --- @module terminal
 
-local M = {}
+local terminal = {}
 
 -- Raw mode state tracking
 local raw_mode_active = false
 
 --- Set terminal to raw mode for single-character input
-function M.set_raw_mode()
+function terminal.set_raw_mode()
     if not raw_mode_active then
         os.execute("stty raw -echo 2>/dev/null")
         raw_mode_active = true
@@ -20,7 +20,7 @@ function M.set_raw_mode()
 end
 
 --- Restore terminal to normal (cooked) mode
-function M.restore_normal_mode()
+function terminal.restore_normal_mode()
     if raw_mode_active then
         os.execute("stty sane 2>/dev/null")
         raw_mode_active = false
@@ -29,8 +29,8 @@ end
 
 --- Read a single character without waiting for Enter
 --- @return string|nil Character read, or nil on EOF
-function M.read_char()
-    M.set_raw_mode()
+function terminal.read_char()
+    terminal.set_raw_mode()
     return io.read(1)
 end
 
@@ -41,7 +41,7 @@ end
 
 --- Write text with optional formatting
 --- @param ... Arguments for string.format or a single string
-function M.echo(...)
+function terminal.echo(...)
     local args = {...}
     local text
     
@@ -62,11 +62,11 @@ end
 
 --- Write multiple strings efficiently using table.concat
 --- @param parts Array of strings to concatenate
-function M.echo_multi(parts)
+function terminal.echo_multi(parts)
     local text = table.concat(parts)
     local fixed_text = fix_line_endings(text)
     io.write(fixed_text)
     io.flush()
 end
 
-return M
+return terminal

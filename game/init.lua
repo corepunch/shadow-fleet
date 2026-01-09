@@ -7,11 +7,11 @@
 ---
 --- @module game
 
-local M = {}
+local gamestate = {}
 
 --- Initialize game state with default values
 --- @return table New game state
-function M.new()
+function gamestate.new()
     return {
         -- Player resources
         location = "Moscow Safehouse",
@@ -122,7 +122,7 @@ local HEAT_HIGH = 7
 --- Calculate fleet statistics
 --- @param game table Game state
 --- @return table Statistics including total ships, max capacity, average age, and losses
-function M.get_fleet_stats(game)
+function gamestate.get_fleet_stats(game)
     local total_ships = #game.fleet
     local total_age = 0
     for _, ship in ipairs(game.fleet) do
@@ -141,7 +141,7 @@ end
 --- Get heat level description
 --- @param game table Game state
 --- @return string Human-readable heat level description
-function M.get_heat_description(game)
+function gamestate.get_heat_description(game)
     local heat = game.heat
     if heat == HEAT_LOW then
         return "LOW (0/10)"
@@ -157,7 +157,7 @@ end
 --- Get heat meter color based on level
 --- @param game table Game state
 --- @return string Color name for UI rendering
-function M.get_heat_color(game)
+function gamestate.get_heat_color(game)
     local heat = game.heat
     if heat == HEAT_LOW then
         return "fg_green"
@@ -173,7 +173,7 @@ end
 --- Get heat meter message
 --- @param game table Game state
 --- @return string Contextual message about current heat level
-function M.get_heat_message(game)
+function gamestate.get_heat_message(game)
     local heat = game.heat
     if heat == HEAT_LOW then
         return "No eyes on you yet. One slip, and drones swarm."
@@ -190,7 +190,7 @@ end
 --- @param ship table Ship to check
 --- @param upgrade table Upgrade definition
 --- @return boolean, string Can apply and optional error message
-function M.can_apply_upgrade(ship, upgrade)
+function gamestate.can_apply_upgrade(ship, upgrade)
     -- Hull repair only if hull is damaged
     if upgrade.effect == "hull" and ship.hull >= 100 then
         return false, "Hull is already at 100%"
@@ -210,7 +210,7 @@ end
 --- Apply an upgrade to a ship
 --- @param ship table Ship to upgrade
 --- @param upgrade table Upgrade definition to apply
-function M.apply_upgrade(ship, upgrade)
+function gamestate.apply_upgrade(ship, upgrade)
     if upgrade.effect == "hull" then
         ship.hull = upgrade.value
     elseif upgrade.effect == "fuel_capacity" then
@@ -225,10 +225,10 @@ end
 --- @param game table Game state
 --- @param ship table Ship to get upgrades for
 --- @return table Array of applicable upgrade definitions
-function M.get_available_upgrades(game, ship)
+function gamestate.get_available_upgrades(game, ship)
     local available = {}
     for _, upgrade in ipairs(game.upgrades) do
-        local can_apply = M.can_apply_upgrade(ship, upgrade)
+        local can_apply = gamestate.can_apply_upgrade(ship, upgrade)
         if can_apply then
             table.insert(available, upgrade)
         end
@@ -236,4 +236,4 @@ function M.get_available_upgrades(game, ship)
     return available
 end
 
-return M
+return gamestate

@@ -8,7 +8,7 @@
 --   local command_labels = require("command_labels")
 --   local label = command_labels["menu.open_fleet"]  -- Returns "Fleet"
 
-local M = {
+local command_labels = {
     -- Main menu command labels
     ["menu.open_fleet"] = "Fleet",
     ["menu.open_route"] = "Route",
@@ -58,4 +58,4 @@ local M = {
     ["menu.back"] = "Back"
 }
 
-return M
+return command_labels

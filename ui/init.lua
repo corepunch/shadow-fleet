@@ -6,18 +6,18 @@
 ---
 --- @module ui
 
-local M = {}
+local widgets = {}
 
 --- Widget: Separator line
 --- @param width number Optional width (default 120)
-function M.separator(width)
+function widgets.separator(width)
     width = width or 120
     io.write(string.rep("=", width))
     io.flush()
 end
 
 -- Widget: Centered title
-function M.title(text, width)
+function widgets.title(text, width)
     width = width or 120
     local padding = math.floor((width - #text) / 2)
     io.write(string.rep(" ", padding) .. text)
@@ -25,7 +25,7 @@ function M.title(text, width)
 end
 
 -- Widget: Status bar
-function M.status_bar(left_text, middle_text, right_text, width)
+function widgets.status_bar(left_text, middle_text, right_text, width)
     width = width or 120
     io.write(left_text)
     if middle_text then
@@ -50,19 +50,19 @@ function M.status_bar(left_text, middle_text, right_text, width)
 end
 
 -- Widget: Section header
-function M.section_header(text)
+function widgets.section_header(text)
     io.write("--- " .. text .. " ---")
     io.flush()
 end
 
 -- Widget: Labeled value
-function M.labeled_value(label, value)
+function widgets.labeled_value(label, value)
     io.write(label .. tostring(value))
     io.flush()
 end
 
 -- Widget: Percentage bar
-function M.percentage_bar(label, value, max_value)
+function widgets.percentage_bar(label, value, max_value)
     max_value = max_value or 100
     local percent = math.floor((value / max_value) * 100)
     io.write(label .. ": " .. percent .. "%")
@@ -70,7 +70,7 @@ function M.percentage_bar(label, value, max_value)
 end
 
 -- Widget: Heat meter
-function M.heat_meter(game)
+function widgets.heat_meter(game)
     local gamestate = require("game")
     local heat = game.heat
     local max_heat = game.heat_max
@@ -91,13 +91,13 @@ function M.heat_meter(game)
 end
 
 -- Widget: Menu item
-function M.menu_item(number, text)
+function widgets.menu_item(number, text)
     io.write(tostring(number) .. ". " .. text)
     io.flush()
 end
 
 -- Utility: Format number with thousands separator
-function M.format_number(num)
+function widgets.format_number(num)
     local formatted = tostring(num)
     while true do
         local new_formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
@@ -112,7 +112,7 @@ end
 -- @param columns table - Array of column definitions: {{title="Name", value_fn=function(row), width=11}, ...}
 -- @param data table - Array of data rows to display
 -- @param options table - Optional settings {title="Table Title", footer_fn=function(), output_fn=function(str)}
-function M.table_generator(columns, data, options)
+function widgets.table_generator(columns, data, options)
     options = options or {}
     local output_fn = options.output_fn or io.write
     
@@ -163,4 +163,4 @@ function M.table_generator(columns, data, options)
     end
 end
 
-return M
+return widgets
