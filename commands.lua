@@ -14,7 +14,7 @@
 --   end)
 --   local result = commands.run("menu.open_fleet", game, "main")
 
-local commands = {}
+local M = {}
 
 -- Registry of command handlers
 -- Maps command ID strings to handler functions
@@ -27,13 +27,9 @@ local registry = {}
 --                          - change_context: string to switch context
 --                          - quit: boolean to exit the game
 --                          - message: string to display to the user
-function commands.register(id, handler)
-    if type(id) ~= "string" then
-        error("Command ID must be a string")
-    end
-    if type(handler) ~= "function" then
-        error("Command handler must be a function")
-    end
+function M.register(id, handler)
+    assert(type(id) == "string", "Command ID must be a string")
+    assert(type(handler) == "function", "Command handler must be a function")
     registry[id] = handler
 end
 
@@ -43,17 +39,15 @@ end
 -- @param ctx string - Current context (e.g., "main", "fleet")
 -- @param ... any - Additional parameters to pass to handler
 -- @return table|nil - Result from command handler
-function commands.run(id, game, ctx, ...)
+function M.run(id, game, ctx, ...)
     local handler = registry[id]
     if not handler then
         return { message = "Unknown command: " .. tostring(id) }
     end
     
-    -- Call handler with game state, context, and any additional params
     local success, result = pcall(handler, game, ctx, ...)
     
     if not success then
-        -- Handler threw an error
         return { message = "Command error: " .. tostring(result) }
     end
     
@@ -62,13 +56,13 @@ end
 
 -- List all registered commands
 -- @return table - Array of command IDs
-function commands.list()
+function M.list()
     local command_list = {}
-    for id, _ in pairs(registry) do
+    for id in pairs(registry) do
         table.insert(command_list, id)
     end
     table.sort(command_list)
     return command_list
 end
 
-return commands
+return M

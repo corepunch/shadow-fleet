@@ -1,10 +1,10 @@
 -- Shadow Fleet - Game State
 -- Central game state management
 
-local gamestate = {}
+local M = {}
 
 -- Initialize game state with default values
-function gamestate.new()
+function M.new()
     return {
         -- Player resources
         location = "Moscow Safehouse",
@@ -108,7 +108,7 @@ function gamestate.new()
 end
 
 -- Calculate fleet statistics
-function gamestate.get_fleet_stats(game)
+function M.get_fleet_stats(game)
     local total_ships = #game.fleet
     local total_age = 0
     for _, ship in ipairs(game.fleet) do
@@ -124,26 +124,33 @@ function gamestate.get_fleet_stats(game)
     }
 end
 
+-- Heat level thresholds
+local HEAT_LOW = 0
+local HEAT_MEDIUM = 3
+local HEAT_HIGH = 7
+
 -- Get heat level description
-function gamestate.get_heat_description(game)
-    if game.heat == 0 then
+function M.get_heat_description(game)
+    local heat = game.heat
+    if heat == HEAT_LOW then
         return "LOW (0/10)"
-    elseif game.heat <= 3 then
-        return "MEDIUM (" .. game.heat .. "/10)"
-    elseif game.heat <= 7 then
-        return "HIGH (" .. game.heat .. "/10)"
+    elseif heat <= HEAT_MEDIUM then
+        return string.format("MEDIUM (%d/10)", heat)
+    elseif heat <= HEAT_HIGH then
+        return string.format("HIGH (%d/10)", heat)
     else
-        return "CRITICAL (" .. game.heat .. "/10)"
+        return string.format("CRITICAL (%d/10)", heat)
     end
 end
 
 -- Get heat meter color based on level
-function gamestate.get_heat_color(game)
-    if game.heat == 0 then
+function M.get_heat_color(game)
+    local heat = game.heat
+    if heat == HEAT_LOW then
         return "fg_green"
-    elseif game.heat <= 3 then
+    elseif heat <= HEAT_MEDIUM then
         return "fg_yellow"
-    elseif game.heat <= 7 then
+    elseif heat <= HEAT_HIGH then
         return "fg_bright_yellow"
     else
         return "fg_red"
@@ -151,12 +158,13 @@ function gamestate.get_heat_color(game)
 end
 
 -- Get heat meter message
-function gamestate.get_heat_message(game)
-    if game.heat == 0 then
+function M.get_heat_message(game)
+    local heat = game.heat
+    if heat == HEAT_LOW then
         return "No eyes on you yet. One slip, and drones swarm."
-    elseif game.heat <= 3 then
+    elseif heat <= HEAT_MEDIUM then
         return "Low profile. Keep it that way."
-    elseif game.heat <= 7 then
+    elseif heat <= HEAT_HIGH then
         return "Authorities are watching. Lay low."
     else
         return "DANGER! Active pursuit in progress!"
@@ -164,7 +172,7 @@ function gamestate.get_heat_message(game)
 end
 
 -- Check if an upgrade is applicable to a ship
-function gamestate.can_apply_upgrade(ship, upgrade)
+function M.can_apply_upgrade(ship, upgrade)
     -- Hull repair only if hull is damaged
     if upgrade.effect == "hull" and ship.hull >= 100 then
         return false, "Hull is already at 100%"
@@ -182,7 +190,7 @@ function gamestate.can_apply_upgrade(ship, upgrade)
 end
 
 -- Apply an upgrade to a ship
-function gamestate.apply_upgrade(ship, upgrade)
+function M.apply_upgrade(ship, upgrade)
     if upgrade.effect == "hull" then
         ship.hull = upgrade.value
     elseif upgrade.effect == "fuel_capacity" then
@@ -194,10 +202,10 @@ function gamestate.apply_upgrade(ship, upgrade)
 end
 
 -- Get available upgrades for a ship
-function gamestate.get_available_upgrades(game, ship)
+function M.get_available_upgrades(game, ship)
     local available = {}
     for _, upgrade in ipairs(game.upgrades) do
-        local can_apply, reason = gamestate.can_apply_upgrade(ship, upgrade)
+        local can_apply = M.can_apply_upgrade(ship, upgrade)
         if can_apply then
             table.insert(available, upgrade)
         end
@@ -205,4 +213,4 @@ function gamestate.get_available_upgrades(game, ship)
     return available
 end
 
-return gamestate
+return M
