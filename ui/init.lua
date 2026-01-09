@@ -105,4 +105,68 @@ function widgets.format_number(num)
     return formatted
 end
 
+-- Widget: Generic table generator
+-- Renders a table with headers, separators, and data rows
+-- @param columns table - Array of column definitions: {{title="Name", value_fn=function(row), width=11}, ...}
+-- @param data table - Array of data rows to display
+-- @param options table - Optional settings {title="Table Title", footer_fn=function(), output_fn=function(str)}
+function widgets.table_generator(columns, data, options)
+    options = options or {}
+    local output_fn = options.output_fn or io.write
+    
+    -- Print optional title
+    if options.title then
+        output_fn(options.title .. "\n")
+    end
+    
+    -- Build format string (reused for all rows)
+    local format_str = ""
+    local separator_values = {}
+    local header_values = {}
+    
+    for i, col in ipairs(columns) do
+        format_str = format_str .. "%-" .. col.width .. "s"
+        if i < #columns then
+            format_str = format_str .. " "
+        end
+        table.insert(separator_values, string.rep("-", col.width))
+        table.insert(header_values, col.title)
+    end
+    format_str = format_str .. "\n"
+    
+    -- Print table header
+    output_fn(string.format(format_str, table.unpack(header_values)))
+    
+    -- Print column separators
+    output_fn(string.format(format_str, table.unpack(separator_values)))
+    
+    -- Print data rows
+    for _, row in ipairs(data) do
+        local row_values = {}
+        
+        for _, col in ipairs(columns) do
+            -- Get value from the value function
+            local value = col.value_fn(row)
+            -- Handle nil values by converting to "-"
+            if value == nil then
+                value = "-"
+            end
+            table.insert(row_values, tostring(value))
+        end
+        
+        output_fn(string.format(format_str, table.unpack(row_values)))
+    end
+    
+    -- Print optional footer
+    if options.footer_fn then
+        output_fn("\n")
+        options.footer_fn()
+    end
+    
+    -- Flush only if using default io.write (custom output functions like echo handle their own flushing)
+    if output_fn == io.write then
+        io.flush()
+    end
+end
+
 return widgets

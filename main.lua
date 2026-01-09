@@ -107,39 +107,33 @@ end
 
 -- Print fleet status
 local function print_fleet_status()
-    echo("--- FLEET STATUS ---\n")
+    -- Define column structure
+    local columns = {
+        {title = "Name", value_fn = function(ship) return ship.name end, width = 11},
+        {title = "Age", value_fn = function(ship) return ship.age .. "y" end, width = 4},
+        {title = "Hull", value_fn = function(ship) return ship.hull .. "%" end, width = 5},
+        {title = "Fuel", value_fn = function(ship) return ship.fuel .. "%" end, width = 5},
+        {title = "Status", value_fn = function(ship) return ship.status end, width = 10},
+        {title = "Cargo", value_fn = function(ship) return ship.cargo end, width = 17},
+        {title = "Origin", value_fn = function(ship) return ship.origin end, width = 21},
+        {title = "Destination", value_fn = function(ship) return ship.destination end, width = 23},
+        {title = "ETA", value_fn = function(ship) return ship.eta end, width = 7},
+        {title = "Risk", value_fn = function(ship) return ship.risk end, width = 4}
+    }
     
-    -- Table header
-    echo("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
-        "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk")
-    
-    -- Column separators matching header text length
-    echo("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
-        string.rep("-", 4), string.rep("-", 3), string.rep("-", 4), string.rep("-", 4),
-        string.rep("-", 6), string.rep("-", 5), string.rep("-", 6), string.rep("-", 11),
-        string.rep("-", 3), string.rep("-", 4))
-    
-    -- Table rows
-    for i, ship in ipairs(game.fleet) do
-        echo("%-11s ", ship.name)
-        echo("%-3s ", ship.age .. "y")
-        echo("%-5s ", ship.hull .. "%")
-        echo("%-5s ", ship.fuel .. "%")
-        echo("%-10s ", ship.status)
-        echo("%-17s ", ship.cargo)
-        echo("%-21s ", ship.origin or "-")
-        echo("%-23s ", ship.destination or "-")
-        echo("%-7s ", ship.eta or "-")
-        echo("%-4s", ship.risk)
-        echo("\n")
+    -- Define footer function
+    local footer_fn = function()
+        local stats = gamestate.get_fleet_stats(game)
+        echo("Total Fleet: " .. stats.total .. "/" .. stats.max .. 
+             " | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses .. "\n\n")
     end
     
-    echo("\n")
-    local stats = gamestate.get_fleet_stats(game)
-    echo("Total Fleet: ")
-    echo(stats.total .. "/" .. stats.max)
-    echo(" | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses)
-    echo("\n\n")
+    -- Use the generic table generator with echo for output
+    widgets.table_generator(columns, game.fleet, {
+        title = "--- FLEET STATUS ---",
+        footer_fn = footer_fn,
+        output_fn = echo
+    })
 end
 
 -- Print market snapshot
