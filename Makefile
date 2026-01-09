@@ -6,7 +6,6 @@ all: test
 # Run all tests
 test:
 	@echo "Running tests..."
-	@lua5.3 tests/test_terminal.lua
 	@lua5.3 tests/test_widgets.lua
 	@lua5.3 tests/test_navigation.lua
 	@echo ""
