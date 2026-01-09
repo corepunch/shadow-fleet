@@ -1,180 +1,159 @@
-# Arrow Key Navigation Implementation
+# BBS Door Navigation Implementation
 
-This document describes the arrow key navigation feature added to Shadow Fleet.
+This document describes the BBS Door-style hotkey navigation feature in Shadow Fleet.
 
 ## Overview
 
-The game now supports arrow key navigation for the main menu, replacing the previous numeric input system. Users can now use ↑↓ arrow keys to navigate through menu options and press Enter to confirm their selection.
+The game now uses a simple BBS Door-style interface with hotkey navigation, replacing the previous arrow key navigation system. Users can use single-character hotkeys to navigate through menu options without needing arrow keys or Enter confirmation.
 
 ## Changes Made
 
-### 1. New Keyboard Input Module (`terminal/input.lua`)
+### 1. Simplified Main Loop (`main.lua`)
 
-A new module was created to handle raw keyboard input, including arrow keys:
+The main game loop has been completely refactored for BBS Door-style interaction:
 
 **Features:**
-- Reads individual key presses without requiring Enter
-- Detects arrow keys (UP, DOWN, LEFT, RIGHT)
-- Handles Enter, ESC, and character keys
-- Supports both arrow key and numeric (1-8) input for convenience
-- Efficiently manages terminal raw mode (set once, not per-key)
+- Simple sequential text output using `io.write()` at cursor position
+- Hotkey-based navigation (single character input)
+- No cursor positioning or screen updates for menu selection
+- Clean, readable output format
+- Standard line-based input with `io.read()`
 
-**Key Functions:**
-- `input.set_raw_mode()` - Set terminal to raw mode (call once before main loop)
-- `input.restore_mode()` - Restore terminal to normal mode (call on exit)
-- `input.read_key()` - Reads a single keypress and returns a key code (no stty overhead)
-- `input.wait_for_enter()` - Waits for Enter key press
-- `input.keys` - Table of key constants (UP, DOWN, ENTER, Q, etc.)
+**Key Changes:**
+- Removed arrow key detection and raw mode terminal handling
+- Removed menu highlighting and visual selection feedback
+- Simplified to use regular `io.read()` for input
+- Uses color-coded text output with ANSI escape sequences
+- Menu options displayed with hotkey indicators: `(F) Fleet`
 
-**Performance:**
-- Terminal raw mode is set **once** before the main loop, not on every keypress
-- Eliminates per-key process spawn overhead
-- Provides immediate, lag-free input response
+### 2. Removed Terminal Input Module (`terminal/input.lua`)
 
-### 2. Enhanced UI Widget (`ui/init.lua`)
+The specialized input module for arrow key detection has been removed:
 
-Added a new widget function for rendering menu items with highlight support:
+**Removed Features:**
+- Raw terminal mode handling
+- Arrow key escape sequence detection
+- `read_key()` function for character-by-character input
+- `set_raw_mode()` and `restore_mode()` functions
 
-**New Function:**
-- `widgets.menu_item_highlighted(row, number, text, is_selected)` - Renders a menu item with visual highlighting when selected
-  - Displays a `>` marker for selected items
-  - Uses blue background for highlighted items
-  - Uses bright yellow/white text for better visibility
+**Reason:** No longer needed with simple hotkey navigation using standard `io.read()`
 
-### 3. Updated Main Game Loop (`main.lua`)
+### 3. Simplified UI Widgets (`ui/init.lua`)
 
-Modified the main game loop to support arrow key navigation:
+Removed the highlighted menu item widget:
 
-**Changes:**
-- Calls `input.set_raw_mode()` once before the main loop starts
-- Uses `xpcall` with error handler to ensure `input.restore_mode()` is always called
-- Added `selected_index` variable to track current menu selection
-- Updated `render_dashboard()` to accept and display the selected menu item
-- Modified `sections.quick_actions()` to render items with highlighting
-- Replaced `io.read()` with `input.read_key()` for keyboard input
-- Added arrow key handling (UP/DOWN to navigate, ENTER to select)
-- Maintains backward compatibility with numeric keys (1-8)
-- Updated menu header text to indicate arrow key usage
-- Temporarily restores normal mode for submenu interactions
+**Removed Function:**
+- `widgets.menu_item_highlighted()` - No longer needed without menu highlighting
 
-### 4. New Test Suite (`tests/test_navigation.lua`)
+**Retained Functions:**
+- All other widgets remain functional (separator, title, section headers, etc.)
 
-Added comprehensive tests for the navigation system:
+### 4. Updated Test Suite (`tests/test_navigation.lua`)
+
+Updated tests to reflect the new navigation system:
 
 **Tests:**
-- Input module loading and function existence
-- Key constant definitions
-- Menu rendering with different selections
-- Highlighted menu item widget functionality
+- Widgets module loading and function existence
+- Basic menu item rendering
+- BBS Door navigation system validation
 
 ## Usage
 
 ### For Players
 
-**Navigation:**
-1. Use ↑ (Up Arrow) to move to the previous menu item
-2. Use ↓ (Down Arrow) to move to the next menu item
-3. Press Enter to select the highlighted option
-4. Press 'q' to quit the game
-5. (Optional) Still works with numeric keys 1-8 for direct selection
+**Main Menu Navigation:**
+1. Type **F** for Fleet management
+2. Type **R** for Route planning
+3. Type **T** for Trade operations
+4. Type **E** for Evade tactics
+5. Type **V** for eVents
+6. Type **M** for Market operations
+7. Type **S** for Status information
+8. Type **?** for Help
+9. Type **Q** to quit the game
+
+**Submenu Navigation:**
+- Use the hotkey shown in parentheses for each submenu option
+- Type **B** to go back to the main menu
+- Type **Q** to return to the main menu
 
 **Visual Feedback:**
-- Selected menu items are highlighted with:
-  - A `>` marker on the left
-  - Blue background
-  - Bright yellow/white text
+- Menu options are displayed with hotkey indicators: `(F) Fleet`
+- Colored text highlights important information
+- Sequential output makes it easy to read the current state
 
 ### For Developers
 
-**Using the Input Module:**
+**Using the Simplified Navigation:**
 ```lua
-local input = require("terminal.input")
+local term = require("terminal")
 
--- Set raw mode ONCE before your main loop
-input.set_raw_mode()
+-- Initialize terminal
+term.init()
 
--- Use xpcall to ensure terminal is restored on error
-local function main_loop()
-    while true do
-        local key = input.read_key()  -- No overhead, reads immediately
-        if key == input.keys.UP then
-            -- Handle up arrow
-        elseif key == input.keys.DOWN then
-            -- Handle down arrow
-        elseif key == input.keys.ENTER then
-            -- Handle enter
-        elseif key == input.keys.Q then
-            break
-        end
-    end
+-- Write colored text at cursor position
+term.set_fg("fg_bright_yellow")
+io.write("Enter command: ")
+term.reset()
+
+-- Read user input (standard line-based input)
+local choice = io.read()
+if choice then
+    choice = choice:upper()
+    -- Process choice...
 end
 
-local function error_handler(err)
-    input.restore_mode()  -- Always restore terminal
-    return debug.traceback(err, 2)
-end
-
-xpcall(main_loop, error_handler)
-input.restore_mode()  -- Restore on normal exit
+-- Cleanup
+term.cleanup()
 ```
 
-**Using the Highlighted Menu Widget:**
+**Menu Structure:**
 ```lua
-local widgets = require("ui")
-
--- Render menu items with item 3 highlighted
-for i = 1, 8 do
-    widgets.menu_item_highlighted(row, i, "Menu Item " .. i, i == 3)
-    row = row + 1
-end
+local menu_structure = {
+    F = {
+        name = "Fleet",
+        submenus = {
+            V = "View",
+            Y = "Buy",
+            U = "Upgrade",
+            S = "Scrap"
+        }
+    },
+    -- ... more menu items
+}
 ```
 
 ## Technical Details
 
-### Terminal Raw Mode
+### BBS Door Style
 
-The input module uses `stty` to set the terminal to raw mode. **Critical performance improvement:**
-- Raw mode is set **once** before the main loop (not per-keypress)
-- Eliminates process spawn overhead on every key read
-- Provides immediate, lag-free input response
-- Uses `xpcall` to ensure terminal is always restored on exit
+The BBS Door approach is characterized by:
+- Sequential text output (top to bottom)
+- Simple hotkey navigation (single character commands)
+- No cursor positioning for menu updates
+- Clean, readable interface with colored text
+- Standard line-based input using `io.read()`
 
-This allows:
-- Reading single characters without waiting for Enter
-- Detecting arrow key escape sequences
-- Immediate response to user input
+This provides:
+- Simpler code that's easier to maintain
+- Better compatibility with different terminal types
+- Familiar interface for users of classic BBS systems
+- No need for complex input handling or screen refreshes
 
-**Note:** For submenu interactions that require line-based input, the code temporarily restores normal mode and re-enables raw mode after.
+### Color Output
 
-### Screen Refresh Optimization
+The game uses ANSI escape sequences for colored text output:
+- Important values highlighted in appropriate colors
+- Status information color-coded by severity
+- Menu options clearly distinguished
 
-To eliminate screen flicker/blinking during arrow key navigation:
-- Full screen clear and redraw only happens on initial render or after submenu interactions
-- Arrow key navigation uses **partial updates** - only the changed menu items are redrawn
-- This provides smooth, flicker-free navigation with instant visual feedback
+### Input Handling
 
-**Implementation:**
-- `render_dashboard()` returns the menu position and actions list
-- `update_menu_items()` redraws only the previously selected and newly selected items
-- No `term.clear()` is called during normal arrow key navigation
-
-### Arrow Key Detection
-
-Arrow keys send ANSI escape sequences:
-- Up: `\27[A`
-- Down: `\27[B`
-- Right: `\27[C`
-- Left: `\27[D`
-
-The input module properly detects these sequences and returns user-friendly key codes.
-
-### Menu Selection Wrapping
-
-The menu selection wraps around:
-- Pressing ↑ on the first item moves to the last item
-- Pressing ↓ on the last item moves to the first item
-
-This provides a smooth, circular navigation experience.
+Input is handled using standard Lua `io.read()`:
+- Reads a complete line of input
+- Converts to uppercase for case-insensitive commands
+- Validates against available menu options
+- Handles EOF gracefully
 
 ## Testing
 
@@ -188,11 +167,34 @@ Or run just the navigation tests:
 lua5.3 tests/test_navigation.lua
 ```
 
-## Future Enhancements
+## Benefits of BBS Door Style
 
-Possible improvements for the navigation system:
-- Add support for Page Up/Page Down for faster navigation
-- Add support for Home/End keys to jump to first/last item
-- Add visual scroll indicators for long menus
-- Support horizontal navigation for multi-column menus
-- Add keyboard shortcuts (e.g., 'f' for Fleet)
+**Simplicity:**
+- Less code to maintain
+- Easier to understand and modify
+- No complex terminal mode handling
+
+**Compatibility:**
+- Works with any terminal that supports basic input/output
+- No special terminal capabilities required beyond ANSI colors
+- More robust across different platforms
+
+**Usability:**
+- Fast navigation with single-key commands
+- Clear visual layout with sequential output
+- Familiar to users of classic BBS systems
+- Easy to add new menu options
+
+## Migration from Arrow Key Navigation
+
+**What Changed:**
+- Replaced arrow key navigation with hotkey commands
+- Removed menu highlighting and selection visual feedback
+- Simplified from cursor-based updates to sequential output
+- Changed from raw terminal mode to standard line-based input
+
+**What Stayed the Same:**
+- Game state management
+- Fleet, market, and event information display
+- Color-coded output for important information
+- Overall game structure and features
