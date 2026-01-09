@@ -39,7 +39,8 @@ end
 -- Helper function to fix line endings for raw terminal mode
 -- Converts \n to \r\n, avoiding double conversion of existing \r\n sequences
 local function fix_line_endings(text)
-    return text:gsub("\r?\n", "\r\n")
+    local result = text:gsub("\r?\n", "\r\n")
+    return result
 end
 
 -- Helper function to write colored text at cursor position
@@ -98,10 +99,10 @@ local function print_fleet_status()
     write_colored("--- FLEET STATUS ---\n", "fg_bright_white")
     
     -- Table header
-    write_text(string.format("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
-        "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk"))
+    write_colored(string.format("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
+        "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk"), "fg_white")
     
-    write_text(string.rep("-", 80) .. "\n")
+    write_colored(string.rep("-", 80) .. "\n", "fg_white")
     
     -- Table rows
     for i, ship in ipairs(game.fleet) do
