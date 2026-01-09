@@ -115,9 +115,9 @@ local function print_fleet_status()
         {title = "Fuel", value_fn = function(ship) return ship.fuel .. "%" end, width = 5},
         {title = "Status", value_fn = function(ship) return ship.status end, width = 10},
         {title = "Cargo", value_fn = function(ship) return ship.cargo end, width = 17},
-        {title = "Origin", value_fn = function(ship) return ship.origin or "-" end, width = 21},
-        {title = "Destination", value_fn = function(ship) return ship.destination or "-" end, width = 23},
-        {title = "ETA", value_fn = function(ship) return ship.eta or "-" end, width = 7},
+        {title = "Origin", value_fn = function(ship) return ship.origin end, width = 21},
+        {title = "Destination", value_fn = function(ship) return ship.destination end, width = 23},
+        {title = "ETA", value_fn = function(ship) return ship.eta end, width = 7},
         {title = "Risk", value_fn = function(ship) return ship.risk end, width = 4}
     }
     

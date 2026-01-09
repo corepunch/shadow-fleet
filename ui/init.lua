@@ -147,6 +147,10 @@ function widgets.table_generator(columns, data, options)
         for _, col in ipairs(columns) do
             -- Get value from the value function
             local value = col.value_fn(row)
+            -- Handle nil values by converting to "-"
+            if value == nil then
+                value = "-"
+            end
             table.insert(row_values, tostring(value))
         end
         
