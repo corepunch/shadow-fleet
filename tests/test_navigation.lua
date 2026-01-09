@@ -2,7 +2,6 @@
 -- Simple test for BBS Door-style menu navigation
 -- This tests the hotkey-based navigation without requiring user interaction
 
-local term = require("terminal")
 local widgets = require("ui")
 
 -- Test basic menu item widget
@@ -16,12 +15,7 @@ local function test_menu_item_widget()
     print("✓ menu_item function exists")
     
     -- Test rendering
-    term.init()
-    term.clear()
-    
-    local row = 1
-    widgets.section_header(row, "TEST MENU")
-    row = row + 1
+    print("--- TEST MENU ---")
     
     local actions = {
         "Fleet",
@@ -35,13 +29,11 @@ local function test_menu_item_widget()
     }
     
     for i, action in ipairs(actions) do
-        widgets.menu_item(row, i, action)
-        row = row + 1
+        widgets.menu_item(i, action)
+        print("")
     end
     
     print("✓ Menu rendered successfully")
-    
-    term.cleanup()
 end
 
 -- Test widgets module
@@ -80,6 +72,6 @@ print("")
 print("The BBS Door navigation system provides:")
 print("  • Hotkey-based navigation (F/R/T/E/V/M/S/?)")
 print("  • Simple sequential text output")
-print("  • Color-coded text display")
+print("  • Plain text display")
 print("  • Back navigation with B key")
 print("")
