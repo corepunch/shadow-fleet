@@ -110,7 +110,7 @@ local function print_fleet_status()
     -- Define column structure
     local columns = {
         {title = "Name", value_fn = function(ship) return ship.name end, width = 11},
-        {title = "Age", value_fn = function(ship) return ship.age .. "y" end, width = 3},
+        {title = "Age", value_fn = function(ship) return ship.age .. "y" end, width = 4},
         {title = "Hull", value_fn = function(ship) return ship.hull .. "%" end, width = 5},
         {title = "Fuel", value_fn = function(ship) return ship.fuel .. "%" end, width = 5},
         {title = "Status", value_fn = function(ship) return ship.status end, width = 10},

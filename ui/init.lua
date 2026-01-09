@@ -159,7 +159,10 @@ function widgets.table_generator(columns, data, options)
         options.footer_fn()
     end
     
-    io.flush()
+    -- Flush only if using default io.write
+    if output_fn == io.write then
+        io.flush()
+    end
 end
 
 return widgets
