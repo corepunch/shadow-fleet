@@ -10,8 +10,35 @@ local widgets = require("ui")
 -- Initialize game state
 local game = gamestate.new()
 
+-- Raw mode flag
+local raw_mode_active = false
+
+-- Set terminal to raw mode for single-character input
+local function set_raw_mode()
+    if not raw_mode_active then
+        os.execute("stty raw -echo 2>/dev/null")
+        raw_mode_active = true
+    end
+end
+
+-- Restore terminal to normal mode
+local function restore_normal_mode()
+    if raw_mode_active then
+        os.execute("stty sane 2>/dev/null")
+        raw_mode_active = false
+    end
+end
+
+-- Read a single character without waiting for Enter
+local function read_char()
+    set_raw_mode()
+    local char = io.read(1)
+    return char
+end
+
 -- Helper function to write colored text at cursor position
 local function write_colored(text, fg_color, bg_color)
+    io.flush()  -- Ensure output is visible before setting colors
     if bg_color then
         term.set_colors(fg_color, bg_color)
     else
@@ -19,6 +46,7 @@ local function write_colored(text, fg_color, bg_color)
     end
     io.write(text)
     term.reset()
+    io.flush()  -- Ensure colored text is displayed immediately
 end
 
 -- Print a separator line
@@ -176,7 +204,8 @@ end
 
 -- Main dashboard display
 local function render_dashboard()
-    term.clear()
+    -- Don't clear screen - append to terminal content
+    io.write("\n")  -- Add spacing between screens
     print_header()
     print_status()
     print_market_snapshot()
@@ -251,8 +280,9 @@ local menu_structure = {
 local function handle_submenu_action(menu_name, action)
     io.write("\n")
     write_colored("Action '" .. action .. "' in " .. menu_name .. " not yet implemented.\n", "fg_yellow")
-    write_colored("Press Enter to continue...", "fg_white")
-    io.read()
+    write_colored("Press any key to continue...", "fg_white")
+    read_char()  -- Single character input
+    io.write("\n")
 end
 
 -- Handle submenu navigation
@@ -260,9 +290,11 @@ local function handle_submenu(menu_key)
     local menu = menu_structure[menu_key]
     if not menu then return end
     
+    -- Don't clear screen - append to terminal content
+    io.write("\n")
+    
     -- Special case for Fleet menu - show fleet status
     if menu_key == "F" then
-        term.clear()
         print_header()
         print_status()
         print_fleet_status()
@@ -272,7 +304,7 @@ local function handle_submenu(menu_key)
     end
     
     while true do
-        local choice = io.read()
+        local choice = read_char()  -- Single character input
         
         -- Handle EOF (nil input)
         if not choice then
@@ -282,12 +314,14 @@ local function handle_submenu(menu_key)
         choice = choice:upper()
         
         if choice == "B" or choice == "Q" then
+            io.write("\n")  -- Add newline after input
             return  -- Back to main menu or quit
         elseif menu.submenus[choice] then
+            io.write("\n")  -- Add newline after input
             handle_submenu_action(menu.name, menu.submenus[choice])
-            -- Redraw submenu after action
+            -- Redraw submenu after action (without clearing)
+            io.write("\n")
             if menu_key == "F" then
-                term.clear()
                 print_header()
                 print_status()
                 print_fleet_status()
@@ -296,7 +330,7 @@ local function handle_submenu(menu_key)
                 print_submenu(menu.name, menu.submenus)
             end
         else
-            write_colored("Invalid option. Try again: ", "fg_red")
+            -- Invalid option - don't show error, just ignore
         end
     end
 end
@@ -305,32 +339,51 @@ end
 local function main()
     term.init()
     
-    while true do
-        render_dashboard()
-        local choice = io.read()
+    -- Use pcall to ensure terminal is restored on error
+    local function game_loop()
+        -- Clear screen only on initial startup
+        term.clear()
         
-        -- Handle EOF (nil input)
-        if not choice then
-            term.clear()
-            print("Thank you for playing Shadow Fleet!")
-            break
-        end
-        
-        choice = choice:upper()
-        
-        if choice == "Q" then
-            term.clear()
-            print("Thank you for playing Shadow Fleet!")
-            break
-        elseif menu_structure[choice] then
-            handle_submenu(choice)
-        else
-            write_colored("\nInvalid option. Press Enter to continue...", "fg_red")
-            io.read()
+        while true do
+            render_dashboard()
+            local choice = read_char()  -- Single character input
+            
+            -- Handle EOF (nil input)
+            if not choice then
+                io.write("\n")
+                write_colored("Thank you for playing Shadow Fleet!\n", "fg_bright_yellow")
+                break
+            end
+            
+            choice = choice:upper()
+            
+            if choice == "Q" then
+                io.write("\n")
+                write_colored("Thank you for playing Shadow Fleet!\n", "fg_bright_yellow")
+                break
+            elseif menu_structure[choice] then
+                io.write("\n")  -- Add newline after input
+                handle_submenu(choice)
+            else
+                -- Invalid option - just ignore
+            end
         end
     end
     
+    local function error_handler(err)
+        restore_normal_mode()
+        return debug.traceback(err, 2)
+    end
+    
+    local success, err = xpcall(game_loop, error_handler)
+    
+    -- Always restore terminal mode
+    restore_normal_mode()
     term.cleanup()
+    
+    if not success then
+        print("\nError occurred: " .. tostring(err))
+    end
 end
 
 -- Run the game
