@@ -113,11 +113,11 @@ local function print_fleet_status()
     echo("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
         "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk")
     
-    -- Column separators matching header widths
+    -- Column separators matching header text length
     echo("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
-        string.rep("-", 11), string.rep("-", 3), string.rep("-", 5), string.rep("-", 5),
-        string.rep("-", 10), string.rep("-", 17), string.rep("-", 21), string.rep("-", 23),
-        string.rep("-", 7), string.rep("-", 4))
+        string.rep("-", 4), string.rep("-", 3), string.rep("-", 4), string.rep("-", 4),
+        string.rep("-", 6), string.rep("-", 5), string.rep("-", 6), string.rep("-", 11),
+        string.rep("-", 3), string.rep("-", 4))
     
     -- Table rows
     for i, ship in ipairs(game.fleet) do
