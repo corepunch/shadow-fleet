@@ -49,51 +49,48 @@ local fg_bright_green = term.colors.fg_bright_green
 local fg_bright_red = term.colors.fg_bright_red
 local fg_bright_white = term.colors.fg_bright_white
 local fg_bright_cyan = term.colors.fg_bright_cyan
+local fg_cyan = term.colors.fg_cyan
 local fg_white = term.colors.fg_white
 local fg_yellow = term.colors.fg_yellow
+local fg_green = term.colors.fg_green
+local fg_red = term.colors.fg_red
 local bg_black = term.colors.bg_black
 
--- Helper function to write colored text at cursor position
+-- Helper function to write colored text with optional formatting
 -- In raw mode, we need \r\n instead of just \n for proper line breaks
--- This wrapper handles line ending conversion before delegating to terminal color logic
--- Accepts either:
---   1. String color names: write_colored(text, "fg_bright_yellow", "bg_black")
---   2. Two integer color codes: write_colored(text, fg_bright_yellow, bg_black)
---   3. Single packed integer (fg << 8) | bg: write_colored(text, (fg_bright_yellow << 8)|bg_black)
-local function write_colored(text, fg_color, bg_color)
-    -- Fix line endings for raw terminal mode before writing
+-- Usage: echo(color, format_string, ...)
+-- Example: echo(fg_bright_green, "Enter command: ")
+-- Example: echo(fg_white, "Ship: %s Age: %d", ship.name, ship.age)
+local function echo(fg_color, ...)
+    local args = {...}
+    local text
+    
+    -- If we have arguments, format them
+    if #args > 0 then
+        -- First argument is the format string
+        if #args == 1 then
+            text = args[1]
+        else
+            text = string.format(args[1], select(2, ...))
+        end
+    else
+        text = ""
+    end
+    
+    -- Fix line endings for raw terminal mode
     local fixed_text = fix_line_endings(text)
     
     -- Ensure output is visible before setting colors
     io.flush()
     
-    -- Note: We duplicate the color logic from term.write_colored here because
-    -- we need to handle line ending conversion for raw mode. The terminal module
-    -- doesn't know about raw mode line ending requirements.
-    
-    -- Handle color setting based on input format
-    if type(fg_color) == "number" and bg_color == nil then
-        -- Single integer parameter - check if it's a packed color code
-        if fg_color > term.MAX_ANSI_CODE then
-            -- Packed color code (fg << 8) | bg
-            local packed = fg_color
-            fg_color = packed >> 8
-            bg_color = packed & 0xFF
-        else
-            -- Single color code, default bg to black
-            bg_color = term.colors.bg_black
-        end
-        term.set_colors(fg_color, bg_color)
-    elseif bg_color then
-        term.set_colors(fg_color, bg_color)
-    else
-        term.set_fg(fg_color)
-    end
+    -- Set color (always with black background)
+    term.set_colors(fg_color, bg_black)
     
     io.write(fixed_text)
-    -- Restore default colors: white (standard grey) on black
-    term.set_colors(term.colors.fg_white, term.colors.bg_black)
-    io.flush()  -- Ensure colored text is displayed immediately
+    
+    -- Restore default colors: white on black
+    term.set_colors(fg_white, bg_black)
+    io.flush()
 end
 
 -- Helper function to write plain text with proper line endings in raw mode
@@ -104,112 +101,112 @@ end
 
 -- Print a separator line
 local function print_separator()
-    write_colored(string.rep("=", 80) .. "\n", "fg_white")
+    echo(fg_white, string.rep("=", 80) .. "\n")
 end
 
 -- Print header
 local function print_header()
     print_separator()
-    write_colored("PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE\n", "fg_bright_red")
+    echo(fg_bright_red, "PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE\n")
     print_separator()
 end
 
 -- Print status line
 local function print_status()
     local heat_desc = gamestate.get_heat_description(game)
-    write_colored("[", "fg_white")
-    write_colored("Dark Terminal v0.1", "fg_cyan")
-    write_colored("] - ", "fg_white")
-    write_colored("Rogue Operator Mode", "fg_yellow")
-    write_colored(" | Heat: ", "fg_white")
-    write_colored(heat_desc, gamestate.get_heat_color(game))
+    echo(fg_white, "[")
+    echo(fg_cyan, "Dark Terminal v0.1")
+    echo(fg_white, "] - ")
+    echo(fg_yellow, "Rogue Operator Mode")
+    echo(fg_white, " | Heat: ")
+    echo(gamestate.get_heat_color(game), heat_desc)
     write_text("\n")
     
-    write_colored(game.location, "fg_bright_cyan")
-    write_colored(" - " .. game.date .. " | Rubles: ", "fg_white")
-    write_colored(widgets.format_number(game.rubles), "fg_bright_yellow")
-    write_colored(" | Oil Stock: ", "fg_white")
-    write_colored(game.oil_stock .. "k bbls", "fg_bright_white")
+    echo(fg_bright_cyan, game.location)
+    echo(fg_white, " - " .. game.date .. " | Rubles: ")
+    echo(fg_bright_yellow, widgets.format_number(game.rubles))
+    echo(fg_white, " | Oil Stock: ")
+    echo(fg_bright_white, game.oil_stock .. "k bbls")
     write_text("\n\n")
 end
 
 -- Print fleet status
 local function print_fleet_status()
-    write_colored("--- FLEET STATUS ---\n", "fg_bright_white")
+    echo(fg_bright_white, "--- FLEET STATUS ---\n")
     
     -- Table header
-    write_colored(string.format("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
-        "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk"), "fg_white")
+    echo(fg_white, "%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
+        "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk")
     
-    write_colored(string.rep("-", 80) .. "\n", "fg_white")
+    echo(fg_white, string.rep("-", 80) .. "\n")
     
     -- Table rows
     for i, ship in ipairs(game.fleet) do
-        write_colored(string.format("%-11s ", ship.name), "fg_bright_cyan")
-        write_colored(string.format("%-3s ", ship.age .. "y"), "fg_white")
+        echo(fg_bright_cyan, "%-11s ", ship.name)
+        echo(fg_white, "%-3s ", ship.age .. "y")
         
-        local hull_color = ship.hull >= 70 and "fg_green" or (ship.hull >= 50 and "fg_yellow" or "fg_red")
-        write_colored(string.format("%-5s ", ship.hull .. "%"), hull_color)
+        local hull_color = ship.hull >= 70 and fg_green or (ship.hull >= 50 and fg_yellow or fg_red)
+        echo(hull_color, "%-5s ", ship.hull .. "%")
         
-        local fuel_color = ship.fuel >= 70 and "fg_green" or (ship.fuel >= 30 and "fg_yellow" or "fg_red")
-        write_colored(string.format("%-5s ", ship.fuel .. "%"), fuel_color)
+        local fuel_color = ship.fuel >= 70 and fg_green or (ship.fuel >= 30 and fg_yellow or fg_red)
+        echo(fuel_color, "%-5s ", ship.fuel .. "%")
         
-        write_colored(string.format("%-10s ", ship.status), "fg_white")
-        write_colored(string.format("%-17s ", ship.cargo), "fg_bright_white")
-        write_colored(string.format("%-21s ", ship.origin or "-"), "fg_bright_white")
-        write_colored(string.format("%-23s ", ship.destination or "-"), "fg_white")
-        write_colored(string.format("%-7s ", ship.eta or "-"), "fg_yellow")
+        echo(fg_white, "%-10s ", ship.status)
+        echo(fg_bright_white, "%-17s ", ship.cargo)
+        echo(fg_bright_white, "%-21s ", ship.origin or "-")
+        echo(fg_white, "%-23s ", ship.destination or "-")
+        echo(fg_yellow, "%-7s ", ship.eta or "-")
         
-        local risk_color = ship.risk == "None" and "fg_green" or 
-                          (ship.risk:match("LOW") or ship.risk:match("MED")) and "fg_yellow" or "fg_bright_yellow"
-        write_colored(string.format("%-4s", ship.risk), risk_color)
+        local risk_color = ship.risk == "None" and fg_green or 
+                          (ship.risk:match("LOW") or ship.risk:match("MED")) and fg_yellow or fg_bright_yellow
+        echo(risk_color, "%-4s", ship.risk)
         write_text("\n")
     end
     
     write_text("\n")
     local stats = gamestate.get_fleet_stats(game)
-    write_colored("Total Fleet: ", "fg_white")
-    write_colored(stats.total .. "/" .. stats.max, "fg_bright_white")
-    write_colored(" | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses, "fg_white")
+    echo(fg_white, "Total Fleet: ")
+    echo(fg_bright_white, stats.total .. "/" .. stats.max)
+    echo(fg_white, " | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses)
     write_text("\n\n")
 end
 
 -- Print market snapshot
 local function print_market_snapshot()
-    write_colored("--- MARKET SNAPSHOT ---\n", "fg_bright_white")
+    echo(fg_bright_white, "--- MARKET SNAPSHOT ---\n")
     
-    write_colored("Crude Price Cap: ", "fg_white")
-    write_colored("$" .. game.market.crude_price_cap .. "/bbl", (fg_bright_yellow << 8)|bg_black)
-    write_colored(" | Shadow Markup: ", "fg_white")
-    write_colored("+" .. game.market.shadow_markup_percent .. "%", "fg_bright_green")
-    write_colored(" (", "fg_white")
-    write_colored("$" .. game.market.shadow_price .. "/bbl", (fg_bright_yellow << 8)|bg_black)
-    write_colored(" to India/China)", "fg_white")
+    echo(fg_white, "Crude Price Cap: ")
+    echo(fg_bright_yellow, "$" .. game.market.crude_price_cap .. "/bbl")
+    echo(fg_white, " | Shadow Markup: ")
+    echo(fg_bright_green, "+" .. game.market.shadow_markup_percent .. "%")
+    echo(fg_white, " (")
+    echo(fg_bright_yellow, "$" .. game.market.shadow_price .. "/bbl")
+    echo(fg_white, " to India/China)")
     write_text("\n")
     
-    write_colored("Demand: ", "fg_white")
-    write_colored(game.market.demand, "fg_bright_green")
-    write_colored(" (Baltic Exports: ", "fg_white")
-    write_colored(game.market.baltic_exports .. "M bbls/day", "fg_bright_white")
-    write_colored(") | Sanctions Alert: ", "fg_white")
-    write_colored(game.market.sanctions_alert, "fg_red")
+    echo(fg_white, "Demand: ")
+    echo(fg_bright_green, game.market.demand)
+    echo(fg_white, " (Baltic Exports: ")
+    echo(fg_bright_white, game.market.baltic_exports .. "M bbls/day")
+    echo(fg_white, ") | Sanctions Alert: ")
+    echo(fg_red, game.market.sanctions_alert)
     write_text("\n")
     
-    write_colored('News Ticker: "', "fg_white")
-    write_colored(game.market.news, "fg_yellow")
-    write_colored('"', "fg_white")
+    echo(fg_white, 'News Ticker: "')
+    echo(fg_yellow, game.market.news)
+    echo(fg_white, '"')
     write_text("\n\n")
 end
 
 -- Print active events
 local function print_active_events()
-    write_colored("--- ACTIVE EVENTS ---\n", "fg_bright_white")
+    echo(fg_bright_white, "--- ACTIVE EVENTS ---\n")
     
     for _, event in ipairs(game.events) do
-        write_colored("- ", "fg_white")
-        local event_color = event.type == "Pending" and "fg_yellow" or "fg_green"
-        write_colored(event.type, event_color)
-        write_colored(": " .. event.description, "fg_white")
+        echo(fg_white, "- ")
+        local event_color = event.type == "Pending" and fg_yellow or fg_green
+        echo(event_color, event.type)
+        echo(fg_white, ": " .. event.description)
         write_text("\n")
     end
     write_text("\n")
@@ -217,48 +214,48 @@ end
 
 -- Print heat meter
 local function print_heat_meter()
-    write_colored("--- HEAT METER ---\n", "fg_bright_white")
+    echo(fg_bright_white, "--- HEAT METER ---\n")
     
     local heat = game.heat
     local max_heat = game.heat_max
     
-    write_colored("[", "fg_white")
+    echo(fg_white, "[")
     for i = 1, max_heat do
         if i <= heat then
-            write_colored("|", "fg_red")
+            echo(fg_red, "|")
         else
-            write_colored("|", "fg_white")
+            echo(fg_white, "|")
         end
     end
-    write_colored("] " .. heat .. "/" .. max_heat, gamestate.get_heat_color(game))
-    write_colored(" - ", "fg_white")
-    write_colored(gamestate.get_heat_message(game), heat > 7 and "fg_bright_red" or "fg_white")
+    echo(gamestate.get_heat_color(game), "] " .. heat .. "/" .. max_heat)
+    echo(fg_white, " - ")
+    echo(heat > 7 and fg_bright_red or fg_white, gamestate.get_heat_message(game))
     write_text("\n\n")
 end
 
 -- Print main menu
 local function print_main_menu()
-    write_colored("--- QUICK ACTIONS ---\n", "fg_bright_white")
-    write_colored("(F) Fleet\n", "fg_white")
-    write_colored("(R) Route\n", "fg_white")
-    write_colored("(T) Trade\n", "fg_white")
-    write_colored("(E) Evade\n", "fg_white")
-    write_colored("(V) Events\n", "fg_white")
-    write_colored("(M) Market\n", "fg_white")
-    write_colored("(S) Status\n", "fg_white")
-    write_colored("(?) Help\n", "fg_white")
-    write_colored("(Q) Quit\n\n", "fg_white")
-    write_colored("Enter command: ", "fg_bright_green")
+    echo(fg_bright_white, "--- QUICK ACTIONS ---\n")
+    echo(fg_white, "(F) Fleet\n")
+    echo(fg_white, "(R) Route\n")
+    echo(fg_white, "(T) Trade\n")
+    echo(fg_white, "(E) Evade\n")
+    echo(fg_white, "(V) Events\n")
+    echo(fg_white, "(M) Market\n")
+    echo(fg_white, "(S) Status\n")
+    echo(fg_white, "(?) Help\n")
+    echo(fg_white, "(Q) Quit\n\n")
+    echo(fg_bright_green, "Enter command: ")
 end
 
 -- Print submenu based on choice
 local function print_submenu(menu_name, options)
-    write_colored("\n--- " .. menu_name:upper() .. " MENU ---\n", "fg_bright_white")
+    echo(fg_bright_white, "\n--- " .. menu_name:upper() .. " MENU ---\n")
     for key, option in pairs(options) do
-        write_colored("(" .. key:upper() .. ") " .. option .. "\n", "fg_white")
+        echo(fg_white, "(" .. key:upper() .. ") " .. option .. "\n")
     end
-    write_colored("(B) Back\n\n", "fg_white")
-    write_colored("Enter command: ", "fg_bright_green")
+    echo(fg_white, "(B) Back\n\n")
+    echo(fg_bright_green, "Enter command: ")
 end
 
 -- Main dashboard display
@@ -338,8 +335,8 @@ local menu_structure = {
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)
     write_text("\n")
-    write_colored("Action '" .. action .. "' in " .. menu_name .. " not yet implemented.\n", "fg_yellow")
-    write_colored("Press any key to continue...", "fg_white")
+    echo(fg_yellow, "Action '" .. action .. "' in " .. menu_name .. " not yet implemented.\n")
+    echo(fg_white, "Press any key to continue...")
     read_char()  -- Single character input
     write_text("\n")
 end
@@ -410,7 +407,7 @@ local function main()
             -- Handle EOF (nil input)
             if not choice then
                 write_text("\n")
-                write_colored("Thank you for playing Shadow Fleet!\n", "fg_bright_yellow")
+                echo(fg_bright_yellow, "Thank you for playing Shadow Fleet!\n")
                 break
             end
             
@@ -418,7 +415,7 @@ local function main()
             
             if choice == "Q" then
                 write_text("\n")
-                write_colored("Thank you for playing Shadow Fleet!\n", "fg_bright_yellow")
+                echo(fg_bright_yellow, "Thank you for playing Shadow Fleet!\n")
                 break
             elseif menu_structure[choice] then
                 write_text("\n")  -- Add newline after input
