@@ -199,8 +199,14 @@ end
 -- Print main menu
 local function print_main_menu()
     write_colored("--- QUICK ACTIONS ---\n", "fg_bright_white")
-    write_colored("(F) Fleet  (R) Route  (T) Trade  (E) Evade\n", "fg_white")
-    write_colored("(V) Events  (M) Market  (S) Status  (?) Help\n", "fg_white")
+    write_colored("(F) Fleet\n", "fg_white")
+    write_colored("(R) Route\n", "fg_white")
+    write_colored("(T) Trade\n", "fg_white")
+    write_colored("(E) Evade\n", "fg_white")
+    write_colored("(V) Events\n", "fg_white")
+    write_colored("(M) Market\n", "fg_white")
+    write_colored("(S) Status\n", "fg_white")
+    write_colored("(?) Help\n", "fg_white")
     write_colored("(Q) Quit\n\n", "fg_white")
     write_colored("Enter command: ", "fg_bright_green")
 end
