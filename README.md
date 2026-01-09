@@ -61,10 +61,18 @@ lua5.3 main.lua
 ```
 
 **Controls:**
-- Use ↑↓ arrow keys to navigate menu options
-- Press Enter to select an option
-- Press 'q' to quit
-- Numbers 1-8 also work for direct selection
+- Use hotkeys to navigate menu options:
+  - **F** - Fleet management
+  - **R** - Route planning
+  - **T** - Trade operations
+  - **E** - Evade tactics
+  - **V** - eVents
+  - **M** - Market operations
+  - **S** - Status information
+  - **?** - Help
+- Press the corresponding hotkey for submenu options
+- Press **B** to go back from a submenu
+- Press **Q** to quit
 
 **Run demos:**
 ```bash
@@ -79,7 +87,7 @@ make test
 
 ## Features
 
-- **Arrow Key Navigation** - Intuitive menu navigation using arrow keys (see [NAVIGATION.md](NAVIGATION.md))
-- **Visual Feedback** - Highlighted menu items with color-coded selection
+- **Hotkey Navigation** - Quick BBS Door-style navigation using hotkeys (F/R/T/E/V/M/S/?)
+- **Simple Interface** - Sequential text output with colored formatting
 - **Terminal Framework** - Comprehensive ANSI terminal control
 - **Widget System** - Reusable UI components for building interfaces

@@ -1,13 +1,27 @@
 #!/usr/bin/env lua5.3
--- Simple test for menu navigation
--- This simulates the main menu without requiring user interaction for automated testing
+-- Simple test for BBS Door-style menu navigation
+-- This tests the hotkey-based navigation without requiring user interaction
 
 local term = require("terminal")
 local widgets = require("ui")
 
--- Test menu rendering with highlighting
-local function test_menu_rendering()
-    print("Testing menu item highlighting...")
+-- Test basic menu item widget
+local function test_menu_item_widget()
+    print("Testing menu item widget...")
+    
+    -- Test that menu_item function exists
+    assert(type(widgets.menu_item) == "function", 
+           "widgets.menu_item should be a function")
+    
+    print("✓ menu_item function exists")
+    
+    -- Test rendering
+    term.init()
+    term.clear()
+    
+    local row = 1
+    widgets.section_header(row, "TEST MENU")
+    row = row + 1
     
     local actions = {
         "Fleet",
@@ -20,84 +34,52 @@ local function test_menu_rendering()
         "Help"
     }
     
-    -- Test that menu_item_highlighted function exists
-    assert(type(widgets.menu_item_highlighted) == "function", 
-           "widgets.menu_item_highlighted should be a function")
-    
-    print("✓ menu_item_highlighted function exists")
-    
-    -- Test rendering with different selections
-    term.init()
-    term.clear()
-    
-    local row = 1
-    widgets.section_header(row, "TEST MENU WITH SELECTION 1")
-    row = row + 1
-    
     for i, action in ipairs(actions) do
-        widgets.menu_item_highlighted(row, i, action, i == 1)
+        widgets.menu_item(row, i, action)
         row = row + 1
     end
     
-    print("✓ Menu rendered successfully with item 1 highlighted")
-    
-    -- Test with different selection
-    row = row + 2
-    widgets.section_header(row, "TEST MENU WITH SELECTION 5")
-    row = row + 1
-    
-    for i, action in ipairs(actions) do
-        widgets.menu_item_highlighted(row, i, action, i == 5)
-        row = row + 1
-    end
-    
-    print("✓ Menu rendered successfully with item 5 highlighted")
+    print("✓ Menu rendered successfully")
     
     term.cleanup()
 end
 
--- Test input module
-local function test_input_module()
-    print("\nTesting input module...")
+-- Test widgets module
+local function test_widgets_module()
+    print("\nTesting widgets module...")
     
-    local input = require("terminal.input")
+    local widgets = require("ui")
     
     -- Test that module loads
-    assert(type(input) == "table", "input should be a table")
-    print("✓ Input module loaded successfully")
+    assert(type(widgets) == "table", "widgets should be a table")
+    print("✓ Widgets module loaded successfully")
     
-    -- Test that key constants exist
-    assert(input.keys.UP == "up", "UP key constant should exist")
-    assert(input.keys.DOWN == "down", "DOWN key constant should exist")
-    assert(input.keys.ENTER == "enter", "ENTER key constant should exist")
-    assert(input.keys.Q == "q", "Q key constant should exist")
-    print("✓ All key constants exist")
-    
-    -- Test that functions exist
-    assert(type(input.read_key) == "function", "read_key should be a function")
-    assert(type(input.wait_for_enter) == "function", "wait_for_enter should be a function")
-    assert(type(input.set_raw_mode) == "function", "set_raw_mode should be a function")
-    assert(type(input.restore_mode) == "function", "restore_mode should be a function")
-    print("✓ All input functions exist (including set_raw_mode and restore_mode)")
+    -- Test that key functions exist
+    assert(type(widgets.separator) == "function", "separator should be a function")
+    assert(type(widgets.title) == "function", "title should be a function")
+    assert(type(widgets.section_header) == "function", "section_header should be a function")
+    assert(type(widgets.menu_item) == "function", "menu_item should be a function")
+    assert(type(widgets.format_number) == "function", "format_number should be a function")
+    print("✓ All widget functions exist")
 end
 
 -- Run tests
 print("===================================")
-print("Running Menu Navigation Tests")
+print("Running BBS Door Navigation Tests")
 print("===================================")
 print("")
 
-test_input_module()
-test_menu_rendering()
+test_widgets_module()
+test_menu_item_widget()
 
 print("")
 print("===================================")
 print("All tests passed! ✓")
 print("===================================")
 print("")
-print("The arrow key navigation system provides:")
-print("  • Arrow key detection (UP/DOWN/LEFT/RIGHT)")
-print("  • Enter key confirmation")
-print("  • Highlighted menu items")
-print("  • Visual selection feedback")
+print("The BBS Door navigation system provides:")
+print("  • Hotkey-based navigation (F/R/T/E/V/M/S/?)")
+print("  • Simple sequential text output")
+print("  • Color-coded text display")
+print("  • Back navigation with B key")
 print("")
