@@ -43,11 +43,20 @@ shadow-fleet/
 
 ### File Headers
 
-All Lua files should start with:
+Executable Lua files (main.lua, test files):
 ```lua
 #!/usr/bin/env lua5.3
+
 -- Module Name - Brief description
 -- Additional context if needed
+```
+
+Module files (game/init.lua, ui/init.lua):
+```lua
+-- Module Name - Brief description
+-- Additional context if needed
+
+local module_name = {}
 ```
 
 ### Comments
@@ -188,11 +197,22 @@ widgets.format_number(1000000)  -- Returns "1,000,000"
 
 ### Menu Structure
 
-```lua
--- Main menu hotkeys: F, R, T, E, V, M, S, ?, Q
--- Submenu common hotkeys: B (back), Q (quit to main)
--- Display format: "(F) Fleet" - hotkey in parentheses
-```
+Main menu hotkeys:
+- **F** - Fleet (View/Buy/Upgrade/Scrap)
+- **R** - Route (Plot Ghost Path/Load Cargo)
+- **T** - Trade (Sell/Launder Oil)
+- **E** - Evade (Spoof AIS/Flag Swap/Bribe)
+- **V** - Events (Resolve Pending Dilemmas)
+- **M** - Market (Check Prices/Speculate/Auction Dive)
+- **S** - Status (Quick Recap/News Refresh)
+- **?** - Help (Command Details)
+- **Q** - Quit
+
+Submenu common hotkeys:
+- **B** - Back to main menu
+- Various single-letter commands for submenu actions
+
+Display format: `(F) Fleet` - hotkey in parentheses followed by menu name
 
 ## Build and Run Commands
 
