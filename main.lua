@@ -5,6 +5,10 @@
 
 local gamestate = require("game")
 local widgets = require("ui")
+local commands = require("commands")
+local keymap = require("keymap")
+local command_labels = require("command_labels")
+local commands_init = require("commands_init")
 
 -- Initialize game state
 local game = gamestate.new()
@@ -195,99 +199,50 @@ local function print_heat_meter()
     echo("\n\n")
 end
 
--- Menu structure with submenus
-local menu_structure = {
-    F = {
-        name = "Fleet",
-        submenus = {
-            V = "View",
-            Y = "Buy",
-            U = "Upgrade",
-            S = "Scrap"
-        }
-    },
-    R = {
-        name = "Route",
-        submenus = {
-            P = "Plot Ghost Path",
-            L = "Load Cargo"
-        }
-    },
-    T = {
-        name = "Trade",
-        submenus = {
-            S = "Sell",
-            L = "Launder Oil"
-        }
-    },
-    E = {
-        name = "Evade",
-        submenus = {
-            A = "Spoof AIS",
-            F = "Flag Swap",
-            I = "Bribe"
-        }
-    },
-    V = {
-        name = "Events",
-        submenus = {
-            R = "Resolve Pending Dilemmas"
-        }
-    },
-    M = {
-        name = "Market",
-        submenus = {
-            C = "Check Prices",
-            P = "Speculate",
-            A = "Auction Dive"
-        }
-    },
-    S = {
-        name = "Status",
-        submenus = {
-            R = "Quick Recap",
-            N = "News Refresh"
-        }
-    },
-    ["?"] = {
-        name = "Help",
-        submenus = {
-            C = "Command Details"
-        }
-    }
-}
-
--- Helper function to find hotkey for a menu item name
-local function find_hotkey(item_name)
-    -- Special handling for Quit which is not in menu_structure
-    if item_name == "Quit" then
-        return "Q"
-    end
+-- Helper function to generate formatted menu items from a keymap
+-- @param context_keymap table - The keymap for a specific context (e.g., keymap.main)
+-- @return table - Array of formatted menu items like "(F) Fleet"
+local function generate_menu_items(context_keymap)
+    local items = {}
     
-    -- Search in menu_structure
-    for key, menu_item in pairs(menu_structure) do
-        if menu_item.name == item_name then
-            return key
+    -- Collect all hotkey-command pairs
+    for hotkey, command_id in pairs(context_keymap) do
+        local label = command_labels[command_id]
+        if label then
+            table.insert(items, {
+                hotkey = hotkey,
+                label = label,
+                formatted = "(" .. hotkey .. ") " .. label
+            })
         end
     end
     
-    return nil
-end
-
--- Helper function to format a menu item with its hotkey
-local function format_menu_item(item_name)
-    local hotkey = find_hotkey(item_name)
-    if hotkey then
-        return "(" .. hotkey .. ") " .. item_name
-    else
-        return item_name
+    -- Sort by hotkey for consistent display
+    -- Put special keys at the end (like ? and Q)
+    table.sort(items, function(a, b)
+        -- Special handling for common navigation keys
+        if a.hotkey == "B" then return false end  -- Back goes last
+        if b.hotkey == "B" then return true end
+        if a.hotkey == "Q" then return false end  -- Quit goes near last
+        if b.hotkey == "Q" then return true end
+        if a.hotkey == "?" then return false end  -- Help goes near last
+        if b.hotkey == "?" then return true end
+        return a.hotkey < b.hotkey
+    end)
+    
+    -- Extract just the formatted strings
+    local formatted = {}
+    for _, item in ipairs(items) do
+        table.insert(formatted, item.formatted)
     end
+    
+    return formatted
 end
 
--- Generic function to draw a box with title and items
+-- Generic function to draw a menu with title and items
 -- items: array of strings with format "(X) Item Name" or just "Item Name"
 local function draw_boxed_menu(title, formatted_items)
-    -- Calculate box width based on longest item
+    -- Calculate width based on longest item
     local max_width = #title
     for _, line_text in ipairs(formatted_items) do
         if #line_text > max_width then
@@ -295,94 +250,43 @@ local function draw_boxed_menu(title, formatted_items)
         end
     end
     
-    -- Add padding for box
-    local box_width = max_width + 4  -- 2 chars padding on each side
-    local inner_width = max_width
-    
-    -- Top border: ╔═══╗
-    echo("╔")
-    echo(string.rep("═", box_width))
-    echo("╗\n")
-    
-    -- Title line centered
-    local title_padding = math.floor((inner_width - #title) / 2)
-    echo("║  ")
-    echo(string.rep(" ", title_padding))
+    -- Title line
     echo(title)
-    echo(string.rep(" ", inner_width - #title - title_padding))
-    echo("  ║\n")
+    echo("\n")
     
-    -- Separator after title
-    echo("╠")
-    echo(string.rep("═", box_width))
-    echo("╣\n")
+    -- Separator line between title and items
+    echo(string.rep("═", max_width))
+    echo("\n")
     
     -- Menu items
     for _, line_text in ipairs(formatted_items) do
-        echo("║  ")
         echo(line_text)
-        echo(string.rep(" ", inner_width - #line_text))
-        echo("  ║\n")
+        echo("\n")
     end
     
-    -- Bottom border: ╚═══╝
-    echo("╚")
-    echo(string.rep("═", box_width))
-    echo("╝\n\n")
-    
+    echo("\n")
     echo("Enter command: ")
 end
 
--- Generic function to print a menu with a title and list of items
--- Uses double-lined box-drawing characters
--- items: array of item names, hotkeys are looked up from menu_structure
-local function print_menu(title, items)
-    local formatted_items = {}
-    for _, item_name in ipairs(items) do
-        table.insert(formatted_items, format_menu_item(item_name))
-    end
+-- Generic function to print a menu from a keymap
+-- @param title string - Menu title
+-- @param context_keymap table - The keymap for this context
+local function print_menu_from_keymap(title, context_keymap)
+    local formatted_items = generate_menu_items(context_keymap)
     draw_boxed_menu(title, formatted_items)
 end
 
 -- Print main menu
 local function print_main_menu()
-    print_menu("QUICK ACTIONS", {
-        "Fleet",
-        "Route",
-        "Trade",
-        "Evade",
-        "Events",
-        "Market",
-        "Status",
-        "Help",
-        "Quit"
-    })
+    print_menu_from_keymap("QUICK ACTIONS", keymap.main)
 end
 
--- Print submenu based on choice
-local function print_submenu(menu_name, options)
+-- Print submenu for a given context
+-- @param menu_name string - Display name for the menu
+-- @param context_keymap table - The keymap for this context
+local function print_submenu(menu_name, context_keymap)
     echo("\n")
-    
-    -- Convert options table to list of formatted items
-    local items = {}
-    for key, option in pairs(options) do
-        table.insert(items, {hotkey = key:upper(), name = option})
-    end
-    
-    -- Sort items by hotkey for consistent display
-    table.sort(items, function(a, b) return a.hotkey < b.hotkey end)
-    
-    -- Add Back option
-    table.insert(items, {hotkey = "B", name = "Back"})
-    
-    -- Format items with hotkeys
-    local formatted_items = {}
-    for _, item in ipairs(items) do
-        table.insert(formatted_items, "(" .. item.hotkey .. ") " .. item.name)
-    end
-    
-    -- Use the generic box drawing function
-    draw_boxed_menu(menu_name:upper() .. " MENU", formatted_items)
+    print_menu_from_keymap(menu_name:upper() .. " MENU", context_keymap)
 end
 
 -- Main dashboard display
@@ -549,49 +453,86 @@ local function handle_submenu_action(menu_name, action)
     echo("\n")
 end
 
--- Handle submenu navigation
-local function handle_submenu(menu_key)
-    local menu = menu_structure[menu_key]
-    if not menu then return end
-    
+-- Get the keymap for a given context
+local function get_context_keymap(context)
+    return keymap[context] or keymap.main  -- Default to main menu if context not found
+end
+
+-- Get the display name for a context
+local function get_context_name(context)
+    -- Capitalize first letter of context name
+    if context == "main" then
+        return "Main Menu"
+    else
+        return context:sub(1,1):upper() .. context:sub(2)
+    end
+end
+
+-- Handle context display and input
+-- Returns the new context or nil to return to main
+local function handle_context(context)
     -- Don't clear screen - append to terminal content
     echo("\n")
     
     -- Special case for Fleet menu - show fleet status
-    if menu_key == "F" then
+    if context == "fleet" then
         print_header()
         print_status()
         print_fleet_status()
-        print_submenu(menu.name, menu.submenus)
+        print_submenu(get_context_name(context), get_context_keymap(context))
     else
-        print_submenu(menu.name, menu.submenus)
+        print_submenu(get_context_name(context), get_context_keymap(context))
     end
+    
+    local context_keymap = get_context_keymap(context)
     
     while true do
         local choice = read_char()  -- Single character input
         
         -- Handle EOF (nil input)
         if not choice then
-            return
+            return "main"
         end
         
         choice = choice:upper()
         
-        if choice == "B" or choice == "Q" then
+        -- Look up command in keymap
+        local command_id = context_keymap[choice]
+        
+        if command_id then
             echo("\n")  -- Add newline after input
-            return  -- Back to main menu or quit
-        elseif menu.submenus[choice] then
-            echo("\n")  -- Add newline after input
-            handle_submenu_action(menu.name, menu.submenus[choice])
-            -- Redraw submenu after action (without clearing)
-            echo("\n")
-            if menu_key == "F" then
-                print_header()
-                print_status()
-                print_fleet_status()
-                print_submenu(menu.name, menu.submenus)
-            else
-                print_submenu(menu.name, menu.submenus)
+            
+            -- Run the command
+            local result = commands.run(command_id, game, context)
+            
+            -- Handle command result
+            if result then
+                if result.change_context then
+                    -- Switch to new context
+                    return result.change_context
+                elseif result.quit then
+                    -- Quit the game
+                    return "quit"
+                elseif result.message then
+                    -- Display message to user
+                    echo(result.message .. "\n")
+                    echo("Press any key to continue...")
+                    read_char()
+                    echo("\n")
+                end
+            end
+            
+            -- Redraw submenu after action (unless we're switching context)
+            if not result or not result.change_context then
+                echo("\n")
+                if context == "fleet" then
+                    print_header()
+                    print_status()
+                    print_fleet_status()
+                    print_submenu(get_context_name(context), get_context_keymap(context))
+                else
+                    print_submenu(get_context_name(context), get_context_keymap(context))
+                end
             end
         else
             -- Invalid option - don't show error, just ignore
@@ -601,30 +542,69 @@ end
 
 -- Main game loop
 local function main()
+    -- Initialize command registry
+    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action)
+    
+    -- Current context (main menu or submenu name)
+    local current_context = "main"
+    
     -- Use pcall to ensure terminal is restored on error
     local function game_loop()
         while true do
-            render_dashboard()
-            local choice = read_char()  -- Single character input
-            
-            -- Handle EOF (nil input)
-            if not choice then
-                echo("\n")
-                echo("Thank you for playing Shadow Fleet!\n")
-                break
-            end
-            
-            choice = choice:upper()
-            
-            if choice == "Q" then
-                echo("\n")
-                echo("Thank you for playing Shadow Fleet!\n")
-                break
-            elseif menu_structure[choice] then
-                echo("\n")  -- Add newline after input
-                handle_submenu(choice)
+            if current_context == "main" then
+                -- Render main dashboard
+                render_dashboard()
+                local choice = read_char()  -- Single character input
+                
+                -- Handle EOF (nil input)
+                if not choice then
+                    echo("\n")
+                    echo("Thank you for playing Shadow Fleet!\n")
+                    break
+                end
+                
+                choice = choice:upper()
+                
+                -- Look up command in main keymap
+                local command_id = keymap.main[choice]
+                
+                if command_id then
+                    echo("\n")  -- Add newline after input
+                    
+                    -- Run the command
+                    local result = commands.run(command_id, game, current_context)
+                    
+                    -- Handle command result
+                    if result then
+                        if result.change_context then
+                            -- Switch to submenu context
+                            current_context = result.change_context
+                        elseif result.quit then
+                            -- Quit the game
+                            echo("Thank you for playing Shadow Fleet!\n")
+                            break
+                        elseif result.message then
+                            -- Display message to user
+                            echo(result.message .. "\n")
+                            echo("Press any key to continue...")
+                            read_char()
+                            echo("\n")
+                        end
+                    end
+                else
+                    -- Invalid option - just ignore
+                end
             else
-                -- Invalid option - just ignore
+                -- Handle submenu context
+                local new_context = handle_context(current_context)
+                
+                if new_context == "quit" then
+                    echo("\n")
+                    echo("Thank you for playing Shadow Fleet!\n")
+                    break
+                else
+                    current_context = new_context
+                end
             end
         end
     end

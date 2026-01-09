@@ -5,40 +5,30 @@ print("Testing Menu Formatting...")
 print("")
 
 -- Test that the main.lua file can be loaded and contains the new function
-print("✓ Test 1: Checking that main.lua contains print_menu function")
+print("✓ Test 1: Checking that main.lua contains menu functions")
 
--- Read the main.lua file and verify it contains print_menu
+-- Read the main.lua file and verify it contains required functions
 local file = io.open("main.lua", "r")
 assert(file, "Could not open main.lua")
 local content = file:read("*all")
 file:close()
 
-assert(content:match("local function print_menu"), "main.lua should contain print_menu function")
-assert(content:match("╔"), "main.lua should use double-lined box drawing characters (╔)")
-assert(content:match("╗"), "main.lua should use double-lined box drawing characters (╗)")
-assert(content:match("║"), "main.lua should use double-lined box drawing characters (║)")
-assert(content:match("╚"), "main.lua should use double-lined box drawing characters (╚)")
-assert(content:match("╝"), "main.lua should use double-lined box drawing characters (╝)")
-assert(content:match("═"), "main.lua should use double-lined box drawing characters (═)")
+assert(content:match("local function print_menu_from_keymap") or content:match("function print_menu_from_keymap"), 
+       "main.lua should contain print_menu_from_keymap function")
+assert(content:match("═"), "main.lua should use separator line (═)")
 
-print("✓ All box-drawing characters found")
+print("✓ Separator character found")
 
--- Test that print_main_menu now uses print_menu
-assert(content:match('print_menu%("QUICK ACTIONS"'), "print_main_menu should call print_menu with QUICK ACTIONS title")
-print("✓ print_main_menu now uses print_menu function")
+-- Test that print_main_menu uses the new approach
+assert(content:match('print_menu_from_keymap%("QUICK ACTIONS"'), "print_main_menu should call print_menu_from_keymap with QUICK ACTIONS title")
+print("✓ print_main_menu now uses print_menu_from_keymap function")
 
--- Test that the menu items are passed as a list
-assert(content:match('"Fleet"'), "Menu should include Fleet")
-assert(content:match('"Route"'), "Menu should include Route")
-assert(content:match('"Trade"'), "Menu should include Trade")
-assert(content:match('"Evade"'), "Menu should include Evade")
-assert(content:match('"Events"'), "Menu should include Events")
-assert(content:match('"Market"'), "Menu should include Market")
-assert(content:match('"Status"'), "Menu should include Status")
-assert(content:match('"Help"'), "Menu should include Help")
-assert(content:match('"Quit"'), "Menu should include Quit")
+-- Test that keymap and command_labels are used
+assert(content:match('require%("keymap"%)'), "main.lua should require keymap module")
+assert(content:match('require%("command_labels"%)'), "main.lua should require command_labels module")
+assert(content:match('require%("commands"%)'), "main.lua should require commands module")
 
-print("✓ All menu items found in the list")
+print("✓ All required modules are loaded")
 
 print("")
 print("===================================")
@@ -46,8 +36,8 @@ print("All tests passed! ✓")
 print("===================================")
 print("")
 print("The menu formatting system provides:")
-print("  • print_menu(title, items) function")
-print("  • Double-lined box-drawing characters (╔╗║╚╝═)")
-print("  • Automatic hotkey extraction from menu_structure")
-print("  • Centered title in box")
+print("  • print_menu_from_keymap(title, keymap) function")
+print("  • Simple separator line between title and items")
+print("  • Keymap-based hotkey mapping")
+print("  • Command registry for actions")
 print("")
