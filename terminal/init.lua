@@ -63,6 +63,9 @@ terminal.styles = {
     strikethrough = 9,
 }
 
+-- Constants
+terminal.MAX_ANSI_CODE = 255  -- Maximum value for a single ANSI color code
+
 -- Clear the entire screen
 -- Sets black background before clearing to ensure consistent background color
 function terminal.clear()
@@ -217,9 +220,26 @@ function terminal.write_at(row, col, text, fg, bg)
 end
 
 -- Write colored text at current position
+-- Accepts either:
+--   1. String color names: write_colored(text, "fg_bright_yellow", "bg_black")
+--   2. Two integer color codes: write_colored(text, terminal.colors.fg_bright_yellow, terminal.colors.bg_black)
+--   3. Single packed integer (fg << 8) | bg: write_colored(text, (terminal.colors.fg_bright_yellow << 8) | terminal.colors.bg_black)
 function terminal.write_colored(text, fg, bg)
-    -- Default to black background if not specified
-    bg = bg or "bg_black"
+    -- If fg is an integer and bg is nil, check if it's a packed color code
+    if type(fg) == "number" and bg == nil then
+        -- If the value is > MAX_ANSI_CODE, it's likely a packed color code (fg << 8) | bg
+        if fg > terminal.MAX_ANSI_CODE then
+            local packed = fg
+            fg = packed >> 8
+            bg = packed & 0xFF
+        else
+            -- Single color code, default bg to black
+            bg = terminal.colors.bg_black
+        end
+    else
+        -- Default to black background if not specified
+        bg = bg or "bg_black"
+    end
     
     if fg or bg then
         if fg and bg then
@@ -231,7 +251,8 @@ function terminal.write_colored(text, fg, bg)
         end
     end
     io.write(text)
-    terminal.reset()
+    -- Restore default colors: white (standard grey) on black
+    terminal.set_colors(terminal.colors.fg_white, terminal.colors.bg_black)
     io.flush()
 end
 
