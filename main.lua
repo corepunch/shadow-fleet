@@ -124,10 +124,8 @@ local function print_fleet_status()
     -- Define footer function
     local footer_fn = function()
         local stats = gamestate.get_fleet_stats(game)
-        echo("Total Fleet: ")
-        echo(stats.total .. "/" .. stats.max)
-        echo(" | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses)
-        echo("\n\n")
+        echo("Total Fleet: " .. stats.total .. "/" .. stats.max .. 
+             " | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses .. "\n\n")
     end
     
     -- Use the generic table generator with echo for output
