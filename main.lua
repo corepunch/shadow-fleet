@@ -63,16 +63,13 @@ local function write_colored(text, fg_color, bg_color)
     -- Fix line endings for raw terminal mode before writing
     local fixed_text = fix_line_endings(text)
     
-    -- Maximum value for a single ANSI color code
-    local MAX_ANSI_CODE = 255
-    
-    -- Delegate to terminal.write_colored for color handling and reset
-    io.flush()  -- Ensure output is visible before setting colors
+    -- Ensure output is visible before setting colors
+    io.flush()
     
     -- Handle color setting based on input format
     if type(fg_color) == "number" and bg_color == nil then
         -- Single integer parameter - check if it's a packed color code
-        if fg_color > MAX_ANSI_CODE then
+        if fg_color > term.MAX_ANSI_CODE then
             -- Packed color code (fg << 8) | bg
             local packed = fg_color
             fg_color = packed >> 8
