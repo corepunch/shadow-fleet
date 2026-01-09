@@ -60,6 +60,20 @@ local game = gamestate.new()
 lua5.3 main.lua
 ```
 
+**Choose a color theme:**
+```bash
+# Run with dark theme (default - white text on black background)
+lua5.3 main.lua --theme dark
+
+# Run with light theme (black text on white background)
+lua5.3 main.lua --theme light
+```
+
+**Show help:**
+```bash
+lua5.3 main.lua --help
+```
+
 **Controls:**
 - Use hotkeys to navigate menu options:
   - **F** - Fleet management
@@ -78,6 +92,7 @@ lua5.3 main.lua
 ```bash
 lua5.3 terminal_demo.lua
 lua5.3 game_ui_example.lua
+lua5.3 theme_demo.lua  # View both color themes
 ```
 
 **Run tests:**
@@ -87,7 +102,8 @@ make test
 
 ## Features
 
+- **Color Themes** - Choose between dark and light themes via command-line argument
 - **Hotkey Navigation** - Quick BBS Door-style navigation using hotkeys (F/R/T/E/V/M/S/?)
 - **Simple Interface** - Sequential text output with colored formatting
-- **Terminal Framework** - Comprehensive ANSI terminal control
+- **Terminal Framework** - Comprehensive ANSI terminal control with theme support
 - **Widget System** - Reusable UI components for building interfaces

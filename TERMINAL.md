@@ -7,6 +7,7 @@ A comprehensive Lua module providing cursor control, color management, and scree
 - ✓ **Screen Clearing**: Multiple options for clearing screen, lines, or portions
 - ✓ **Cursor Positioning**: Move cursor anywhere on screen with precise control
 - ✓ **Color Support**: 32 predefined colors (16 foreground + 16 background)
+- ✓ **Color Themes**: Support for dark and light themes with theme-aware color schemes
 - ✓ **Color Schemes**: Pre-configured color combinations for common UI elements
 - ✓ **Text Styles**: Bold, italic, underline, and more
 - ✓ **Drawing Utilities**: Box drawing and fill functions
@@ -25,8 +26,8 @@ local terminal = require("terminal")
 ```lua
 local terminal = require("terminal")
 
--- Initialize terminal for game mode
-terminal.init()
+-- Initialize terminal for game mode with a theme
+terminal.init("dark")  -- or "light"
 
 -- Clear screen and write colored text
 terminal.clear()
@@ -40,7 +41,35 @@ terminal.draw_box(5, 5, 40, 10, "fg_cyan", "bg_black")
 terminal.cleanup()
 ```
 
+## Themes
+
+The terminal framework supports two color themes:
+
+- **Dark Theme** (default): White text on black background
+- **Light Theme**: Black text on white background
+
+```lua
+-- Set theme
+terminal.set_theme("dark")   -- or "light"
+
+-- Get current theme colors
+local bg = terminal.get_theme_bg()  -- Returns "bg_black" or "bg_white"
+local fg = terminal.get_theme_fg()  -- Returns "fg_white" or "fg_black"
+
+-- Initialize with a theme
+terminal.init("light")
+```
+
+Color schemes automatically adapt to the current theme, providing appropriate contrast and readability.
+
 ## API Reference
+
+### Theme Functions
+
+- `terminal.set_theme(theme_name)` - Set the current theme ("dark" or "light")
+- `terminal.get_theme_bg()` - Get background color for current theme
+- `terminal.get_theme_fg()` - Get foreground color for current theme
+- `terminal.get_scheme(scheme_name)` - Get a color scheme for the current theme
 
 ### Screen Operations
 
@@ -101,24 +130,49 @@ terminal.cleanup()
 
 ## Color Schemes
 
-Pre-configured color combinations accessible via `terminal.schemes`:
+The terminal framework provides theme-aware color schemes that automatically adapt to the current theme (dark or light).
 
+**Available Schemes:**
+- `default` - Default text (white on black for dark theme, black on white for light theme)
+- `title` - Titles and headers
+- `error` - Error messages (red foreground)
+- `success` - Success messages (green foreground)
+- `warning` - Warning messages (yellow foreground)
+- `info` - Information messages (cyan foreground)
+- `highlight` - Highlighted text (inverted colors)
+- `menu` - Menu items
+- `menu_selected` - Selected menu items
+- `ocean` - Ocean/water themed
+- `danger` - Danger indicators (white on red)
+
+**Dark Theme Colors:**
 - `default` - White on black
 - `title` - Bright yellow on blue
 - `error` - Bright red on black
 - `success` - Bright green on black
-- `warning` - Bright yellow on black
-- `info` - Bright cyan on black
-- `highlight` - Black on white
-- `menu` - White on blue
-- `menu_selected` - Yellow on blue
-- `ocean` - Bright white on blue
-- `danger` - White on red
+- etc.
+
+**Light Theme Colors:**
+- `default` - Black on white
+- `title` - Blue on bright yellow
+- `error` - Red on white
+- `success` - Green on white
+- etc.
 
 Example:
 ```lua
+-- Set theme first
+terminal.set_theme("light")
+
+-- Apply scheme (automatically uses light theme colors)
 terminal.apply_scheme("title")
 io.write("This is a title")
+terminal.reset()
+
+-- Or get scheme for manual use
+local error_scheme = terminal.get_scheme("error")
+terminal.set_colors(error_scheme.fg, error_scheme.bg)
+io.write("Error message")
 terminal.reset()
 ```
 
