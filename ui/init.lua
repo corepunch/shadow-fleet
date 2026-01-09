@@ -114,21 +114,21 @@ end
 
 -- Widget: Horizontal menu items
 -- Renders menu items horizontally on a single row with 2-space padding between items
+-- Each item has format: " word " (space-word-space)
+-- Between items: no extra spaces needed (trailing space + leading space = 2 spaces)
 function widgets.horizontal_menu(row, col, actions, selected_index)
     term.move_to(row, col)  -- Position cursor
     
     for i, action in ipairs(actions) do
+        -- All items have 1 space before and after: " word "
+        local item_text = " " .. action .. " "
+        
         if i == selected_index then
-            -- Draw highlighted item with 1 space padding before and after
-            term.write_colored(" " .. action .. " ", "fg_bright_white", "bg_blue")
+            -- Highlight the item (including its surrounding spaces)
+            term.write_colored(item_text, "fg_bright_white", "bg_blue")
         else
             -- Draw unselected item
-            term.write_colored(action, "fg_white")
-        end
-        
-        -- Add 2-space padding between items (except after the last item)
-        if i < #actions then
-            term.write_colored("  ", "fg_white")
+            term.write_colored(item_text, "fg_white")
         end
     end
     
