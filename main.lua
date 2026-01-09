@@ -249,9 +249,9 @@ local menu_structure = {
 
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)
-    term.clear()
-    print("Action '" .. action .. "' in " .. menu_name .. " not yet implemented.")
-    print("Press Enter to continue...")
+    io.write("\n")
+    write_colored("Action '" .. action .. "' in " .. menu_name .. " not yet implemented.\n", "fg_yellow")
+    write_colored("Press Enter to continue...", "fg_white")
     io.read()
 end
 
