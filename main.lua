@@ -184,9 +184,9 @@ local function print_heat_meter()
     echo("[")
     for i = 1, max_heat do
         if i <= heat then
-            echo("#")  -- Filled heat bar
+            echo("█")  -- Filled heat bar (solid block)
         else
-            echo("|")  -- Empty heat bar
+            echo("░")  -- Empty heat bar (25% dithered)
         end
     end
     echo("] " .. heat .. "/" .. max_heat)
