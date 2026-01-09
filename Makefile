@@ -9,6 +9,7 @@ test:
 	@lua5.3 tests/test_widgets.lua
 	@lua5.3 tests/test_navigation.lua
 	@lua5.3 tests/test_menu_formatting.lua
+	@lua5.3 tests/test_upgrades.lua
 	@echo ""
 	@echo "All tests completed successfully!"
 

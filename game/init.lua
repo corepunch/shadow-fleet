@@ -64,6 +64,45 @@ function gamestate.new()
                 type = "Opportunity",
                 description = "Shady Auction - Buy \"RUST-07\" (Age 28y, 1M bbls cap) for 2M Rubles?"
             }
+        },
+        
+        -- Available vessel upgrades
+        upgrades = {
+            {
+                name = "Hull Repair",
+                description = "Restore hull to 100%",
+                cost = 500000,
+                effect = "hull",
+                value = 100
+            },
+            {
+                name = "Fuel Tank Expansion",
+                description = "Increase fuel capacity by 20%",
+                cost = 750000,
+                effect = "fuel_capacity",
+                value = 20
+            },
+            {
+                name = "AIS Spoofer",
+                description = "Permanent AIS spoofing capability",
+                cost = 1000000,
+                effect = "equipment",
+                value = "AIS_SPOOF"
+            },
+            {
+                name = "Hull Reinforcement",
+                description = "Reduce hull degradation by 50%",
+                cost = 1200000,
+                effect = "equipment",
+                value = "HULL_REINFORCE"
+            },
+            {
+                name = "Advanced Radar",
+                description = "Better detection avoidance",
+                cost = 800000,
+                effect = "equipment",
+                value = "ADV_RADAR"
+            }
         }
     }
 end
@@ -122,6 +161,48 @@ function gamestate.get_heat_message(game)
     else
         return "DANGER! Active pursuit in progress!"
     end
+end
+
+-- Check if an upgrade is applicable to a ship
+function gamestate.can_apply_upgrade(ship, upgrade)
+    -- Hull repair only if hull is damaged
+    if upgrade.effect == "hull" and ship.hull >= 100 then
+        return false, "Hull is already at 100%"
+    end
+    
+    -- Check if ship already has this equipment
+    if upgrade.effect == "equipment" then
+        ship.equipment = ship.equipment or {}
+        if ship.equipment[upgrade.value] then
+            return false, "Ship already has this upgrade"
+        end
+    end
+    
+    return true, nil
+end
+
+-- Apply an upgrade to a ship
+function gamestate.apply_upgrade(ship, upgrade)
+    if upgrade.effect == "hull" then
+        ship.hull = upgrade.value
+    elseif upgrade.effect == "fuel_capacity" then
+        ship.fuel_capacity = (ship.fuel_capacity or 100) + upgrade.value
+    elseif upgrade.effect == "equipment" then
+        ship.equipment = ship.equipment or {}
+        ship.equipment[upgrade.value] = true
+    end
+end
+
+-- Get available upgrades for a ship
+function gamestate.get_available_upgrades(game, ship)
+    local available = {}
+    for _, upgrade in ipairs(game.upgrades) do
+        local can_apply, reason = gamestate.can_apply_upgrade(ship, upgrade)
+        if can_apply then
+            table.insert(available, upgrade)
+        end
+    end
+    return available
 end
 
 return gamestate
