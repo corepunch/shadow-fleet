@@ -58,18 +58,21 @@ local bg_black = term.colors.bg_black
 -- Accepts either:
 --   1. String color names: write_colored(text, "fg_bright_yellow", "bg_black")
 --   2. Two integer color codes: write_colored(text, fg_bright_yellow, bg_black)
---   3. Single packed integer (fg << 8) | bg: write_colored(text, fg_bright_yellow|bg_black)
+--   3. Single packed integer (fg << 8) | bg: write_colored(text, (fg_bright_yellow << 8)|bg_black)
 local function write_colored(text, fg_color, bg_color)
     -- Fix line endings for raw terminal mode before writing
     local fixed_text = fix_line_endings(text)
+    
+    -- Maximum value for a single ANSI color code
+    local MAX_ANSI_CODE = 255
     
     -- Delegate to terminal.write_colored for color handling and reset
     io.flush()  -- Ensure output is visible before setting colors
     
     -- Handle color setting based on input format
     if type(fg_color) == "number" and bg_color == nil then
-        -- Single integer parameter - let terminal.write_colored handle it
-        if fg_color > 255 then
+        -- Single integer parameter - check if it's a packed color code
+        if fg_color > MAX_ANSI_CODE then
             -- Packed color code (fg << 8) | bg
             local packed = fg_color
             fg_color = packed >> 8
@@ -174,11 +177,11 @@ local function print_market_snapshot()
     write_colored("--- MARKET SNAPSHOT ---\n", "fg_bright_white")
     
     write_colored("Crude Price Cap: ", "fg_white")
-    write_colored("$" .. game.market.crude_price_cap .. "/bbl", fg_bright_yellow|bg_black)
+    write_colored("$" .. game.market.crude_price_cap .. "/bbl", (fg_bright_yellow << 8)|bg_black)
     write_colored(" | Shadow Markup: ", "fg_white")
     write_colored("+" .. game.market.shadow_markup_percent .. "%", "fg_bright_green")
     write_colored(" (", "fg_white")
-    write_colored("$" .. game.market.shadow_price .. "/bbl", fg_bright_yellow|bg_black)
+    write_colored("$" .. game.market.shadow_price .. "/bbl", (fg_bright_yellow << 8)|bg_black)
     write_colored(" to India/China)", "fg_white")
     write_text("\n")
     
