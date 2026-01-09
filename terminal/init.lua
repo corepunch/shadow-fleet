@@ -251,7 +251,7 @@ function terminal.write_colored(text, fg, bg)
         end
     end
     io.write(text)
-    -- Restore default colors: light-grey (fg_white) on black
+    -- Restore default colors: white (standard grey) on black
     terminal.set_colors(terminal.colors.fg_white, terminal.colors.bg_black)
     io.flush()
 end

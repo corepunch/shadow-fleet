@@ -55,6 +55,7 @@ local bg_black = term.colors.bg_black
 
 -- Helper function to write colored text at cursor position
 -- In raw mode, we need \r\n instead of just \n for proper line breaks
+-- This wrapper handles line ending conversion before delegating to terminal color logic
 -- Accepts either:
 --   1. String color names: write_colored(text, "fg_bright_yellow", "bg_black")
 --   2. Two integer color codes: write_colored(text, fg_bright_yellow, bg_black)
@@ -65,6 +66,10 @@ local function write_colored(text, fg_color, bg_color)
     
     -- Ensure output is visible before setting colors
     io.flush()
+    
+    -- Note: We duplicate the color logic from term.write_colored here because
+    -- we need to handle line ending conversion for raw mode. The terminal module
+    -- doesn't know about raw mode line ending requirements.
     
     -- Handle color setting based on input format
     if type(fg_color) == "number" and bg_color == nil then
@@ -86,7 +91,7 @@ local function write_colored(text, fg_color, bg_color)
     end
     
     io.write(fixed_text)
-    -- Restore default colors: light-grey (fg_white) on black
+    -- Restore default colors: white (standard grey) on black
     term.set_colors(term.colors.fg_white, term.colors.bg_black)
     io.flush()  -- Ensure colored text is displayed immediately
 end
