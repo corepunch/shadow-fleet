@@ -8,7 +8,7 @@ print("")
 print("✓ Test 1: Checking that main.lua contains print_menu function")
 
 -- Read the main.lua file and verify it contains print_menu
-local file = io.open("/home/runner/work/shadow-fleet/shadow-fleet/main.lua", "r")
+local file = io.open("main.lua", "r")
 assert(file, "Could not open main.lua")
 local content = file:read("*all")
 file:close()

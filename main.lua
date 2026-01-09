@@ -195,7 +195,7 @@ local function print_heat_meter()
     echo("\n\n")
 end
 
--- Print submenu based on choice
+-- Menu structure with submenus
 local menu_structure = {
     F = {
         name = "Fleet",
@@ -257,6 +257,33 @@ local menu_structure = {
     }
 }
 
+-- Helper function to find hotkey for a menu item name
+local function find_hotkey(item_name)
+    -- Special handling for Quit which is not in menu_structure
+    if item_name == "Quit" then
+        return "Q"
+    end
+    
+    -- Search in menu_structure
+    for key, menu_item in pairs(menu_structure) do
+        if menu_item.name == item_name then
+            return key
+        end
+    end
+    
+    return nil
+end
+
+-- Helper function to format a menu item with its hotkey
+local function format_menu_item(item_name)
+    local hotkey = find_hotkey(item_name)
+    if hotkey then
+        return "(" .. hotkey .. ") " .. item_name
+    else
+        return item_name
+    end
+end
+
 -- Generic function to print a menu with a title and list of items
 -- Uses double-lined box-drawing characters
 -- items: array of item names, hotkeys are looked up from menu_structure
@@ -264,26 +291,7 @@ local function print_menu(title, items)
     -- Calculate box width based on longest item
     local max_width = #title
     for _, item_name in ipairs(items) do
-        -- Find hotkey for this item
-        local hotkey = nil
-        for key, menu_item in pairs(menu_structure) do
-            if menu_item.name == item_name then
-                hotkey = key
-                break
-            end
-        end
-        -- Format: "(X) Item Name"
-        local line_text
-        if hotkey then
-            line_text = "(" .. hotkey .. ") " .. item_name
-        else
-            -- Special handling for Quit which is not in menu_structure
-            if item_name == "Quit" then
-                line_text = "(Q) " .. item_name
-            else
-                line_text = item_name
-            end
-        end
+        local line_text = format_menu_item(item_name)
         if #line_text > max_width then
             max_width = #line_text
         end
@@ -313,28 +321,7 @@ local function print_menu(title, items)
     
     -- Menu items
     for _, item_name in ipairs(items) do
-        -- Find hotkey for this item
-        local hotkey = nil
-        for key, menu_item in pairs(menu_structure) do
-            if menu_item.name == item_name then
-                hotkey = key
-                break
-            end
-        end
-        
-        -- Format line
-        local line_text
-        if hotkey then
-            line_text = "(" .. hotkey .. ") " .. item_name
-        else
-            -- Special handling for Quit
-            if item_name == "Quit" then
-                line_text = "(Q) " .. item_name
-            else
-                line_text = item_name
-            end
-        end
-        
+        local line_text = format_menu_item(item_name)
         echo("║  ")
         echo(line_text)
         echo(string.rep(" ", inner_width - #line_text))
