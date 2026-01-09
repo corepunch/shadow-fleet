@@ -47,43 +47,80 @@ function sections.fleet_status(start_row)
     widgets.section_header(start_row, "FLEET STATUS")
     local row = start_row + 1
     
+    -- Table header
+    term.write_at(row, 1, "Name", "fg_white")
+    term.write_at(row, 12, "Age", "fg_white")
+    term.write_at(row, 17, "Hull", "fg_white")
+    term.write_at(row, 23, "Fuel", "fg_white")
+    term.write_at(row, 29, "Status", "fg_white")
+    term.write_at(row, 40, "Cargo", "fg_white")
+    term.write_at(row, 58, "Origin", "fg_white")
+    term.write_at(row, 80, "Destination", "fg_white")
+    term.write_at(row, 104, "ETA", "fg_white")
+    term.write_at(row, 112, "Risk", "fg_white")
+    row = row + 1
+    
+    -- Header separator
+    term.write_at(row, 1, "----", "fg_white")
+    term.write_at(row, 12, "---", "fg_white")
+    term.write_at(row, 17, "----", "fg_white")
+    term.write_at(row, 23, "----", "fg_white")
+    term.write_at(row, 29, "------", "fg_white")
+    term.write_at(row, 40, "-----", "fg_white")
+    term.write_at(row, 58, "------", "fg_white")
+    term.write_at(row, 80, "-----------", "fg_white")
+    term.write_at(row, 104, "---", "fg_white")
+    term.write_at(row, 112, "----", "fg_white")
+    row = row + 1
+    
+    -- Table rows
     for i, ship in ipairs(game.fleet) do
-        -- Ship header line
-        term.write_at(row, 1, i .. '. TANKER "', "fg_white")
-        term.write_colored(ship.name, "fg_bright_cyan")
-        term.write_colored('" (Age: ' .. ship.age .. 'y, Hull: ', "fg_white")
+        -- Name column
+        term.write_at(row, 1, ship.name, "fg_bright_cyan")
         
-        -- Hull percentage
+        -- Age column
+        term.write_at(row, 12, ship.age .. "y", "fg_white")
+        
+        -- Hull column with color coding
         local hull_color = ship.hull >= 70 and "fg_green" or (ship.hull >= 50 and "fg_yellow" or "fg_red")
-        term.write_colored(ship.hull .. "%", hull_color)
-        term.write_colored(", Fuel: ", "fg_white")
+        term.write_at(row, 17, ship.hull .. "%", hull_color)
         
-        -- Fuel percentage
+        -- Fuel column with color coding
         local fuel_color = ship.fuel >= 70 and "fg_green" or (ship.fuel >= 30 and "fg_yellow" or "fg_red")
-        term.write_colored(ship.fuel .. "%", fuel_color)
-        term.write_colored(") - " .. ship.status, "fg_white")
+        term.write_at(row, 23, ship.fuel .. "%", fuel_color)
         
-        if ship.location then
-            term.write_colored(": ", "fg_white")
-            term.write_colored(ship.location, "fg_bright_white")
+        -- Status column
+        term.write_at(row, 29, ship.status, "fg_white")
+        
+        -- Cargo column
+        term.write_at(row, 40, ship.cargo, "fg_bright_white")
+        
+        -- Origin column (shows current location for docked ships, departure port for at-sea ships)
+        if ship.origin then
+            term.write_at(row, 58, ship.origin, "fg_bright_white")
+        else
+            term.write_at(row, 58, "-", "fg_white")
         end
-        row = row + 1
         
-        -- Cargo line
-        term.write_at(row, 3, "Cargo: ", "fg_white")
-        term.write_colored(ship.cargo, "fg_bright_white")
-        term.write_colored(" | Route: " .. ship.route, "fg_white")
+        -- Destination column (if present)
+        if ship.destination then
+            term.write_at(row, 80, ship.destination, "fg_white")
+        else
+            term.write_at(row, 80, "-", "fg_white")
+        end
+        
+        -- ETA column (if present)
         if ship.eta then
-            term.write_colored(" | ETA: ", "fg_white")
-            term.write_colored(ship.eta, "fg_yellow")
+            term.write_at(row, 104, ship.eta, "fg_yellow")
+        else
+            term.write_at(row, 104, "-", "fg_white")
         end
-        row = row + 1
         
-        -- Risk line
-        term.write_at(row, 3, "Risk: ", "fg_white")
+        -- Risk column with color coding
         local risk_color = ship.risk == "None" and "fg_green" or 
-                          (ship.risk:match("LOW") and "fg_yellow" or "fg_bright_yellow")
-        term.write_colored(ship.risk, risk_color)
+                          (ship.risk:match("LOW") or ship.risk:match("MED")) and "fg_yellow" or "fg_bright_yellow"
+        term.write_at(row, 112, ship.risk, risk_color)
+        
         row = row + 1
     end
     
