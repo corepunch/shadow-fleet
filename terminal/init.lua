@@ -76,7 +76,7 @@ terminal.themes = {
         fg = "fg_white"
     },
     light = {
-        bg = "bg_white",
+        bg = "bg_bright_white",
         fg = "fg_black"
     }
 }
@@ -392,12 +392,12 @@ terminal.schemes = {
         danger = {fg = "fg_white", bg = "bg_red"},
     },
     light = {
-        default = {fg = "fg_black", bg = "bg_white"},
+        default = {fg = "fg_black", bg = "bg_bright_white"},
         title = {fg = "fg_blue", bg = "bg_bright_yellow"},
-        error = {fg = "fg_red", bg = "bg_white"},
-        success = {fg = "fg_green", bg = "bg_white"},
-        warning = {fg = "fg_yellow", bg = "bg_white"},
-        info = {fg = "fg_cyan", bg = "bg_white"},
+        error = {fg = "fg_red", bg = "bg_bright_white"},
+        success = {fg = "fg_green", bg = "bg_bright_white"},
+        warning = {fg = "fg_yellow", bg = "bg_bright_white"},
+        info = {fg = "fg_cyan", bg = "bg_bright_white"},
         highlight = {fg = "fg_white", bg = "bg_black"},
         menu = {fg = "fg_black", bg = "bg_cyan"},
         menu_selected = {fg = "fg_blue", bg = "bg_bright_yellow"},

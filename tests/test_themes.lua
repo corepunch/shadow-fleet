@@ -32,7 +32,7 @@ print("✓ Test 4: Invalid theme throws error")
 terminal.set_theme("dark")
 assert(terminal.get_theme_bg() == "bg_black", "Dark theme should have black background")
 terminal.set_theme("light")
-assert(terminal.get_theme_bg() == "bg_white", "Light theme should have white background")
+assert(terminal.get_theme_bg() == "bg_bright_white", "Light theme should have bright white background")
 print("✓ Test 5: Theme background colors are correct")
 
 -- Test 6: get_theme_fg returns correct values
@@ -52,7 +52,7 @@ print("✓ Test 7: get_scheme returns dark theme schemes")
 terminal.set_theme("light")
 local light_default = terminal.get_scheme("default")
 assert(light_default.fg == "fg_black", "Light default scheme should have black foreground")
-assert(light_default.bg == "bg_white", "Light default scheme should have white background")
+assert(light_default.bg == "bg_bright_white", "Light default scheme should have bright white background")
 print("✓ Test 8: get_scheme returns light theme schemes")
 
 -- Test 9: init() accepts theme parameter
