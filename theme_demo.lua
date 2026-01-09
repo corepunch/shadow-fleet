@@ -5,7 +5,6 @@ local term = require("terminal")
 
 -- Function to render a sample screen
 local function render_sample(theme_name)
-    term.set_theme(theme_name)
     term.init(theme_name)
     
     print("")
