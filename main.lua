@@ -353,11 +353,68 @@ end
 
 -- Print submenu based on choice
 local function print_submenu(menu_name, options)
-    echo("\n--- " .. menu_name:upper() .. " MENU ---\n")
+    echo("\n")
+    
+    -- Convert options table to list format for print_menu
+    -- We need to build a list of items with their hotkeys
+    local items = {}
     for key, option in pairs(options) do
-        echo("(" .. key:upper() .. ") " .. option .. "\n")
+        -- Store both the hotkey and the option text
+        table.insert(items, {hotkey = key:upper(), name = option})
     end
-    echo("(B) Back\n\n")
+    
+    -- Sort items by hotkey for consistent display
+    table.sort(items, function(a, b) return a.hotkey < b.hotkey end)
+    
+    -- Add Back option
+    table.insert(items, {hotkey = "B", name = "Back"})
+    
+    -- Calculate box width based on longest item
+    local max_width = #menu_name + 5  -- " MENU" suffix
+    for _, item in ipairs(items) do
+        local line_text = "(" .. item.hotkey .. ") " .. item.name
+        if #line_text > max_width then
+            max_width = #line_text
+        end
+    end
+    
+    -- Add padding for box
+    local box_width = max_width + 4  -- 2 chars padding on each side
+    local inner_width = max_width
+    
+    -- Top border: ╔═══╗
+    echo("╔")
+    echo(string.rep("═", box_width))
+    echo("╗\n")
+    
+    -- Title line centered
+    local title = menu_name:upper() .. " MENU"
+    local title_padding = math.floor((inner_width - #title) / 2)
+    echo("║  ")
+    echo(string.rep(" ", title_padding))
+    echo(title)
+    echo(string.rep(" ", inner_width - #title - title_padding))
+    echo("  ║\n")
+    
+    -- Separator after title
+    echo("╠")
+    echo(string.rep("═", box_width))
+    echo("╣\n")
+    
+    -- Menu items
+    for _, item in ipairs(items) do
+        local line_text = "(" .. item.hotkey .. ") " .. item.name
+        echo("║  ")
+        echo(line_text)
+        echo(string.rep(" ", inner_width - #line_text))
+        echo("  ║\n")
+    end
+    
+    -- Bottom border: ╚═══╝
+    echo("╚")
+    echo(string.rep("═", box_width))
+    echo("╝\n\n")
+    
     echo("Enter command: ")
 end
 
