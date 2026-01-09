@@ -7,6 +7,32 @@ local term = require("terminal")
 local gamestate = require("game")
 local widgets = require("ui")
 
+-- Parse command line arguments
+local theme = "dark"  -- default theme
+for i = 1, #arg do
+    if arg[i] == "--theme" or arg[i] == "-t" then
+        if arg[i + 1] then
+            theme = arg[i + 1]
+        end
+    elseif arg[i] == "--help" or arg[i] == "-h" then
+        print("Shadow Fleet - Text-based Strategy Game")
+        print("")
+        print("Usage: lua5.3 main.lua [OPTIONS]")
+        print("")
+        print("Options:")
+        print("  -t, --theme THEME    Set color theme (dark or light). Default: dark")
+        print("  -h, --help           Show this help message")
+        print("")
+        os.exit(0)
+    end
+end
+
+-- Validate theme
+if theme ~= "dark" and theme ~= "light" then
+    print("Error: Invalid theme '" .. theme .. "'. Must be 'dark' or 'light'.")
+    os.exit(1)
+end
+
 -- Initialize game state
 local game = gamestate.new()
 
@@ -54,7 +80,16 @@ local fg_white = term.colors.fg_white
 local fg_yellow = term.colors.fg_yellow
 local fg_green = term.colors.fg_green
 local fg_red = term.colors.fg_red
-local bg_black = term.colors.bg_black
+
+-- Helper function to get theme background
+local function get_bg()
+    return term.colors[term.get_theme_bg()]
+end
+
+-- Helper function to get theme foreground
+local function get_fg()
+    return term.colors[term.get_theme_fg()]
+end
 
 -- Helper function to write colored text with optional formatting
 -- In raw mode, we need \r\n instead of just \n for proper line breaks
@@ -83,13 +118,13 @@ local function echo(fg_color, ...)
     -- Ensure output is visible before setting colors
     io.flush()
     
-    -- Set color (always with black background)
-    term.set_colors(fg_color, bg_black)
+    -- Set color (always with theme background)
+    term.set_colors(fg_color, get_bg())
     
     io.write(fixed_text)
     
-    -- Restore default colors: white on black
-    term.set_colors(fg_white, bg_black)
+    -- Restore default colors based on theme
+    term.set_colors(get_fg(), get_bg())
     io.flush()
 end
 
@@ -101,7 +136,7 @@ end
 
 -- Print a separator line
 local function print_separator()
-    echo(fg_white, string.rep("=", 80) .. "\n")
+    echo(get_fg(), string.rep("=", 80) .. "\n")
 end
 
 -- Print header
@@ -114,18 +149,18 @@ end
 -- Print status line
 local function print_status()
     local heat_desc = gamestate.get_heat_description(game)
-    echo(fg_white, "[")
+    echo(get_fg(), "[")
     echo(fg_cyan, "Dark Terminal v0.1")
-    echo(fg_white, "] - ")
+    echo(get_fg(), "] - ")
     echo(fg_yellow, "Rogue Operator Mode")
-    echo(fg_white, " | Heat: ")
+    echo(get_fg(), " | Heat: ")
     echo(gamestate.get_heat_color(game), heat_desc)
     write_text("\n")
     
     echo(fg_bright_cyan, game.location)
-    echo(fg_white, " - " .. game.date .. " | Rubles: ")
+    echo(get_fg(), " - " .. game.date .. " | Rubles: ")
     echo(fg_bright_yellow, widgets.format_number(game.rubles))
-    echo(fg_white, " | Oil Stock: ")
+    echo(get_fg(), " | Oil Stock: ")
     echo(fg_bright_white, game.oil_stock .. "k bbls")
     write_text("\n\n")
 end
@@ -135,15 +170,15 @@ local function print_fleet_status()
     echo(fg_bright_white, "--- FLEET STATUS ---\n")
     
     -- Table header
-    echo(fg_white, "%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
+    echo(get_fg(), "%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
         "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk")
     
-    echo(fg_white, string.rep("-", 80) .. "\n")
+    echo(get_fg(), string.rep("-", 80) .. "\n")
     
     -- Table rows
     for i, ship in ipairs(game.fleet) do
         echo(fg_bright_cyan, "%-11s ", ship.name)
-        echo(fg_white, "%-3s ", ship.age .. "y")
+        echo(get_fg(), "%-3s ", ship.age .. "y")
         
         local hull_color = ship.hull >= 70 and fg_green or (ship.hull >= 50 and fg_yellow or fg_red)
         echo(hull_color, "%-5s ", ship.hull .. "%")
@@ -151,10 +186,10 @@ local function print_fleet_status()
         local fuel_color = ship.fuel >= 70 and fg_green or (ship.fuel >= 30 and fg_yellow or fg_red)
         echo(fuel_color, "%-5s ", ship.fuel .. "%")
         
-        echo(fg_white, "%-10s ", ship.status)
+        echo(get_fg(), "%-10s ", ship.status)
         echo(fg_bright_white, "%-17s ", ship.cargo)
         echo(fg_bright_white, "%-21s ", ship.origin or "-")
-        echo(fg_white, "%-23s ", ship.destination or "-")
+        echo(get_fg(), "%-23s ", ship.destination or "-")
         echo(fg_yellow, "%-7s ", ship.eta or "-")
         
         local risk_color = ship.risk == "None" and fg_green or 
@@ -165,9 +200,9 @@ local function print_fleet_status()
     
     write_text("\n")
     local stats = gamestate.get_fleet_stats(game)
-    echo(fg_white, "Total Fleet: ")
+    echo(get_fg(), "Total Fleet: ")
     echo(fg_bright_white, stats.total .. "/" .. stats.max)
-    echo(fg_white, " | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses)
+    echo(get_fg(), " | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses)
     write_text("\n\n")
 end
 
@@ -175,26 +210,26 @@ end
 local function print_market_snapshot()
     echo(fg_bright_white, "--- MARKET SNAPSHOT ---\n")
     
-    echo(fg_white, "Crude Price Cap: ")
+    echo(get_fg(), "Crude Price Cap: ")
     echo(fg_bright_yellow, "$" .. game.market.crude_price_cap .. "/bbl")
-    echo(fg_white, " | Shadow Markup: ")
+    echo(get_fg(), " | Shadow Markup: ")
     echo(fg_bright_green, "+" .. game.market.shadow_markup_percent .. "%")
-    echo(fg_white, " (")
+    echo(get_fg(), " (")
     echo(fg_bright_yellow, "$" .. game.market.shadow_price .. "/bbl")
-    echo(fg_white, " to India/China)")
+    echo(get_fg(), " to India/China)")
     write_text("\n")
     
-    echo(fg_white, "Demand: ")
+    echo(get_fg(), "Demand: ")
     echo(fg_bright_green, game.market.demand)
-    echo(fg_white, " (Baltic Exports: ")
+    echo(get_fg(), " (Baltic Exports: ")
     echo(fg_bright_white, game.market.baltic_exports .. "M bbls/day")
-    echo(fg_white, ") | Sanctions Alert: ")
+    echo(get_fg(), ") | Sanctions Alert: ")
     echo(fg_red, game.market.sanctions_alert)
     write_text("\n")
     
-    echo(fg_white, 'News Ticker: "')
+    echo(get_fg(), 'News Ticker: "')
     echo(fg_yellow, game.market.news)
-    echo(fg_white, '"')
+    echo(get_fg(), '"')
     write_text("\n\n")
 end
 
@@ -203,10 +238,10 @@ local function print_active_events()
     echo(fg_bright_white, "--- ACTIVE EVENTS ---\n")
     
     for _, event in ipairs(game.events) do
-        echo(fg_white, "- ")
+        echo(get_fg(), "- ")
         local event_color = event.type == "Pending" and fg_yellow or fg_green
         echo(event_color, event.type)
-        echo(fg_white, ": " .. event.description)
+        echo(get_fg(), ": " .. event.description)
         write_text("\n")
     end
     write_text("\n")
@@ -219,32 +254,32 @@ local function print_heat_meter()
     local heat = game.heat
     local max_heat = game.heat_max
     
-    echo(fg_white, "[")
+    echo(get_fg(), "[")
     for i = 1, max_heat do
         if i <= heat then
             echo(fg_red, "|")
         else
-            echo(fg_white, "|")
+            echo(get_fg(), "|")
         end
     end
     echo(gamestate.get_heat_color(game), "] " .. heat .. "/" .. max_heat)
-    echo(fg_white, " - ")
-    echo(heat > 7 and fg_bright_red or fg_white, gamestate.get_heat_message(game))
+    echo(get_fg(), " - ")
+    echo(heat > 7 and fg_bright_red or get_fg(), gamestate.get_heat_message(game))
     write_text("\n\n")
 end
 
 -- Print main menu
 local function print_main_menu()
     echo(fg_bright_white, "--- QUICK ACTIONS ---\n")
-    echo(fg_white, "(F) Fleet\n")
-    echo(fg_white, "(R) Route\n")
-    echo(fg_white, "(T) Trade\n")
-    echo(fg_white, "(E) Evade\n")
-    echo(fg_white, "(V) Events\n")
-    echo(fg_white, "(M) Market\n")
-    echo(fg_white, "(S) Status\n")
-    echo(fg_white, "(?) Help\n")
-    echo(fg_white, "(Q) Quit\n\n")
+    echo(get_fg(), "(F) Fleet\n")
+    echo(get_fg(), "(R) Route\n")
+    echo(get_fg(), "(T) Trade\n")
+    echo(get_fg(), "(E) Evade\n")
+    echo(get_fg(), "(V) Events\n")
+    echo(get_fg(), "(M) Market\n")
+    echo(get_fg(), "(S) Status\n")
+    echo(get_fg(), "(?) Help\n")
+    echo(get_fg(), "(Q) Quit\n\n")
     echo(fg_bright_green, "Enter command: ")
 end
 
@@ -252,9 +287,9 @@ end
 local function print_submenu(menu_name, options)
     echo(fg_bright_white, "\n--- " .. menu_name:upper() .. " MENU ---\n")
     for key, option in pairs(options) do
-        echo(fg_white, "(" .. key:upper() .. ") " .. option .. "\n")
+        echo(get_fg(), "(" .. key:upper() .. ") " .. option .. "\n")
     end
-    echo(fg_white, "(B) Back\n\n")
+    echo(get_fg(), "(B) Back\n\n")
     echo(fg_bright_green, "Enter command: ")
 end
 
@@ -393,7 +428,7 @@ end
 
 -- Main game loop
 local function main()
-    term.init()
+    term.init(theme)
     
     -- Use pcall to ensure terminal is restored on error
     local function game_loop()

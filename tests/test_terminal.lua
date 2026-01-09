@@ -53,9 +53,13 @@ print("✓ Test 5: Styles table exists")
 
 -- Test 6: Check color schemes
 assert(type(terminal.schemes) == "table", "terminal.schemes should be a table")
-assert(terminal.schemes.default ~= nil, "default scheme should exist")
-assert(terminal.schemes.title ~= nil, "title scheme should exist")
-assert(terminal.schemes.ocean ~= nil, "ocean scheme should exist")
+assert(type(terminal.schemes.dark) == "table", "dark theme schemes should exist")
+assert(type(terminal.schemes.light) == "table", "light theme schemes should exist")
+assert(terminal.schemes.dark.default ~= nil, "default scheme should exist in dark theme")
+assert(terminal.schemes.dark.title ~= nil, "title scheme should exist in dark theme")
+assert(terminal.schemes.dark.ocean ~= nil, "ocean scheme should exist in dark theme")
+assert(terminal.schemes.light.default ~= nil, "default scheme should exist in light theme")
+assert(terminal.schemes.light.title ~= nil, "title scheme should exist in light theme")
 print("✓ Test 6: Color schemes exist")
 
 -- Test 7: Visual test - display colors
@@ -97,8 +101,16 @@ print("✓ Test 8: Color output works correctly")
 
 -- Test 9: Test color schemes
 print("")
-print("Predefined color schemes:")
-for name, scheme in pairs(terminal.schemes) do
+print("Predefined color schemes (dark theme):")
+for name, scheme in pairs(terminal.schemes.dark) do
+    io.write("  " .. name .. ": ")
+    terminal.write_colored(" Sample ", scheme.fg, scheme.bg)
+    print("")
+end
+
+print("")
+print("Predefined color schemes (light theme):")
+for name, scheme in pairs(terminal.schemes.light) do
     io.write("  " .. name .. ": ")
     terminal.write_colored(" Sample ", scheme.fg, scheme.bg)
     print("")

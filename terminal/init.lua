@@ -66,10 +66,44 @@ terminal.styles = {
 -- Constants
 terminal.MAX_ANSI_CODE = 255  -- Maximum value for a single ANSI color code
 
+-- Current theme ("dark" or "light")
+terminal.current_theme = "dark"
+
+-- Theme configurations
+terminal.themes = {
+    dark = {
+        bg = "bg_black",
+        fg = "fg_white"
+    },
+    light = {
+        bg = "bg_white",
+        fg = "fg_black"
+    }
+}
+
+-- Set the current theme
+function terminal.set_theme(theme_name)
+    if terminal.themes[theme_name] then
+        terminal.current_theme = theme_name
+    else
+        error("Unknown theme: " .. tostring(theme_name))
+    end
+end
+
+-- Get current theme background color
+function terminal.get_theme_bg()
+    return terminal.themes[terminal.current_theme].bg
+end
+
+-- Get current theme foreground color
+function terminal.get_theme_fg()
+    return terminal.themes[terminal.current_theme].fg
+end
+
 -- Clear the entire screen
--- Sets black background before clearing to ensure consistent background color
+-- Sets theme background before clearing to ensure consistent background color
 function terminal.clear()
-    terminal.set_bg("bg_black")
+    terminal.set_bg(terminal.get_theme_bg())
     io.write(CSI .. "2J")
     io.flush()
 end
@@ -196,10 +230,10 @@ function terminal.set_style(style)
 end
 
 -- Reset all colors and styles
--- Explicitly set black background to avoid terminal default (white on some systems)
+-- Explicitly set theme background to avoid terminal default
 function terminal.reset()
     io.write(CSI .. "0m")
-    terminal.set_bg("bg_black")
+    terminal.set_bg(terminal.get_theme_bg())
     io.flush()
 end
 
@@ -233,12 +267,12 @@ function terminal.write_colored(text, fg, bg)
             fg = packed >> 8
             bg = packed & 0xFF
         else
-            -- Single color code, default bg to black
-            bg = terminal.colors.bg_black
+            -- Single color code, default bg to theme background
+            bg = terminal.colors[terminal.get_theme_bg()]
         end
     else
-        -- Default to black background if not specified
-        bg = bg or "bg_black"
+        -- Default to theme background if not specified
+        bg = bg or terminal.get_theme_bg()
     end
     
     if fg or bg then
@@ -251,8 +285,8 @@ function terminal.write_colored(text, fg, bg)
         end
     end
     io.write(text)
-    -- Restore default colors: white (standard grey) on black
-    terminal.set_colors(terminal.colors.fg_white, terminal.colors.bg_black)
+    -- Restore default colors based on theme
+    terminal.set_colors(terminal.colors[terminal.get_theme_fg()], terminal.colors[terminal.get_theme_bg()])
     io.flush()
 end
 
@@ -323,10 +357,12 @@ function terminal.fill_box(row, col, width, height, char, fg, bg)
 end
 
 -- Initialize terminal for game mode
-function terminal.init()
-    -- Clear the screen with black background
-    -- This fixes the issue on macOS/terminals with light mode where the
-    -- default background is white
+function terminal.init(theme)
+    -- Set theme if provided (default is "dark")
+    if theme then
+        terminal.set_theme(theme)
+    end
+    -- Clear the screen with theme background
     terminal.clear()
     terminal.hide_cursor()
 end
@@ -340,23 +376,45 @@ function terminal.cleanup()
 end
 
 -- Predefined color schemes for quick access
+-- Schemes adapt to the current theme (dark or light)
 terminal.schemes = {
-    default = {fg = "fg_white", bg = "bg_black"},
-    title = {fg = "fg_bright_yellow", bg = "bg_blue"},
-    error = {fg = "fg_bright_red", bg = "bg_black"},
-    success = {fg = "fg_bright_green", bg = "bg_black"},
-    warning = {fg = "fg_bright_yellow", bg = "bg_black"},
-    info = {fg = "fg_bright_cyan", bg = "bg_black"},
-    highlight = {fg = "fg_black", bg = "bg_white"},
-    menu = {fg = "fg_white", bg = "bg_blue"},
-    menu_selected = {fg = "fg_yellow", bg = "bg_blue"},
-    ocean = {fg = "fg_bright_white", bg = "bg_blue"},
-    danger = {fg = "fg_white", bg = "bg_red"},
+    dark = {
+        default = {fg = "fg_white", bg = "bg_black"},
+        title = {fg = "fg_bright_yellow", bg = "bg_blue"},
+        error = {fg = "fg_bright_red", bg = "bg_black"},
+        success = {fg = "fg_bright_green", bg = "bg_black"},
+        warning = {fg = "fg_bright_yellow", bg = "bg_black"},
+        info = {fg = "fg_bright_cyan", bg = "bg_black"},
+        highlight = {fg = "fg_black", bg = "bg_white"},
+        menu = {fg = "fg_white", bg = "bg_blue"},
+        menu_selected = {fg = "fg_yellow", bg = "bg_blue"},
+        ocean = {fg = "fg_bright_white", bg = "bg_blue"},
+        danger = {fg = "fg_white", bg = "bg_red"},
+    },
+    light = {
+        default = {fg = "fg_black", bg = "bg_white"},
+        title = {fg = "fg_blue", bg = "bg_bright_yellow"},
+        error = {fg = "fg_red", bg = "bg_white"},
+        success = {fg = "fg_green", bg = "bg_white"},
+        warning = {fg = "fg_yellow", bg = "bg_white"},
+        info = {fg = "fg_cyan", bg = "bg_white"},
+        highlight = {fg = "fg_white", bg = "bg_black"},
+        menu = {fg = "fg_black", bg = "bg_cyan"},
+        menu_selected = {fg = "fg_blue", bg = "bg_bright_yellow"},
+        ocean = {fg = "fg_blue", bg = "bg_bright_cyan"},
+        danger = {fg = "fg_white", bg = "bg_red"},
+    }
 }
 
--- Apply a color scheme
+-- Get a color scheme for the current theme
+function terminal.get_scheme(scheme_name)
+    local theme_schemes = terminal.schemes[terminal.current_theme]
+    return theme_schemes and theme_schemes[scheme_name] or terminal.schemes.dark.default
+end
+
+-- Apply a color scheme based on current theme
 function terminal.apply_scheme(scheme_name)
-    local scheme = terminal.schemes[scheme_name]
+    local scheme = terminal.get_scheme(scheme_name)
     if scheme then
         terminal.set_colors(scheme.fg, scheme.bg)
     end
