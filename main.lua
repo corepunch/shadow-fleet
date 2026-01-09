@@ -37,6 +37,7 @@ local function read_char()
 end
 
 -- Helper function to write colored text at cursor position
+-- In raw mode, we need \r\n instead of just \n for proper line breaks
 local function write_colored(text, fg_color, bg_color)
     io.flush()  -- Ensure output is visible before setting colors
     if bg_color then
@@ -44,9 +45,18 @@ local function write_colored(text, fg_color, bg_color)
     else
         term.set_fg(fg_color)
     end
-    io.write(text)
+    -- Replace \n with \r\n for proper line breaks in raw mode
+    local fixed_text = text:gsub("\n", "\r\n")
+    io.write(fixed_text)
     term.reset()
     io.flush()  -- Ensure colored text is displayed immediately
+end
+
+-- Helper function to write plain text with proper line endings in raw mode
+local function write_text(text)
+    local fixed_text = text:gsub("\n", "\r\n")
+    io.write(fixed_text)
+    io.flush()
 end
 
 -- Print a separator line
@@ -70,14 +80,14 @@ local function print_status()
     write_colored("Rogue Operator Mode", "fg_yellow")
     write_colored(" | Heat: ", "fg_white")
     write_colored(heat_desc, gamestate.get_heat_color(game))
-    io.write("\n")
+    write_text("\n")
     
     write_colored(game.location, "fg_bright_cyan")
     write_colored(" - " .. game.date .. " | Rubles: ", "fg_white")
     write_colored(widgets.format_number(game.rubles), "fg_bright_yellow")
     write_colored(" | Oil Stock: ", "fg_white")
     write_colored(game.oil_stock .. "k bbls", "fg_bright_white")
-    io.write("\n\n")
+    write_text("\n\n")
 end
 
 -- Print fleet status
@@ -85,10 +95,10 @@ local function print_fleet_status()
     write_colored("--- FLEET STATUS ---\n", "fg_bright_white")
     
     -- Table header
-    io.write(string.format("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
+    write_text(string.format("%-11s %-3s %-5s %-5s %-10s %-17s %-21s %-23s %-7s %-4s\n",
         "Name", "Age", "Hull", "Fuel", "Status", "Cargo", "Origin", "Destination", "ETA", "Risk"))
     
-    io.write(string.rep("-", 80) .. "\n")
+    write_text(string.rep("-", 80) .. "\n")
     
     -- Table rows
     for i, ship in ipairs(game.fleet) do
@@ -110,15 +120,15 @@ local function print_fleet_status()
         local risk_color = ship.risk == "None" and "fg_green" or 
                           (ship.risk:match("LOW") or ship.risk:match("MED")) and "fg_yellow" or "fg_bright_yellow"
         write_colored(string.format("%-4s", ship.risk), risk_color)
-        io.write("\n")
+        write_text("\n")
     end
     
-    io.write("\n")
+    write_text("\n")
     local stats = gamestate.get_fleet_stats(game)
     write_colored("Total Fleet: ", "fg_white")
     write_colored(stats.total .. "/" .. stats.max, "fg_bright_white")
     write_colored(" | Avg Age: " .. stats.avg_age .. "y | Uninsured Losses: " .. stats.uninsured_losses, "fg_white")
-    io.write("\n\n")
+    write_text("\n\n")
 end
 
 -- Print market snapshot
@@ -132,7 +142,7 @@ local function print_market_snapshot()
     write_colored(" (", "fg_white")
     write_colored("$" .. game.market.shadow_price .. "/bbl", "fg_bright_yellow")
     write_colored(" to India/China)", "fg_white")
-    io.write("\n")
+    write_text("\n")
     
     write_colored("Demand: ", "fg_white")
     write_colored(game.market.demand, "fg_bright_green")
@@ -140,12 +150,12 @@ local function print_market_snapshot()
     write_colored(game.market.baltic_exports .. "M bbls/day", "fg_bright_white")
     write_colored(") | Sanctions Alert: ", "fg_white")
     write_colored(game.market.sanctions_alert, "fg_red")
-    io.write("\n")
+    write_text("\n")
     
     write_colored('News Ticker: "', "fg_white")
     write_colored(game.market.news, "fg_yellow")
     write_colored('"', "fg_white")
-    io.write("\n\n")
+    write_text("\n\n")
 end
 
 -- Print active events
@@ -157,9 +167,9 @@ local function print_active_events()
         local event_color = event.type == "Pending" and "fg_yellow" or "fg_green"
         write_colored(event.type, event_color)
         write_colored(": " .. event.description, "fg_white")
-        io.write("\n")
+        write_text("\n")
     end
-    io.write("\n")
+    write_text("\n")
 end
 
 -- Print heat meter
@@ -180,7 +190,7 @@ local function print_heat_meter()
     write_colored("] " .. heat .. "/" .. max_heat, gamestate.get_heat_color(game))
     write_colored(" - ", "fg_white")
     write_colored(gamestate.get_heat_message(game), heat > 7 and "fg_bright_red" or "fg_white")
-    io.write("\n\n")
+    write_text("\n\n")
 end
 
 -- Print main menu
@@ -205,7 +215,7 @@ end
 -- Main dashboard display
 local function render_dashboard()
     -- Don't clear screen - append to terminal content
-    io.write("\n")  -- Add spacing between screens
+    write_text("\n")  -- Add spacing between screens
     print_header()
     print_status()
     print_market_snapshot()
@@ -278,11 +288,11 @@ local menu_structure = {
 
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)
-    io.write("\n")
+    write_text("\n")
     write_colored("Action '" .. action .. "' in " .. menu_name .. " not yet implemented.\n", "fg_yellow")
     write_colored("Press any key to continue...", "fg_white")
     read_char()  -- Single character input
-    io.write("\n")
+    write_text("\n")
 end
 
 -- Handle submenu navigation
@@ -291,7 +301,7 @@ local function handle_submenu(menu_key)
     if not menu then return end
     
     -- Don't clear screen - append to terminal content
-    io.write("\n")
+    write_text("\n")
     
     -- Special case for Fleet menu - show fleet status
     if menu_key == "F" then
@@ -314,13 +324,13 @@ local function handle_submenu(menu_key)
         choice = choice:upper()
         
         if choice == "B" or choice == "Q" then
-            io.write("\n")  -- Add newline after input
+            write_text("\n")  -- Add newline after input
             return  -- Back to main menu or quit
         elseif menu.submenus[choice] then
-            io.write("\n")  -- Add newline after input
+            write_text("\n")  -- Add newline after input
             handle_submenu_action(menu.name, menu.submenus[choice])
             -- Redraw submenu after action (without clearing)
-            io.write("\n")
+            write_text("\n")
             if menu_key == "F" then
                 print_header()
                 print_status()
@@ -350,7 +360,7 @@ local function main()
             
             -- Handle EOF (nil input)
             if not choice then
-                io.write("\n")
+                write_text("\n")
                 write_colored("Thank you for playing Shadow Fleet!\n", "fg_bright_yellow")
                 break
             end
@@ -358,11 +368,11 @@ local function main()
             choice = choice:upper()
             
             if choice == "Q" then
-                io.write("\n")
+                write_text("\n")
                 write_colored("Thank you for playing Shadow Fleet!\n", "fg_bright_yellow")
                 break
             elseif menu_structure[choice] then
-                io.write("\n")  -- Add newline after input
+                write_text("\n")  -- Add newline after input
                 handle_submenu(choice)
             else
                 -- Invalid option - just ignore
