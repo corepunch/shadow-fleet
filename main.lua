@@ -195,44 +195,7 @@ local function print_heat_meter()
     echo("\n\n")
 end
 
--- Print main menu
-local function print_main_menu()
-    echo("--- QUICK ACTIONS ---\n")
-    echo("(F) Fleet\n")
-    echo("(R) Route\n")
-    echo("(T) Trade\n")
-    echo("(E) Evade\n")
-    echo("(V) Events\n")
-    echo("(M) Market\n")
-    echo("(S) Status\n")
-    echo("(?) Help\n")
-    echo("(Q) Quit\n\n")
-    echo("Enter command: ")
-end
-
 -- Print submenu based on choice
-local function print_submenu(menu_name, options)
-    echo("\n--- " .. menu_name:upper() .. " MENU ---\n")
-    for key, option in pairs(options) do
-        echo("(" .. key:upper() .. ") " .. option .. "\n")
-    end
-    echo("(B) Back\n\n")
-    echo("Enter command: ")
-end
-
--- Main dashboard display
-local function render_dashboard()
-    -- Don't clear screen - append to terminal content
-    echo("\n")  -- Add spacing between screens
-    print_header()
-    print_status()
-    print_market_snapshot()
-    print_active_events()
-    print_heat_meter()
-    print_main_menu()
-end
-
--- Menu structure with submenus
 local menu_structure = {
     F = {
         name = "Fleet",
@@ -293,6 +256,135 @@ local menu_structure = {
         }
     }
 }
+
+-- Generic function to print a menu with a title and list of items
+-- Uses double-lined box-drawing characters
+-- items: array of item names, hotkeys are looked up from menu_structure
+local function print_menu(title, items)
+    -- Calculate box width based on longest item
+    local max_width = #title
+    for _, item_name in ipairs(items) do
+        -- Find hotkey for this item
+        local hotkey = nil
+        for key, menu_item in pairs(menu_structure) do
+            if menu_item.name == item_name then
+                hotkey = key
+                break
+            end
+        end
+        -- Format: "(X) Item Name"
+        local line_text
+        if hotkey then
+            line_text = "(" .. hotkey .. ") " .. item_name
+        else
+            -- Special handling for Quit which is not in menu_structure
+            if item_name == "Quit" then
+                line_text = "(Q) " .. item_name
+            else
+                line_text = item_name
+            end
+        end
+        if #line_text > max_width then
+            max_width = #line_text
+        end
+    end
+    
+    -- Add padding for box
+    local box_width = max_width + 4  -- 2 chars padding on each side
+    local inner_width = max_width
+    
+    -- Top border: ╔═══╗
+    echo("╔")
+    echo(string.rep("═", box_width))
+    echo("╗\n")
+    
+    -- Title line centered
+    local title_padding = math.floor((inner_width - #title) / 2)
+    echo("║  ")
+    echo(string.rep(" ", title_padding))
+    echo(title)
+    echo(string.rep(" ", inner_width - #title - title_padding))
+    echo("  ║\n")
+    
+    -- Separator after title
+    echo("╠")
+    echo(string.rep("═", box_width))
+    echo("╣\n")
+    
+    -- Menu items
+    for _, item_name in ipairs(items) do
+        -- Find hotkey for this item
+        local hotkey = nil
+        for key, menu_item in pairs(menu_structure) do
+            if menu_item.name == item_name then
+                hotkey = key
+                break
+            end
+        end
+        
+        -- Format line
+        local line_text
+        if hotkey then
+            line_text = "(" .. hotkey .. ") " .. item_name
+        else
+            -- Special handling for Quit
+            if item_name == "Quit" then
+                line_text = "(Q) " .. item_name
+            else
+                line_text = item_name
+            end
+        end
+        
+        echo("║  ")
+        echo(line_text)
+        echo(string.rep(" ", inner_width - #line_text))
+        echo("  ║\n")
+    end
+    
+    -- Bottom border: ╚═══╝
+    echo("╚")
+    echo(string.rep("═", box_width))
+    echo("╝\n\n")
+    
+    echo("Enter command: ")
+end
+
+-- Print main menu
+local function print_main_menu()
+    print_menu("QUICK ACTIONS", {
+        "Fleet",
+        "Route",
+        "Trade",
+        "Evade",
+        "Events",
+        "Market",
+        "Status",
+        "Help",
+        "Quit"
+    })
+end
+
+-- Print submenu based on choice
+local function print_submenu(menu_name, options)
+    echo("\n--- " .. menu_name:upper() .. " MENU ---\n")
+    for key, option in pairs(options) do
+        echo("(" .. key:upper() .. ") " .. option .. "\n")
+    end
+    echo("(B) Back\n\n")
+    echo("Enter command: ")
+end
+
+-- Main dashboard display
+local function render_dashboard()
+    -- Don't clear screen - append to terminal content
+    echo("\n")  -- Add spacing between screens
+    print_header()
+    print_status()
+    print_market_snapshot()
+    print_active_events()
+    print_heat_meter()
+    print_main_menu()
+end
 
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)

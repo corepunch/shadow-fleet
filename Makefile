@@ -8,6 +8,7 @@ test:
 	@echo "Running tests..."
 	@lua5.3 tests/test_widgets.lua
 	@lua5.3 tests/test_navigation.lua
+	@lua5.3 tests/test_menu_formatting.lua
 	@echo ""
 	@echo "All tests completed successfully!"
 
