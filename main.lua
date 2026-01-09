@@ -397,8 +397,151 @@ local function render_dashboard()
     print_main_menu()
 end
 
+-- Handle vessel upgrade flow
+local function handle_vessel_upgrade()
+    echo("\n")
+    
+    -- Check if there are any ships
+    if #game.fleet == 0 then
+        echo("No vessels in fleet to upgrade.\n")
+        echo("Press any key to continue...")
+        read_char()
+        echo("\n")
+        return
+    end
+    
+    -- Display vessel selection menu
+    print_header()
+    print_status()
+    echo("--- SELECT VESSEL TO UPGRADE ---\n\n")
+    
+    -- List all vessels with numbers
+    for i, ship in ipairs(game.fleet) do
+        echo(string.format("(%d) %-11s - Age: %dy, Hull: %d%%, Fuel: %d%%, Status: %s\n",
+            i, ship.name, ship.age, ship.hull, ship.fuel, ship.status))
+    end
+    
+    echo("\n(B) Back\n\n")
+    echo("Enter vessel number: ")
+    
+    local choice = read_char()
+    echo("\n")
+    
+    -- Handle EOF or back
+    if not choice or choice:upper() == "B" then
+        return
+    end
+    
+    -- Convert to number
+    local vessel_idx = tonumber(choice)
+    if not vessel_idx or vessel_idx < 1 or vessel_idx > #game.fleet then
+        echo("Invalid vessel number.\n")
+        echo("Press any key to continue...")
+        read_char()
+        echo("\n")
+        return
+    end
+    
+    local selected_ship = game.fleet[vessel_idx]
+    
+    -- Get available upgrades for this ship
+    local available_upgrades = gamestate.get_available_upgrades(game, selected_ship)
+    
+    if #available_upgrades == 0 then
+        echo("\n")
+        echo("No upgrades available for " .. selected_ship.name .. ".\n")
+        echo("Press any key to continue...")
+        read_char()
+        echo("\n")
+        return
+    end
+    
+    -- Display upgrade selection menu
+    echo("\n")
+    print_header()
+    print_status()
+    echo("--- UPGRADE " .. selected_ship.name .. " ---\n\n")
+    echo(string.format("Current: Age %dy, Hull %d%%, Fuel %d%%\n\n",
+        selected_ship.age, selected_ship.hull, selected_ship.fuel))
+    
+    echo("Available Upgrades:\n\n")
+    for i, upgrade in ipairs(available_upgrades) do
+        echo(string.format("(%d) %-25s - %s\n",
+            i, upgrade.name, widgets.format_number(upgrade.cost) .. " Rubles"))
+        echo("    " .. upgrade.description .. "\n\n")
+    end
+    
+    echo("(B) Back\n\n")
+    echo("Your Rubles: " .. widgets.format_number(game.rubles) .. "\n\n")
+    echo("Enter upgrade number: ")
+    
+    choice = read_char()
+    echo("\n")
+    
+    -- Handle EOF or back
+    if not choice or choice:upper() == "B" then
+        return
+    end
+    
+    -- Convert to number
+    local upgrade_idx = tonumber(choice)
+    if not upgrade_idx or upgrade_idx < 1 or upgrade_idx > #available_upgrades then
+        echo("Invalid upgrade number.\n")
+        echo("Press any key to continue...")
+        read_char()
+        echo("\n")
+        return
+    end
+    
+    local selected_upgrade = available_upgrades[upgrade_idx]
+    
+    -- Check if player has enough money
+    if game.rubles < selected_upgrade.cost then
+        echo("\n")
+        echo("Insufficient funds. You need " .. widgets.format_number(selected_upgrade.cost) .. " Rubles.\n")
+        echo("Press any key to continue...")
+        read_char()
+        echo("\n")
+        return
+    end
+    
+    -- Confirm purchase
+    echo("\n")
+    echo("Purchase " .. selected_upgrade.name .. " for " .. widgets.format_number(selected_upgrade.cost) .. " Rubles?\n")
+    echo("(Y) Yes  (N) No\n\n")
+    echo("Confirm: ")
+    
+    choice = read_char()
+    echo("\n")
+    
+    if not choice or choice:upper() ~= "Y" then
+        echo("Purchase cancelled.\n")
+        echo("Press any key to continue...")
+        read_char()
+        echo("\n")
+        return
+    end
+    
+    -- Apply the upgrade
+    gamestate.apply_upgrade(selected_ship, selected_upgrade)
+    game.rubles = game.rubles - selected_upgrade.cost
+    
+    echo("\n")
+    echo("Upgrade successful! " .. selected_upgrade.name .. " installed on " .. selected_ship.name .. ".\n")
+    echo("Remaining Rubles: " .. widgets.format_number(game.rubles) .. "\n")
+    echo("Press any key to continue...")
+    read_char()
+    echo("\n")
+end
+
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)
+    -- Special handling for Fleet > Upgrade
+    if menu_name == "Fleet" and action == "Upgrade" then
+        handle_vessel_upgrade()
+        return
+    end
+    
     echo("\n")
     echo("Action '" .. action .. "' in " .. menu_name .. " not yet implemented.\n")
     echo("Press any key to continue...")
