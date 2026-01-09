@@ -36,6 +36,12 @@ local function read_char()
     return char
 end
 
+-- Helper function to fix line endings for raw terminal mode
+-- Converts \n to \r\n, avoiding double conversion of existing \r\n sequences
+local function fix_line_endings(text)
+    return text:gsub("\r?\n", "\r\n")
+end
+
 -- Helper function to write colored text at cursor position
 -- In raw mode, we need \r\n instead of just \n for proper line breaks
 local function write_colored(text, fg_color, bg_color)
@@ -45,17 +51,14 @@ local function write_colored(text, fg_color, bg_color)
     else
         term.set_fg(fg_color)
     end
-    -- Replace \n with \r\n for proper line breaks in raw mode
-    local fixed_text = text:gsub("\n", "\r\n")
-    io.write(fixed_text)
+    io.write(fix_line_endings(text))
     term.reset()
     io.flush()  -- Ensure colored text is displayed immediately
 end
 
 -- Helper function to write plain text with proper line endings in raw mode
 local function write_text(text)
-    local fixed_text = text:gsub("\n", "\r\n")
-    io.write(fixed_text)
+    io.write(fix_line_endings(text))
     io.flush()
 end
 
