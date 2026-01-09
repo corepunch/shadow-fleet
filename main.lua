@@ -130,23 +130,12 @@ local function print_fleet_status()
         echo("\n\n")
     end
     
-    -- Use the generic table generator
-    local table_output = io.output()  -- Save current output
-    local capture = io.tmpfile()
-    io.output(capture)
-    
+    -- Use the generic table generator with echo for output
     widgets.table_generator(columns, game.fleet, {
         title = "--- FLEET STATUS ---",
-        footer_fn = footer_fn
+        footer_fn = footer_fn,
+        output_fn = echo
     })
-    
-    -- Read captured output and echo it (to fix line endings for raw mode)
-    io.output(table_output)  -- Restore output
-    capture:seek("set", 0)
-    local content = capture:read("*all")
-    capture:close()
-    
-    echo(content)
 end
 
 -- Print market snapshot

@@ -109,61 +109,53 @@ end
 -- Renders a table with headers, separators, and data rows
 -- @param columns table - Array of column definitions: {{title="Name", value_fn=function(row), width=11}, ...}
 -- @param data table - Array of data rows to display
--- @param options table - Optional settings {title="Table Title", footer_fn=function()}
+-- @param options table - Optional settings {title="Table Title", footer_fn=function(), output_fn=function(str)}
 function widgets.table_generator(columns, data, options)
     options = options or {}
+    local output_fn = options.output_fn or io.write
     
     -- Print optional title
     if options.title then
-        io.write(options.title .. "\n")
+        output_fn(options.title .. "\n")
     end
     
-    -- Build format string for headers
-    local header_format = ""
+    -- Build format string (reused for all rows)
+    local format_str = ""
     local separator_values = {}
+    local header_values = {}
     
     for i, col in ipairs(columns) do
-        header_format = header_format .. "%-" .. col.width .. "s"
+        format_str = format_str .. "%-" .. col.width .. "s"
         if i < #columns then
-            header_format = header_format .. " "
+            format_str = format_str .. " "
         end
-        table.insert(separator_values, string.rep("-", #col.title))
-    end
-    header_format = header_format .. "\n"
-    
-    -- Print table header
-    local header_values = {}
-    for _, col in ipairs(columns) do
+        table.insert(separator_values, string.rep("-", col.width))
         table.insert(header_values, col.title)
     end
-    io.write(string.format(header_format, table.unpack(header_values)))
+    format_str = format_str .. "\n"
+    
+    -- Print table header
+    output_fn(string.format(format_str, table.unpack(header_values)))
     
     -- Print column separators
-    io.write(string.format(header_format, table.unpack(separator_values)))
+    output_fn(string.format(format_str, table.unpack(separator_values)))
     
     -- Print data rows
     for _, row in ipairs(data) do
-        local row_format = ""
         local row_values = {}
         
-        for i, col in ipairs(columns) do
-            row_format = row_format .. "%-" .. col.width .. "s"
-            if i < #columns then
-                row_format = row_format .. " "
-            end
-            
+        for _, col in ipairs(columns) do
             -- Get value from the value function
             local value = col.value_fn(row)
             table.insert(row_values, tostring(value))
         end
-        row_format = row_format .. "\n"
         
-        io.write(string.format(row_format, table.unpack(row_values)))
+        output_fn(string.format(format_str, table.unpack(row_values)))
     end
     
     -- Print optional footer
     if options.footer_fn then
-        io.write("\n")
+        output_fn("\n")
         options.footer_fn()
     end
     
