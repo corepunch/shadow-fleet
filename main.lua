@@ -9,11 +9,15 @@ local widgets = require("ui")
 
 -- Parse command line arguments
 local theme = "dark"  -- default theme
-for i = 1, #arg do
+local i = 1
+while i <= #arg do
     if arg[i] == "--theme" or arg[i] == "-t" then
-        if arg[i + 1] then
-            theme = arg[i + 1]
+        if not arg[i + 1] then
+            print("Error: --theme requires a value (dark or light)")
+            os.exit(1)
         end
+        theme = arg[i + 1]
+        i = i + 1  -- Skip the next argument since we consumed it
     elseif arg[i] == "--help" or arg[i] == "-h" then
         print("Shadow Fleet - Text-based Strategy Game")
         print("")
@@ -25,6 +29,7 @@ for i = 1, #arg do
         print("")
         os.exit(0)
     end
+    i = i + 1
 end
 
 -- Validate theme
