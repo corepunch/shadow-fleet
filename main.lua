@@ -60,17 +60,11 @@ function sections.fleet_status(start_row)
     term.write_at(row, 112, "Risk", "fg_white")
     row = row + 1
     
-    -- Header separator
-    term.write_at(row, 1, "----", "fg_white")
-    term.write_at(row, 12, "---", "fg_white")
-    term.write_at(row, 17, "----", "fg_white")
-    term.write_at(row, 23, "----", "fg_white")
-    term.write_at(row, 29, "------", "fg_white")
-    term.write_at(row, 40, "-----", "fg_white")
-    term.write_at(row, 58, "------", "fg_white")
-    term.write_at(row, 80, "-----------", "fg_white")
-    term.write_at(row, 104, "---", "fg_white")
-    term.write_at(row, 112, "----", "fg_white")
+    -- Header separator - ASCII grid drawing
+    -- Build the separator line with proper box-drawing characters
+    -- Columns: Name(11) | Age(5) | Hull(6) | Fuel(6) | Status(11) | Cargo(18) | Origin(22) | Destination(24) | ETA(8) | Risk(...)
+    local separator = "├" .. string.rep("─", 10) .. "┼" .. string.rep("─", 4) .. "┼" .. string.rep("─", 5) .. "┼" .. string.rep("─", 5) .. "┼" .. string.rep("─", 10) .. "┼" .. string.rep("─", 17) .. "┼" .. string.rep("─", 21) .. "┼" .. string.rep("─", 23) .. "┼" .. string.rep("─", 7) .. "┼" .. string.rep("─", 7) .. "┤"
+    term.write_at(row, 1, separator, "fg_white")
     row = row + 1
     
     -- Table rows
