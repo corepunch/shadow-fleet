@@ -222,10 +222,13 @@ end
 --   2. Two integer color codes: write_colored(text, terminal.colors.fg_bright_yellow, terminal.colors.bg_black)
 --   3. Single packed integer (fg << 8) | bg: write_colored(text, (terminal.colors.fg_bright_yellow << 8) | terminal.colors.bg_black)
 function terminal.write_colored(text, fg, bg)
+    -- Maximum value for a single ANSI color code
+    local MAX_ANSI_CODE = 255
+    
     -- If fg is an integer and bg is nil, check if it's a packed color code
     if type(fg) == "number" and bg == nil then
-        -- If the value is > 255, it's likely a packed color code (fg << 8) | bg
-        if fg > 255 then
+        -- If the value is > MAX_ANSI_CODE, it's likely a packed color code (fg << 8) | bg
+        if fg > MAX_ANSI_CODE then
             local packed = fg
             fg = packed >> 8
             bg = packed & 0xFF

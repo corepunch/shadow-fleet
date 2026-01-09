@@ -60,12 +60,17 @@ local bg_black = term.colors.bg_black
 --   2. Two integer color codes: write_colored(text, fg_bright_yellow, bg_black)
 --   3. Single packed integer (fg << 8) | bg: write_colored(text, fg_bright_yellow|bg_black)
 local function write_colored(text, fg_color, bg_color)
+    -- Fix line endings for raw terminal mode before writing
+    local fixed_text = fix_line_endings(text)
+    
+    -- Delegate to terminal.write_colored for color handling and reset
     io.flush()  -- Ensure output is visible before setting colors
     
-    -- If fg_color is an integer and bg_color is nil, check if it's a packed color code
+    -- Handle color setting based on input format
     if type(fg_color) == "number" and bg_color == nil then
-        -- If the value is > 255, it's likely a packed color code (fg << 8) | bg
+        -- Single integer parameter - let terminal.write_colored handle it
         if fg_color > 255 then
+            -- Packed color code (fg << 8) | bg
             local packed = fg_color
             fg_color = packed >> 8
             bg_color = packed & 0xFF
@@ -80,7 +85,7 @@ local function write_colored(text, fg_color, bg_color)
         term.set_fg(fg_color)
     end
     
-    io.write(fix_line_endings(text))
+    io.write(fixed_text)
     -- Restore default colors: light-grey (fg_white) on black
     term.set_colors(term.colors.fg_white, term.colors.bg_black)
     io.flush()  -- Ensure colored text is displayed immediately
