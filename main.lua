@@ -43,17 +43,46 @@ local function fix_line_endings(text)
     return result
 end
 
+-- Shorthand for color constants
+local fg_bright_yellow = term.colors.fg_bright_yellow
+local fg_bright_green = term.colors.fg_bright_green
+local fg_bright_red = term.colors.fg_bright_red
+local fg_bright_white = term.colors.fg_bright_white
+local fg_bright_cyan = term.colors.fg_bright_cyan
+local fg_white = term.colors.fg_white
+local fg_yellow = term.colors.fg_yellow
+local bg_black = term.colors.bg_black
+
 -- Helper function to write colored text at cursor position
 -- In raw mode, we need \r\n instead of just \n for proper line breaks
+-- Accepts either:
+--   1. String color names: write_colored(text, "fg_bright_yellow", "bg_black")
+--   2. Two integer color codes: write_colored(text, fg_bright_yellow, bg_black)
+--   3. Single packed integer (fg << 8) | bg: write_colored(text, fg_bright_yellow|bg_black)
 local function write_colored(text, fg_color, bg_color)
     io.flush()  -- Ensure output is visible before setting colors
-    if bg_color then
+    
+    -- If fg_color is an integer and bg_color is nil, check if it's a packed color code
+    if type(fg_color) == "number" and bg_color == nil then
+        -- If the value is > 255, it's likely a packed color code (fg << 8) | bg
+        if fg_color > 255 then
+            local packed = fg_color
+            fg_color = packed >> 8
+            bg_color = packed & 0xFF
+        else
+            -- Single color code, default bg to black
+            bg_color = term.colors.bg_black
+        end
+        term.set_colors(fg_color, bg_color)
+    elseif bg_color then
         term.set_colors(fg_color, bg_color)
     else
         term.set_fg(fg_color)
     end
+    
     io.write(fix_line_endings(text))
-    term.reset()
+    -- Restore default colors: light-grey (fg_white) on black
+    term.set_colors(term.colors.fg_white, term.colors.bg_black)
     io.flush()  -- Ensure colored text is displayed immediately
 end
 
@@ -140,11 +169,11 @@ local function print_market_snapshot()
     write_colored("--- MARKET SNAPSHOT ---\n", "fg_bright_white")
     
     write_colored("Crude Price Cap: ", "fg_white")
-    write_colored("$" .. game.market.crude_price_cap .. "/bbl", "fg_bright_yellow")
+    write_colored("$" .. game.market.crude_price_cap .. "/bbl", fg_bright_yellow|bg_black)
     write_colored(" | Shadow Markup: ", "fg_white")
     write_colored("+" .. game.market.shadow_markup_percent .. "%", "fg_bright_green")
     write_colored(" (", "fg_white")
-    write_colored("$" .. game.market.shadow_price .. "/bbl", "fg_bright_yellow")
+    write_colored("$" .. game.market.shadow_price .. "/bbl", fg_bright_yellow|bg_black)
     write_colored(" to India/China)", "fg_white")
     write_text("\n")
     

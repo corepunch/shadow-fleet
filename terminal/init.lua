@@ -217,9 +217,26 @@ function terminal.write_at(row, col, text, fg, bg)
 end
 
 -- Write colored text at current position
+-- Accepts either:
+--   1. String color names: write_colored(text, "fg_bright_yellow", "bg_black")
+--   2. Two integer color codes: write_colored(text, terminal.colors.fg_bright_yellow, terminal.colors.bg_black)
+--   3. Single packed integer (fg << 8) | bg: write_colored(text, (terminal.colors.fg_bright_yellow << 8) | terminal.colors.bg_black)
 function terminal.write_colored(text, fg, bg)
-    -- Default to black background if not specified
-    bg = bg or "bg_black"
+    -- If fg is an integer and bg is nil, check if it's a packed color code
+    if type(fg) == "number" and bg == nil then
+        -- If the value is > 255, it's likely a packed color code (fg << 8) | bg
+        if fg > 255 then
+            local packed = fg
+            fg = packed >> 8
+            bg = packed & 0xFF
+        else
+            -- Single color code, default bg to black
+            bg = terminal.colors.bg_black
+        end
+    else
+        -- Default to black background if not specified
+        bg = bg or "bg_black"
+    end
     
     if fg or bg then
         if fg and bg then
@@ -231,7 +248,8 @@ function terminal.write_colored(text, fg, bg)
         end
     end
     io.write(text)
-    terminal.reset()
+    -- Restore default colors: light-grey (fg_white) on black
+    terminal.set_colors("fg_white", "bg_black")
     io.flush()
 end
 
