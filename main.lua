@@ -8,7 +8,7 @@ local gamestate = require("game")
 local widgets = require("ui")
 
 -- Parse command line arguments
-local theme = "dark"  -- default theme
+local theme = "light"  -- default theme
 for i = 1, #arg do
     if arg[i] == "--theme" or arg[i] == "-t" then
         if arg[i + 1] then
