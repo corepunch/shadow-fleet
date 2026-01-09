@@ -138,11 +138,6 @@ function M.get_fleet_stats(game)
     }
 end
 
--- Heat level thresholds
-local HEAT_LOW = 0
-local HEAT_MEDIUM = 3
-local HEAT_HIGH = 7
-
 --- Get heat level description
 --- @param game table Game state
 --- @return string Human-readable heat level description
