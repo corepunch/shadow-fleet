@@ -1,9 +1,15 @@
--- UI Widgets Module
--- Provides reusable UI components for text-based interfaces
+--- UI Widgets Module
+--- Provides reusable UI components for text-based interfaces
+---
+--- This module contains a collection of widgets for rendering terminal-based
+--- UI elements including separators, tables, status bars, and formatted output.
+---
+--- @module ui
 
 local M = {}
 
--- Widget: Separator line
+--- Widget: Separator line
+--- @param width number Optional width (default 120)
 function M.separator(width)
     width = width or 120
     io.write(string.rep("=", width))

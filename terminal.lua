@@ -1,12 +1,17 @@
--- Terminal I/O Module
--- Handles raw terminal mode and formatted output
+--- Terminal I/O Module
+--- Handles raw terminal mode and formatted output for BBS Door style interface
+---
+--- This module provides low-level terminal control functions for reading
+--- single-character input and writing formatted output with proper line endings.
+---
+--- @module terminal
 
 local M = {}
 
--- Raw mode state
+-- Raw mode state tracking
 local raw_mode_active = false
 
--- Set terminal to raw mode for single-character input
+--- Set terminal to raw mode for single-character input
 function M.set_raw_mode()
     if not raw_mode_active then
         os.execute("stty raw -echo 2>/dev/null")
@@ -14,7 +19,7 @@ function M.set_raw_mode()
     end
 end
 
--- Restore terminal to normal mode
+--- Restore terminal to normal (cooked) mode
 function M.restore_normal_mode()
     if raw_mode_active then
         os.execute("stty sane 2>/dev/null")
@@ -22,23 +27,20 @@ function M.restore_normal_mode()
     end
 end
 
--- Read a single character without waiting for Enter
+--- Read a single character without waiting for Enter
+--- @return string|nil Character read, or nil on EOF
 function M.read_char()
     M.set_raw_mode()
     return io.read(1)
 end
 
--- Fix line endings for raw terminal mode
--- Converts \n to \r\n, avoiding double conversion of existing \r\n sequences
+--- Fix line endings for raw terminal mode
 local function fix_line_endings(text)
     return text:gsub("\r?\n", "\r\n")
 end
 
--- Write text with optional formatting
--- In raw mode, we need \r\n instead of just \n for proper line breaks
--- Usage: echo(format_string, ...)
--- Example: echo("Enter command: ")
--- Example: echo("Ship: %s Age: %d", ship.name, ship.age)
+--- Write text with optional formatting
+--- @param ... Arguments for string.format or a single string
 function M.echo(...)
     local args = {...}
     local text
@@ -58,7 +60,8 @@ function M.echo(...)
     io.flush()
 end
 
--- Write multiple strings efficiently using table.concat
+--- Write multiple strings efficiently using table.concat
+--- @param parts Array of strings to concatenate
 function M.echo_multi(parts)
     local text = table.concat(parts)
     local fixed_text = fix_line_endings(text)

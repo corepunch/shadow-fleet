@@ -1,9 +1,16 @@
--- Shadow Fleet - Game State
--- Central game state management
+--- Shadow Fleet - Game State
+--- Central game state management
+---
+--- This module handles game state initialization and provides helper functions
+--- for querying and modifying game state, including fleet stats, heat levels,
+--- and upgrade management.
+---
+--- @module game
 
 local M = {}
 
--- Initialize game state with default values
+--- Initialize game state with default values
+--- @return table New game state
 function M.new()
     return {
         -- Player resources
@@ -107,7 +114,14 @@ function M.new()
     }
 end
 
--- Calculate fleet statistics
+-- Heat level thresholds
+local HEAT_LOW = 0
+local HEAT_MEDIUM = 3
+local HEAT_HIGH = 7
+
+--- Calculate fleet statistics
+--- @param game table Game state
+--- @return table Statistics including total ships, max capacity, average age, and losses
 function M.get_fleet_stats(game)
     local total_ships = #game.fleet
     local total_age = 0
@@ -129,7 +143,9 @@ local HEAT_LOW = 0
 local HEAT_MEDIUM = 3
 local HEAT_HIGH = 7
 
--- Get heat level description
+--- Get heat level description
+--- @param game table Game state
+--- @return string Human-readable heat level description
 function M.get_heat_description(game)
     local heat = game.heat
     if heat == HEAT_LOW then
@@ -143,7 +159,9 @@ function M.get_heat_description(game)
     end
 end
 
--- Get heat meter color based on level
+--- Get heat meter color based on level
+--- @param game table Game state
+--- @return string Color name for UI rendering
 function M.get_heat_color(game)
     local heat = game.heat
     if heat == HEAT_LOW then
@@ -157,7 +175,9 @@ function M.get_heat_color(game)
     end
 end
 
--- Get heat meter message
+--- Get heat meter message
+--- @param game table Game state
+--- @return string Contextual message about current heat level
 function M.get_heat_message(game)
     local heat = game.heat
     if heat == HEAT_LOW then
@@ -171,7 +191,10 @@ function M.get_heat_message(game)
     end
 end
 
--- Check if an upgrade is applicable to a ship
+--- Check if an upgrade is applicable to a ship
+--- @param ship table Ship to check
+--- @param upgrade table Upgrade definition
+--- @return boolean, string Can apply and optional error message
 function M.can_apply_upgrade(ship, upgrade)
     -- Hull repair only if hull is damaged
     if upgrade.effect == "hull" and ship.hull >= 100 then
@@ -189,7 +212,9 @@ function M.can_apply_upgrade(ship, upgrade)
     return true, nil
 end
 
--- Apply an upgrade to a ship
+--- Apply an upgrade to a ship
+--- @param ship table Ship to upgrade
+--- @param upgrade table Upgrade definition to apply
 function M.apply_upgrade(ship, upgrade)
     if upgrade.effect == "hull" then
         ship.hull = upgrade.value
@@ -201,7 +226,10 @@ function M.apply_upgrade(ship, upgrade)
     end
 end
 
--- Get available upgrades for a ship
+--- Get available upgrades for a ship
+--- @param game table Game state
+--- @param ship table Ship to get upgrades for
+--- @return table Array of applicable upgrade definitions
 function M.get_available_upgrades(game, ship)
     local available = {}
     for _, upgrade in ipairs(game.upgrades) do

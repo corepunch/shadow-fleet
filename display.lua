@@ -1,24 +1,31 @@
--- Display Module
--- Handles dashboard and status rendering
+--- Display Module
+--- Handles dashboard and status rendering for Shadow Fleet
+---
+--- This module provides high-level display functions for rendering
+--- game state information including header, status, market data, events, etc.
+---
+--- @module display
 
 local gamestate = require("game")
 local widgets = require("ui")
 
 local M = {}
 
--- Print separator line
+--- Print separator line
 function M.separator(echo_fn)
     echo_fn(string.rep("=", 80) .. "\n")
 end
 
--- Print header
+--- Print game header
 function M.header(echo_fn)
     M.separator(echo_fn)
     echo_fn("PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE\n")
     M.separator(echo_fn)
 end
 
--- Print status line
+--- Print status line with player info
+--- @param game table Game state
+--- @param echo_fn function Output function
 function M.status(game, echo_fn)
     local heat_desc = gamestate.get_heat_description(game)
     
@@ -33,7 +40,9 @@ function M.status(game, echo_fn)
     echo_fn(table.concat(parts))
 end
 
--- Print fleet status
+--- Print fleet status table
+--- @param game table Game state
+--- @param echo_fn function Output function
 function M.fleet_status(game, echo_fn)
     local columns = {
         {title = "Name", value_fn = function(ship) return ship.name end, width = 11},
@@ -61,7 +70,9 @@ function M.fleet_status(game, echo_fn)
     })
 end
 
--- Print market snapshot
+--- Print market snapshot
+--- @param game table Game state
+--- @param echo_fn function Output function
 function M.market_snapshot(game, echo_fn)
     local parts = {
         "--- MARKET SNAPSHOT ---\n",
@@ -77,7 +88,9 @@ function M.market_snapshot(game, echo_fn)
     echo_fn(table.concat(parts))
 end
 
--- Print active events
+--- Print active events list
+--- @param game table Game state
+--- @param echo_fn function Output function
 function M.active_events(game, echo_fn)
     local parts = {"--- ACTIVE EVENTS ---\n"}
     
@@ -93,7 +106,9 @@ function M.active_events(game, echo_fn)
     echo_fn(table.concat(parts))
 end
 
--- Print heat meter
+--- Print heat meter visualization
+--- @param game table Game state
+--- @param echo_fn function Output function
 function M.heat_meter(game, echo_fn)
     local parts = {"--- HEAT METER ---\n["}
     
