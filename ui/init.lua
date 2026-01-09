@@ -76,9 +76,9 @@ function widgets.heat_meter(game)
     
     for i = 1, max_heat do
         if i <= heat then
-            io.write("#")  -- Filled heat bar
+            io.write("█")  -- Filled heat bar (solid block)
         else
-            io.write("|")  -- Empty heat bar
+            io.write("░")  -- Empty heat bar (25% dithered)
         end
     end
     
