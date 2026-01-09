@@ -239,10 +239,10 @@ local function generate_menu_items(context_keymap)
     return formatted
 end
 
--- Generic function to draw a box with title and items
+-- Generic function to draw a menu with title and items
 -- items: array of strings with format "(X) Item Name" or just "Item Name"
 local function draw_boxed_menu(title, formatted_items)
-    -- Calculate box width based on longest item
+    -- Calculate width based on longest item
     local max_width = #title
     for _, line_text in ipairs(formatted_items) do
         if #line_text > max_width then
@@ -250,46 +250,25 @@ local function draw_boxed_menu(title, formatted_items)
         end
     end
     
-    -- Add padding for box
-    local box_width = max_width + 4  -- 2 chars padding on each side
-    local inner_width = max_width
-    
-    -- Top border: ╔═══╗
-    echo("╔")
-    echo(string.rep("═", box_width))
-    echo("╗\n")
-    
-    -- Title line centered
-    local title_padding = math.floor((inner_width - #title) / 2)
-    echo("║  ")
-    echo(string.rep(" ", title_padding))
+    -- Title line
     echo(title)
-    echo(string.rep(" ", inner_width - #title - title_padding))
-    echo("  ║\n")
+    echo("\n")
     
-    -- Separator after title
-    echo("╠")
-    echo(string.rep("═", box_width))
-    echo("╣\n")
+    -- Separator line between title and items
+    echo(string.rep("═", max_width))
+    echo("\n")
     
     -- Menu items
     for _, line_text in ipairs(formatted_items) do
-        echo("║  ")
         echo(line_text)
-        echo(string.rep(" ", inner_width - #line_text))
-        echo("  ║\n")
+        echo("\n")
     end
     
-    -- Bottom border: ╚═══╝
-    echo("╚")
-    echo(string.rep("═", box_width))
-    echo("╝\n\n")
-    
+    echo("\n")
     echo("Enter command: ")
 end
 
 -- Generic function to print a menu from a keymap
--- Uses double-lined box-drawing characters
 -- @param title string - Menu title
 -- @param context_keymap table - The keymap for this context
 local function print_menu_from_keymap(title, context_keymap)

@@ -15,14 +15,9 @@ file:close()
 
 assert(content:match("local function print_menu_from_keymap") or content:match("function print_menu_from_keymap"), 
        "main.lua should contain print_menu_from_keymap function")
-assert(content:match("╔"), "main.lua should use double-lined box drawing characters (╔)")
-assert(content:match("╗"), "main.lua should use double-lined box drawing characters (╗)")
-assert(content:match("║"), "main.lua should use double-lined box drawing characters (║)")
-assert(content:match("╚"), "main.lua should use double-lined box drawing characters (╚)")
-assert(content:match("╝"), "main.lua should use double-lined box drawing characters (╝)")
-assert(content:match("═"), "main.lua should use double-lined box drawing characters (═)")
+assert(content:match("═"), "main.lua should use separator line (═)")
 
-print("✓ All box-drawing characters found")
+print("✓ Separator character found")
 
 -- Test that print_main_menu uses the new approach
 assert(content:match('print_menu_from_keymap%("QUICK ACTIONS"'), "print_main_menu should call print_menu_from_keymap with QUICK ACTIONS title")
@@ -42,7 +37,7 @@ print("===================================")
 print("")
 print("The menu formatting system provides:")
 print("  • print_menu_from_keymap(title, keymap) function")
-print("  • Double-lined box-drawing characters (╔╗║╚╝═)")
+print("  • Simple separator line between title and items")
 print("  • Keymap-based hotkey mapping")
 print("  • Command registry for actions")
 print("")
