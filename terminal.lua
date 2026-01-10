@@ -31,7 +31,43 @@ end
 --- @return string|nil Character read, or nil on EOF
 function terminal.read_char()
     terminal.set_raw_mode()
-    return io.read(1)
+    local char
+    -- Skip newlines/carriage returns
+    repeat
+        char = io.read(1)
+    until not char or (char ~= "\r" and char ~= "\n")
+    return char
+end
+
+--- Read a full line of text (in raw mode, reads chars until newline)
+--- Skips any leading newlines first
+--- @return string|nil Line read, or nil on EOF
+function terminal.read_line()
+    terminal.set_raw_mode()
+    
+    -- Skip leading newlines
+    local char
+    repeat
+        char = io.read(1)
+    until not char or (char ~= "\r" and char ~= "\n")
+    
+    if not char then
+        return nil  -- EOF
+    end
+    
+    -- Start building the line with the first non-newline character
+    local chars = {char}
+    
+    -- Read until we hit another newline
+    while true do
+        char = io.read(1)
+        if not char or char == "\r" or char == "\n" then
+            break
+        end
+        table.insert(chars, char)
+    end
+    
+    return table.concat(chars)
 end
 
 --- Fix line endings for raw terminal mode

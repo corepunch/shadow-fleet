@@ -7,7 +7,7 @@
 --
 -- Usage:
 --   local commands_init = require("commands_init")
---   commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char)
+--   commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char, read_line)
 
 local commands = require("commands")
 local routes = require("game.routes")
@@ -20,7 +20,8 @@ local commands_init = {}
 -- @param handle_submenu_action function - The generic submenu action handler from main.lua
 -- @param echo function - The echo/output function
 -- @param read_char function - The character read function
-function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char)
+-- @param read_line function - The line read function
+function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char, read_line)
     
     -- Main Menu Commands (Context Switching)
     local menu_contexts = {
@@ -100,18 +101,18 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
     
     -- Route Commands
     commands.register("route.plot", function(game)
-        routes.plot_route(game, echo, read_char)
+        routes.plot_route(game, echo, read_char, read_line)
         return nil
     end)
     
     commands.register("route.load", function(game)
-        routes.load_cargo(game, echo, read_char)
+        routes.load_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
     -- Trade Commands
     commands.register("trade.sell", function(game)
-        routes.sell_cargo(game, echo, read_char)
+        routes.sell_cargo(game, echo, read_char, read_line)
         return nil
     end)
     

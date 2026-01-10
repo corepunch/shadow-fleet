@@ -15,9 +15,10 @@ local routes = {}
 --- Interactive function to select ship and destination
 --- @param game table Game state
 --- @param echo_fn function Output function
---- @param read_char function Input function
+--- @param read_char function Input function for single character
+--- @param read_line function Input function for line input
 --- @return boolean Success
-function routes.plot_route(game, echo_fn, read_char)
+function routes.plot_route(game, echo_fn, read_char, read_line)
     echo_fn("\n")
     echo_fn("--- PLOT ROUTE ---\n\n")
     
@@ -171,9 +172,10 @@ end
 --- Load cargo onto a ship
 --- @param game table Game state
 --- @param echo_fn function Output function
---- @param read_char function Input function
+--- @param read_char function Input function for single character
+--- @param read_line function Input function for line input
 --- @return boolean Success
-function routes.load_cargo(game, echo_fn, read_char)
+function routes.load_cargo(game, echo_fn, read_char, read_line)
     echo_fn("\n")
     echo_fn("--- LOAD CARGO ---\n\n")
     
@@ -242,7 +244,8 @@ function routes.load_cargo(game, echo_fn, read_char)
     echo_fn(string.format("Oil price: $%d/bbl\n\n", port.oil_price))
     
     echo_fn("Enter cargo amount (in thousands of barrels): ")
-    local input = io.read()
+    local input = read_line()
+    echo_fn("\n")
     
     if not input then
         return false
@@ -307,9 +310,10 @@ end
 --- Sell cargo at current port
 --- @param game table Game state
 --- @param echo_fn function Output function
---- @param read_char function Input function
+--- @param read_char function Input function for single character
+--- @param read_line function Input function for line input
 --- @return boolean Success
-function routes.sell_cargo(game, echo_fn, read_char)
+function routes.sell_cargo(game, echo_fn, read_char, read_line)
     echo_fn("\n")
     echo_fn("--- SELL CARGO ---\n\n")
     
