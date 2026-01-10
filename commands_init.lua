@@ -10,7 +10,7 @@
 --   commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char, read_line)
 
 local commands = require("commands")
-local routes = require("game.routes")
+local routes_presenter = require("presenters.routes")
 local turn_processor = require("game.turn")
 
 local commands_init = {}
@@ -101,18 +101,18 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
     
     -- Route Commands
     commands.register("route.plot", function(game)
-        routes.plot_route(game, echo, read_char, read_line)
+        routes_presenter.plot_route(game, echo, read_char, read_line)
         return nil
     end)
     
     commands.register("route.load", function(game)
-        routes.load_cargo(game, echo, read_char, read_line)
+        routes_presenter.load_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
     -- Trade Commands
     commands.register("trade.sell", function(game)
-        routes.sell_cargo(game, echo, read_char, read_line)
+        routes_presenter.sell_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
