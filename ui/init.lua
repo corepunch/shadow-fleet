@@ -1,11 +1,15 @@
--- UI Widgets Module
--- Provides reusable UI components for text-based interfaces
-
-local gamestate = require("game")
+--- UI Widgets Module
+--- Provides reusable UI components for text-based interfaces
+---
+--- This module contains a collection of widgets for rendering terminal-based
+--- UI elements including separators, tables, status bars, and formatted output.
+---
+--- @module ui
 
 local widgets = {}
 
--- Widget: Separator line
+--- Widget: Separator line
+--- @param width number Optional width (default 120)
 function widgets.separator(width)
     width = width or 120
     io.write(string.rep("=", width))
@@ -25,7 +29,6 @@ function widgets.status_bar(left_text, middle_text, right_text, width)
     width = width or 120
     io.write(left_text)
     if middle_text then
-        -- Calculate position for centered middle text
         local left_len = #left_text
         local mid_len = #middle_text
         local right_len = right_text and #right_text or 0
@@ -34,7 +37,6 @@ function widgets.status_bar(left_text, middle_text, right_text, width)
         io.write(string.rep(" ", left_padding) .. middle_text)
     end
     if right_text then
-        -- Calculate remaining space for right text
         local used_len = #left_text
         if middle_text then
             local mid_len = #middle_text
@@ -69,22 +71,22 @@ end
 
 -- Widget: Heat meter
 function widgets.heat_meter(game)
+    local gamestate = require("game")
     local heat = game.heat
     local max_heat = game.heat_max
     
-    io.write("[")
-    
+    local parts = {"["}
     for i = 1, max_heat do
-        if i <= heat then
-            io.write("█")  -- Filled heat bar (solid block)
-        else
-            io.write("░")  -- Empty heat bar (25% dithered)
-        end
+        table.insert(parts, i <= heat and "█" or "░")
     end
+    table.insert(parts, "] ")
+    table.insert(parts, tostring(heat))
+    table.insert(parts, "/")
+    table.insert(parts, tostring(max_heat))
+    table.insert(parts, " - ")
+    table.insert(parts, gamestate.get_heat_message(game))
     
-    io.write("] " .. heat .. "/" .. max_heat)
-    io.write(" - ")
-    io.write(gamestate.get_heat_message(game))
+    io.write(table.concat(parts))
     io.flush()
 end
 
@@ -97,10 +99,10 @@ end
 -- Utility: Format number with thousands separator
 function widgets.format_number(num)
     local formatted = tostring(num)
-    local k
     while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        local new_formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
         if k == 0 then break end
+        formatted = new_formatted
     end
     return formatted
 end
@@ -119,41 +121,33 @@ function widgets.table_generator(columns, data, options)
         output_fn(options.title .. "\n")
     end
     
-    -- Build format string (reused for all rows)
-    local format_str = ""
+    -- Build format string and header data
+    local format_parts = {}
     local separator_values = {}
     local header_values = {}
     
     for i, col in ipairs(columns) do
-        format_str = format_str .. "%-" .. col.width .. "s"
+        table.insert(format_parts, "%-" .. col.width .. "s")
         if i < #columns then
-            format_str = format_str .. " "
+            table.insert(format_parts, " ")
         end
         table.insert(separator_values, string.rep("-", col.width))
         table.insert(header_values, col.title)
     end
-    format_str = format_str .. "\n"
     
-    -- Print table header
+    local format_str = table.concat(format_parts) .. "\n"
+    
+    -- Print table header and separator
     output_fn(string.format(format_str, table.unpack(header_values)))
-    
-    -- Print column separators
     output_fn(string.format(format_str, table.unpack(separator_values)))
     
     -- Print data rows
     for _, row in ipairs(data) do
         local row_values = {}
-        
         for _, col in ipairs(columns) do
-            -- Get value from the value function
             local value = col.value_fn(row)
-            -- Handle nil values by converting to "-"
-            if value == nil then
-                value = "-"
-            end
-            table.insert(row_values, tostring(value))
+            table.insert(row_values, value == nil and "-" or tostring(value))
         end
-        
         output_fn(string.format(format_str, table.unpack(row_values)))
     end
     
@@ -163,7 +157,7 @@ function widgets.table_generator(columns, data, options)
         options.footer_fn()
     end
     
-    -- Flush only if using default io.write (custom output functions like echo handle their own flushing)
+    -- Flush only if using default io.write
     if output_fn == io.write then
         io.flush()
     end

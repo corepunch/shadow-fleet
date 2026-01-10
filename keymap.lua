@@ -12,7 +12,6 @@
 local keymap = {}
 
 -- Main menu keymap
--- Maps single-character hotkeys to command IDs
 keymap.main = {
     F = "menu.open_fleet",
     R = "menu.open_route",
