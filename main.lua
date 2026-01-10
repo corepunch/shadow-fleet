@@ -232,7 +232,7 @@ end
 
 -- Main game loop
 local function main()
-    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action)
+    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char)
     
     local current_context = "main"
     

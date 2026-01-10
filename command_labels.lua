@@ -17,6 +17,7 @@ local command_labels = {
     ["menu.open_events"] = "Events",
     ["menu.open_market"] = "Market",
     ["menu.open_status"] = "Status",
+    ["turn.end"] = "eNd Turn",
     ["help.open"] = "Help",
     ["app.quit"] = "Quit",
     
