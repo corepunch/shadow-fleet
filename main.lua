@@ -18,6 +18,7 @@ local game = gamestate.new()
 -- Wrapper for echo function to use throughout
 local echo = terminal.echo
 local read_char = terminal.read_char
+local read_line = terminal.read_line
 
 -- Main dashboard display
 local function render_dashboard()
@@ -232,7 +233,7 @@ end
 
 -- Main game loop
 local function main()
-    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action)
+    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char, read_line)
     
     local current_context = "main"
     

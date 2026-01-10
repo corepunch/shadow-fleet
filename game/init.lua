@@ -16,6 +16,7 @@ function gamestate.new()
         -- Player resources
         location = "Moscow Safehouse",
         date = "Jan 08, 2026",
+        turn = 0,
         rubles = 5000000,
         oil_stock = 0,
         
@@ -30,10 +31,17 @@ function gamestate.new()
                 age = 22,
                 hull = 65,
                 fuel = 80,
+                capacity = 500,  -- 500k barrels capacity
+                cargo_amount = 0,
+                cargo_type = nil,
                 status = "Docked",
                 origin = "Ust-Luga (RU)",
+                origin_id = "ust_luga",
                 cargo = "Empty",
                 destination = nil,
+                destination_id = nil,
+                days_remaining = nil,
+                eta = nil,
                 risk = "None"
             },
             {
@@ -41,10 +49,16 @@ function gamestate.new()
                 age = 18,
                 hull = 72,
                 fuel = 45,
+                capacity = 500,
+                cargo_amount = 500,
+                cargo_type = "Crude",
                 status = "At Sea",
                 origin = "Ust-Luga",
+                origin_id = "ust_luga",
                 cargo = "500k bbls Crude",
                 destination = "STS off Malta",
+                destination_id = "malta_sts",
+                days_remaining = 2,
                 eta = "2 days",
                 risk = "MED (AIS Spoof Active)"
             }

@@ -20,6 +20,7 @@ keymap.main = {
     V = "menu.open_events",
     M = "menu.open_market",
     S = "menu.open_status",
+    N = "turn.end",
     ["?"] = "help.open",
     Q = "app.quit"
 }
