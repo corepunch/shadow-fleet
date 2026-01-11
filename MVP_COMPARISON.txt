@@ -334,13 +334,15 @@ AFTER:
   ✅ Easy to maintain and extend
   ✅ Professional architecture (CakePHP-style MVP)
 
-FILES CHANGED:
-  - Removed: game/routes.lua (405 lines of mixed code)
-  + Added: game/routes_model.lua (150 lines pure logic)
-  + Added: presenters/routes.lua (350 lines UI coordination)
-  + Added: tests/test_routes_model.lua (200 lines tests)
+FILES CHANGED IN THIS PR:
+  - Removed: game/routes.lua (405 lines of deprecated mixed code)
   ~ Updated: MVP_ARCHITECTURE.md (documented completion)
   + Added: MVP_REFACTORING_SUMMARY.md (comprehensive guide)
+  + Added: MVP_COMPARISON.txt (visual comparison)
+
+NOTE: The clean MVP files (routes_model.lua, presenters/routes.lua, 
+test_routes_model.lua) were added in earlier commits. This PR completes
+the refactoring by removing the deprecated file.
 
 RESULT: ✅ REFACTORING COMPLETE - Production ready!
 

@@ -316,12 +316,15 @@ shadow-fleet/
 - UI dependencies in Model layer: **0 violations** ✅
 - Testable without UI: ✅ Yes
 
-### Breakdown
-- **Model** (`game/routes_model.lua`): 150 lines
-- **Presenter** (`presenters/routes.lua`): 350 lines
-- **Tests** (`tests/test_routes_model.lua`): 200 lines
+### Note on Files
+The MVP refactoring had already been implemented in earlier commits. This PR completes the refactoring by:
+- Removing the deprecated mixed-concern file (`game/routes.lua`: 405 lines)
+- The clean MVP files already exist in the codebase:
+  - **Model** (`game/routes_model.lua`): 150 lines
+  - **Presenter** (`presenters/routes.lua`): 350 lines
+  - **Tests** (`tests/test_routes_model.lua`): 200 lines
 
-**Total**: 700 lines (295 lines more than before, but with better separation, testing, and maintainability)
+This PR finalizes the cleanup by removing the old deprecated code.
 
 ## Verification
 
