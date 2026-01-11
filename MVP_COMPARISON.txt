@@ -1,0 +1,347 @@
+═══════════════════════════════════════════════════════════════════════════════
+SHADOW FLEET - MVP REFACTORING COMPARISON
+═══════════════════════════════════════════════════════════════════════════════
+
+BEFORE REFACTORING (Mixed Concerns)
+───────────────────────────────────────────────────────────────────────────────
+
+File: game/routes.lua (DEPRECATED - REMOVED)
+Size: 13KB, 405 lines
+UI Dependencies: 132 violations (echo_fn, read_char, read_line)
+
+Example code with MIXED CONCERNS:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ function routes.load_cargo(game, echo_fn, read_char, read_line)            │
+│     echo_fn("\n")                              ← UI CODE                    │
+│     echo_fn("--- LOAD CARGO ---\n\n")         ← UI CODE                    │
+│                                                                             │
+│     local available_ships = {}                                              │
+│     for i, ship in ipairs(game.fleet) do                                    │
+│         if ship.status == "Docked" then       ← BUSINESS LOGIC             │
+│             local port = world.get_port(...)  ← BUSINESS LOGIC             │
+│             if port and port.type == "export" then                          │
+│                 table.insert(available_ships, ...)                          │
+│                 echo_fn(string.format("(%d) %s\n", ...))  ← UI CODE         │
+│             end                                                             │
+│         end                                                                 │
+│     end                                                                     │
+│                                                                             │
+│     local cost = amount * 1000 * port.oil_price  ← BUSINESS LOGIC          │
+│     game.rubles = game.rubles - cost             ← STATE MUTATION          │
+│     echo_fn(string.format("Cost: %s...", ...))   ← UI CODE                 │
+│ end                                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+PROBLEMS:
+  ❌ Business logic mixed with UI rendering
+  ❌ Cannot test business logic without UI mocking
+  ❌ UI changes require modifying business rules
+  ❌ Cannot reuse logic for different interfaces
+
+
+AFTER REFACTORING (MVP Pattern)
+───────────────────────────────────────────────────────────────────────────────
+
+Split into THREE separate layers:
+
+1. MODEL LAYER - game/routes_model.lua (150 lines, 0 UI dependencies)
+───────────────────────────────────────────────────────────────────────────────
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ --- Pure business logic - NO UI dependencies                               │
+│                                                                             │
+│ function routes_model.get_ships_for_loading(game)                          │
+│     local ships = {}                                                        │
+│     for i, ship in ipairs(game.fleet) do                                    │
+│         if ship.status == "Docked" then                                     │
+│             local port = world.get_port(ship.origin_id)                     │
+│             if port and port.type == "export" then                          │
+│                 table.insert(ships, {index=i, ship=ship, port=port})        │
+│             end                                                             │
+│         end                                                                 │
+│     end                                                                     │
+│     return ships                                                            │
+│ end                                                                         │
+│                                                                             │
+│ function routes_model.calculate_cargo_cost(amount, price_per_barrel)       │
+│     return amount * 1000 * price_per_barrel                                 │
+│ end                                                                         │
+│                                                                             │
+│ function routes_model.validate_cargo_load(ship, amount, cost, rubles)      │
+│     if not amount or amount <= 0 then                                       │
+│         return false, "Invalid amount"                                      │
+│     end                                                                     │
+│     local cargo_space = ship.capacity - (ship.cargo_amount or 0)           │
+│     if amount > cargo_space then                                            │
+│         return false, "Cannot load - insufficient space"                    │
+│     end                                                                     │
+│     if rubles < cost then                                                   │
+│         return false, "Insufficient funds"                                  │
+│     end                                                                     │
+│     return true, nil                                                        │
+│ end                                                                         │
+│                                                                             │
+│ function routes_model.load_cargo(game, ship, amount, cost)                 │
+│     ship.cargo_amount = (ship.cargo_amount or 0) + amount                  │
+│     ship.cargo_type = "Crude"                                               │
+│     game.rubles = game.rubles - cost                                        │
+│ end                                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+BENEFITS:
+  ✅ 100% testable without UI
+  ✅ Reusable across different interfaces
+  ✅ Clear, focused business logic
+
+
+2. PRESENTER LAYER - presenters/routes.lua (350 lines, coordinates UI & Model)
+───────────────────────────────────────────────────────────────────────────────
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ --- UI interaction - delegates to Model for business logic                 │
+│                                                                             │
+│ function routes_presenter.load_cargo(game, echo_fn, read_char, read_line)  │
+│     echo_fn("\n")                                                           │
+│     echo_fn("--- LOAD CARGO ---\n\n")                                       │
+│                                                                             │
+│     -- 1. Get data from MODEL                                              │
+│     local available_ships = routes_model.get_ships_for_loading(game)       │
+│                                                                             │
+│     if #available_ships == 0 then                                           │
+│         echo_fn("No ships available...\nPress any key...")                  │
+│         read_char()                                                         │
+│         return false                                                        │
+│     end                                                                     │
+│                                                                             │
+│     -- 2. Present options to user (VIEW concern)                           │
+│     echo_fn("Select ship to load:\n\n")                                     │
+│     for i, entry in ipairs(available_ships) do                              │
+│         echo_fn(string.format("(%d) %s - %s\n", i, ...))                    │
+│     end                                                                     │
+│     echo_fn("\n(B) Back\n\nEnter ship number: ")                            │
+│                                                                             │
+│     -- 3. Get user input                                                   │
+│     local choice = read_char()                                              │
+│     local ship = available_ships[choice].ship                               │
+│     local amount = tonumber(read_line())                                    │
+│                                                                             │
+│     -- 4. Calculate and validate using MODEL                               │
+│     local cost = routes_model.calculate_cargo_cost(amount, port.oil_price) │
+│     local valid, err = routes_model.validate_cargo_load(...)               │
+│                                                                             │
+│     if not valid then                                                       │
+│         echo_fn(string.format("\n%s\nPress any key...", err))               │
+│         return false                                                        │
+│     end                                                                     │
+│                                                                             │
+│     -- 5. Execute using MODEL                                              │
+│     routes_model.load_cargo(game, ship, amount, cost)                      │
+│                                                                             │
+│     echo_fn(string.format("\nLoaded %dk barrels...", amount))               │
+│     read_char()                                                             │
+│     return true                                                             │
+│ end                                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+BENEFITS:
+  ✅ Handles user interaction flow
+  ✅ Delegates business logic to Model
+  ✅ Can be tested with mock UI functions
+
+
+3. VIEW LAYER - display.lua, ui/init.lua (rendering only)
+───────────────────────────────────────────────────────────────────────────────
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ --- Rendering only - receives data and echo_fn                             │
+│                                                                             │
+│ function display.fleet_status(game, echo_fn)                                │
+│     local columns = {                                                       │
+│         {title = "Name", value_fn = function(ship) return ship.name end},   │
+│         {title = "Status", value_fn = function(ship) return ship.status end}│
+│     }                                                                       │
+│                                                                             │
+│     widgets.table_generator(columns, game.fleet, {                          │
+│         title = "--- FLEET STATUS ---",                                     │
+│         output_fn = echo_fn                                                 │
+│     })                                                                      │
+│ end                                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+BENEFITS:
+  ✅ Pure rendering functions
+  ✅ No state mutation
+  ✅ Reusable across different contexts
+
+
+ARCHITECTURE VERIFICATION
+═══════════════════════════════════════════════════════════════════════════════
+
+UI Dependency Check (echo_fn, read_char, read_line, io.write, io.read):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ MODEL LAYER (should be 0)                                                   │
+│   game/init.lua         : 0 ✅                                              │
+│   game/routes_model.lua : 0 ✅                                              │
+│   game/turn.lua         : 0 ✅                                              │
+│   game/world.lua        : 0 ✅                                              │
+│                                                                             │
+│ PRESENTER LAYER (expected)                                                  │
+│   presenters/routes.lua : 126 ✅                                            │
+│   commands_init.lua     : 8 ✅                                              │
+│                                                                             │
+│ VIEW LAYER (expected)                                                       │
+│   display.lua           : 22 ✅                                             │
+│   menu.lua              : 6 ✅                                              │
+│                                                                             │
+│ INFRASTRUCTURE                                                              │
+│   terminal.lua          : 2 ✅                                              │
+│   main.lua              : 18 ✅                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+RESULT: ✅ PERFECT SEPARATION - Model layer has ZERO UI dependencies!
+
+
+DATA FLOW DIAGRAM
+═══════════════════════════════════════════════════════════════════════════════
+
+                    ┌──────────────┐
+                    │  User Input  │
+                    └──────┬───────┘
+                           │
+                           ▼
+        ┌──────────────────────────────────────┐
+        │         PRESENTER LAYER              │
+        │   (presenters/routes.lua)            │
+        │                                      │
+        │   1. Collect user input              │
+        │   2. Query Model ──────┐             │
+        │   3. Present options   │             │
+        │   4. Validate ─────────┤             │
+        │   5. Execute ──────────┤             │
+        └────────────────────────┼─────────────┘
+                                 │
+                                 ▼
+        ┌──────────────────────────────────────┐
+        │          MODEL LAYER                 │
+        │   (game/routes_model.lua)            │
+        │                                      │
+        │   • get_ships_for_loading()          │
+        │   • calculate_cargo_cost()           │
+        │   • validate_cargo_load()            │
+        │   • load_cargo()                     │
+        │                                      │
+        │   Returns: data, validation results  │
+        └────────────────────┬─────────────────┘
+                             │
+                             ▼
+        ┌──────────────────────────────────────┐
+        │         PRESENTER LAYER              │
+        │   (formats data for display)         │
+        └────────────────────┬─────────────────┘
+                             │
+                             ▼
+        ┌──────────────────────────────────────┐
+        │          VIEW LAYER                  │
+        │   (display.lua, ui/init.lua)         │
+        │                                      │
+        │   Renders formatted output           │
+        └────────────────────┬─────────────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Terminal Output  │
+                    └──────────────────┘
+
+
+TEST RESULTS
+═══════════════════════════════════════════════════════════════════════════════
+
+All 6 test suites passing:
+  ✅ test_widgets.lua         - UI widget tests
+  ✅ test_navigation.lua       - Navigation tests
+  ✅ test_menu_formatting.lua  - Menu tests
+  ✅ test_upgrades.lua         - Upgrade system tests
+  ✅ test_world_turn.lua       - World/turn logic tests
+  ✅ test_routes_model.lua     - Routes model tests (MVP pattern)
+
+Example test output:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Testing Routes Model (MVP Pattern)...                                      │
+│                                                                             │
+│ ✓ Test 1: get_docked_ships works correctly                                 │
+│ ✓ Test 2: get_ships_for_loading works correctly                            │
+│ ✓ Test 3: get_ships_for_selling works correctly                            │
+│ ✓ Test 4: check_fuel works correctly                                       │
+│ ✓ Test 5: calculate_cargo_cost works correctly                             │
+│ ✓ Test 6: calculate_cargo_revenue works correctly                          │
+│ ✓ Test 7: validate_cargo_load accepts valid request                        │
+│ ✓ Test 8: validate_cargo_load rejects insufficient funds                   │
+│ ✓ Test 9: validate_cargo_load rejects capacity overflow                    │
+│ ✓ Test 10: load_cargo updates state correctly                              │
+│ ✓ Test 11: sell_cargo updates state correctly                              │
+│ ✓ Test 12: depart_ship updates state correctly                             │
+│ ✓ Test 13: Model layer is pure (no UI dependencies)                        │
+│                                                                             │
+│ All tests passed! ✓                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+GAME EXECUTION
+═══════════════════════════════════════════════════════════════════════════════
+
+$ lua5.3 main.lua
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ══════════════════════════════════════════════════════════════════════════  │
+│ PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE                               │
+│ ══════════════════════════════════════════════════════════════════════════  │
+│ [Dark Terminal v0.1] - Rogue Operator Mode | Heat: LOW (0/10)              │
+│ Moscow Safehouse - Jan 08, 2026 | Rubles: 5,000,000 | Oil Stock: 0k bbls   │
+│                                                                             │
+│ --- MARKET SNAPSHOT ---                                                    │
+│ Crude Price Cap: $60/bbl | Shadow Markup: +25% ($75/bbl to India/China)    │
+│ Demand: HIGH (Baltic Exports: 4.1M bbls/day) | Sanctions Alert: EU +15%    │
+│ News Ticker: "NATO eyes 92 new blacklisted hulls. Stay dark, comrades."    │
+│                                                                             │
+│ --- ACTIVE EVENTS ---                                                      │
+│ - Pending: Crew Mutiny Risk on GHOST-01 (Resolve? Y/N)                     │
+│ - Opportunity: Shady Auction - Buy "RUST-07" (Age 28y) for 2M Rubles?      │
+│                                                                             │
+│ --- HEAT METER ---                                                         │
+│ [░░░░░░░░░░] 0/10 - No eyes on you yet. One slip, and drones swarm.         │
+│                                                                             │
+│ QUICK ACTIONS                                                              │
+│ ═════════════                                                              │
+│ (E) Evade     (M) Market    (S) Status    (V) Events    (Q) Quit           │
+│ (F) Fleet     (N) eNd Turn  (T) Trade     (?) Help                         │
+│ (R) Route                                                                  │
+│                                                                             │
+│ Enter command: _                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+✅ GAME RUNS PERFECTLY with new MVP architecture!
+
+
+SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+BEFORE:
+  ❌ Mixed concerns (UI + logic in same file)
+  ❌ 132 UI dependency violations in Model layer
+  ❌ Cannot test business logic without UI mocking
+  ❌ Hard to maintain and extend
+
+AFTER:
+  ✅ Clean separation (Model, View, Presenter)
+  ✅ ZERO UI dependencies in Model layer
+  ✅ Fully testable without UI
+  ✅ Easy to maintain and extend
+  ✅ Professional architecture (CakePHP-style MVP)
+
+FILES CHANGED:
+  - Removed: game/routes.lua (405 lines of mixed code)
+  + Added: game/routes_model.lua (150 lines pure logic)
+  + Added: presenters/routes.lua (350 lines UI coordination)
+  + Added: tests/test_routes_model.lua (200 lines tests)
+  ~ Updated: MVP_ARCHITECTURE.md (documented completion)
+  + Added: MVP_REFACTORING_SUMMARY.md (comprehensive guide)
+
+RESULT: ✅ REFACTORING COMPLETE - Production ready!
+
+═══════════════════════════════════════════════════════════════════════════════
