@@ -243,15 +243,17 @@ shadow-fleet/
 └── main.lua           # Application entry point
 ```
 
-## Deprecated Files
-
-- `game/routes.lua` - **DEPRECATED**: Use `game/routes_model.lua` (Model) and `presenters/routes.lua` (Presenter) instead
-
 ## Summary
 
-The MVP pattern provides:
-- ✅ **Model**: Pure business logic (`game/routes_model.lua`)
+The MVP pattern is **fully implemented** across the codebase:
+- ✅ **Model**: Pure business logic (`game/routes_model.lua`, `game/world.lua`, `game/turn.lua`, `game/init.lua`)
 - ✅ **View**: Display/rendering (`ui/`, `display.lua`)
 - ✅ **Presenter**: UI interaction (`presenters/routes.lua`, `commands_init.lua`)
 
-This architecture makes the code more testable, maintainable, and follows established design patterns for separation of concerns.
+This architecture provides:
+- **Complete separation of concerns**: Game logic, UI rendering, and user interaction are isolated
+- **Testability**: Model layer can be tested without UI dependencies
+- **Maintainability**: Clear responsibility boundaries between layers
+- **Reusability**: Business logic can be reused across different UIs
+
+All deprecated files have been removed. The codebase now fully adheres to the MVP pattern inspired by CakePHP's architecture.
