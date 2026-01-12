@@ -108,24 +108,28 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
         return nil
     end)
     
-    -- Port Commands
     commands.register("port.load", function(game)
         routes_presenter.load_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("port.sell", function(game)
+    commands.register("port.unload", function(game)
         routes_presenter.sell_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("port.launder", function()
-        handle_submenu_action("Port", "Launder Oil")
+    commands.register("port.layup", function()
+        handle_submenu_action("Stop Action", "Lay Up")
         return nil
     end)
     
-    -- Navigate Commands
-    commands.register("navigate.plot", function(game)
+    -- Navigate Commands (Globe menu)
+    commands.register("navigate.view", function()
+        handle_submenu_action("Globe", "View Map")
+        return nil
+    end)
+    
+    commands.register("navigate.sail", function(game)
         routes_presenter.plot_route(game, echo, read_char, read_line)
         return nil
     end)
