@@ -35,8 +35,7 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     -- Present ship selection
     echo_fn("Select ship to depart:\n\n")
     for i, entry in ipairs(docked_ships) do
-        local origin_port = world.get_port(entry.ship.origin_id)
-        local origin_name = origin_port and origin_port.name or entry.ship.origin_id or "Unknown"
+        local origin_name = world.port_name(entry.ship.origin_id)
         echo_fn(string.format("(%d) %s - %s, Fuel: %d%%, Cargo: %s\n",
             i, entry.ship.name, origin_name, entry.ship.fuel,
             entry.ship.cargo or "Empty"))
@@ -72,7 +71,7 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     end
     
     local current_port = world.get_port(current_port_id)
-    local current_port_name = current_port and current_port.name or current_port_id
+    local current_port_name = world.port_name(current_port_id)
     
     -- Get available destinations from model
     local destinations = world.get_destinations(current_port_id)
@@ -180,8 +179,7 @@ function routes_presenter.load_cargo(game, echo_fn, read_char, read_line)
     echo_fn("Select ship to load:\n\n")
     for i, entry in ipairs(available_ships) do
         local cargo_space = entry.ship.capacity - (entry.ship.cargo_amount or 0)
-        local origin_port = world.get_port(entry.ship.origin_id)
-        local origin_name = origin_port and origin_port.name or entry.ship.origin_id or "Unknown"
+        local origin_name = world.port_name(entry.ship.origin_id)
         echo_fn(string.format("(%d) %s - %s, Capacity: %dk bbls (%dk available)\n",
             i, entry.ship.name, origin_name, entry.ship.capacity, cargo_space))
     end
@@ -217,8 +215,7 @@ function routes_presenter.load_cargo(game, echo_fn, read_char, read_line)
     end
     
     -- Present cargo options
-    local origin_port = world.get_port(ship.origin_id)
-    local origin_name = origin_port and origin_port.name or ship.origin_id or "Unknown"
+    local origin_name = world.port_name(ship.origin_id)
     echo_fn("\n--- CARGO OPTIONS ---\n\n")
     echo_fn(string.format("Ship: %s\n", ship.name))
     echo_fn(string.format("Location: %s\n", origin_name))
@@ -296,8 +293,7 @@ function routes_presenter.sell_cargo(game, echo_fn, read_char, read_line)
     -- Present ship selection
     echo_fn("Select ship to sell cargo from:\n\n")
     for i, entry in ipairs(ships_with_cargo) do
-        local dest_port = world.get_port(entry.ship.destination_id)
-        local dest_name = dest_port and dest_port.name or entry.ship.destination_id or "Unknown"
+        local dest_name = world.port_name(entry.ship.destination_id)
         echo_fn(string.format("(%d) %s - %s, Cargo: %s\n",
             i, entry.ship.name, dest_name, entry.ship.cargo))
     end
@@ -326,8 +322,7 @@ function routes_presenter.sell_cargo(game, echo_fn, read_char, read_line)
     local revenue = routes_model.calculate_cargo_revenue(ship.cargo_amount, port.oil_price)
     
     -- Present sale summary
-    local dest_port = world.get_port(ship.destination_id)
-    local dest_name = dest_port and dest_port.name or ship.destination_id or "Unknown"
+    local dest_name = world.port_name(ship.destination_id)
     echo_fn("\n--- CARGO SALE ---\n\n")
     echo_fn(string.format("Ship: %s\n", ship.name))
     echo_fn(string.format("Location: %s\n", dest_name))
