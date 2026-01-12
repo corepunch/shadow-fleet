@@ -159,7 +159,8 @@ end
 
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)
-    if menu_name == "Fleet" and action == "Upgrade" then
+    -- Legacy upgrade handler (not currently in menu)
+    if menu_name == "Ship Broker" and action == "Upgrade" then
         handle_vessel_upgrade()
         return
     end
