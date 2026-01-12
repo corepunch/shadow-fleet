@@ -135,7 +135,6 @@ end
 --- @param route table Route data
 function routes_model.depart_ship(ship, destination, route)
     ship.status = "At Sea"
-    ship.destination = destination.name
     ship.destination_id = destination.id
     ship.days_remaining = route.days
     if route.days == 1 then

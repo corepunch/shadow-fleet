@@ -93,7 +93,6 @@ local test_route2 = {days = 2, risk = "low"}
 ship.status = "Docked"
 routes_model.depart_ship(ship, test_destination, test_route2)
 assert(ship.status == "At Sea", "Ship should be At Sea")
-assert(ship.destination == "Skaw STS", "Destination should be set")
 assert(ship.destination_id == "skaw_sts", "Destination ID should be set")
 assert(ship.days_remaining == 2, "Days remaining should be 2")
 assert(ship.eta == "2 days", "ETA should be '2 days'")
