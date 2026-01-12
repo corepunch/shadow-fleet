@@ -14,13 +14,13 @@ local keymap = {}
 -- Main menu keymap
 keymap.main = {
     F = "menu.open_fleet",
-    R = "menu.open_route",
-    T = "menu.open_trade",
+    P = "menu.open_port",
+    N = "menu.open_navigate",
     E = "menu.open_evade",
     V = "menu.open_events",
     M = "menu.open_market",
     S = "menu.open_status",
-    N = "turn.end",
+    T = "turn.end",
     ["?"] = "help.open",
     Q = "app.quit"
 }
@@ -34,17 +34,17 @@ keymap.fleet = {
     B = "menu.back"
 }
 
--- Route submenu keymap
-keymap.route = {
-    P = "route.plot",
-    L = "route.load",
+-- Port submenu keymap
+keymap.port = {
+    L = "port.load",
+    S = "port.sell",
+    U = "port.launder",
     B = "menu.back"
 }
 
--- Trade submenu keymap
-keymap.trade = {
-    S = "trade.sell",
-    L = "trade.launder",
+-- Navigate submenu keymap
+keymap.navigate = {
+    P = "navigate.plot",
     B = "menu.back"
 }
 

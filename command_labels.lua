@@ -11,13 +11,13 @@
 local command_labels = {
     -- Main menu command labels
     ["menu.open_fleet"] = "Fleet",
-    ["menu.open_route"] = "Route",
-    ["menu.open_trade"] = "Trade",
+    ["menu.open_port"] = "Port",
+    ["menu.open_navigate"] = "Navigate",
     ["menu.open_evade"] = "Evade",
     ["menu.open_events"] = "Events",
     ["menu.open_market"] = "Market",
     ["menu.open_status"] = "Status",
-    ["turn.end"] = "eNd Turn",
+    ["turn.end"] = "end Turn",
     ["help.open"] = "Help",
     ["app.quit"] = "Quit",
     
@@ -27,13 +27,13 @@ local command_labels = {
     ["fleet.upgrade"] = "Upgrade",
     ["fleet.scrap"] = "Scrap",
     
-    -- Route submenu labels
-    ["route.plot"] = "Plot Ghost Path",
-    ["route.load"] = "Load Cargo",
+    -- Port submenu labels
+    ["port.load"] = "Load Cargo",
+    ["port.sell"] = "Sell Cargo",
+    ["port.launder"] = "Launder Oil",
     
-    -- Trade submenu labels
-    ["trade.sell"] = "Sell",
-    ["trade.launder"] = "Launder Oil",
+    -- Navigate submenu labels
+    ["navigate.plot"] = "Plot Ghost Path",
     
     -- Evade submenu labels
     ["evade.spoof_ais"] = "Spoof AIS",

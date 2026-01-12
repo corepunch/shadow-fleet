@@ -55,12 +55,13 @@ News Ticker: "NATO eyes 92 new blacklisted hulls. Stay dark, comrades."
 
 --- QUICK ACTIONS ---
 (F) Fleet
-(R) Route
-(T) Trade
+(P) Port
+(N) Navigate
 (E) Evade
 (V) Events
 (M) Market
 (S) Status
+(T) end Turn
 (?) Help
 (Q) Quit
 
@@ -68,9 +69,9 @@ Enter command:
 ```
 
 **User Actions**:
-- Press hotkey (F/R/T/E/V/M/S/?/Q) to navigate to submenus
+- Press hotkey (F/P/N/E/V/M/S/T/?/Q) to navigate to submenus
 - Dashboard refreshes after returning from submenus
-- No "End Turn" on dashboard - turn advances through specific actions
+- Turn advances through specific actions or explicit "end Turn" command
 
 **Color Coding**:
 - Header: Bright Red
@@ -125,15 +126,57 @@ Enter command:
 
 ---
 
-### Route Planning Screen (R)
+### Port Operations Screen (P)
 
-**Purpose**: Plot routes and assign cargo to ships.
+**Purpose**: Manage cargo and port-based activities for ships at port.
 
 **Display Elements**:
 ```
---- ROUTE MENU ---
-(P) Plot Ghost Path
+--- PORT MENU ---
 (L) Load Cargo
+(S) Sell Cargo
+(U) Launder Oil
+(B) Back
+
+Enter command:
+```
+
+**Submenu Actions**:
+- **(L) Load Cargo**: Buy and load cargo onto docked ships
+  - Select ship at port
+  - Choose cargo type (crude oil, refined products)
+  - Specify quantity (limited by ship capacity)
+  - Pay for cargo at current market price
+  
+- **(S) Sell Cargo**: Sell oil cargo at current port
+  - Select ship with cargo at port
+  - View current market price (varies by location and demand)
+  - Choose quantity to sell
+  - Receive payment in rubles
+  - Increases heat based on volume and location
+  
+- **(U) Launder Oil**: Use shell companies and transfers to obscure cargo origin
+  - Costs money but reduces heat
+  - Allows selling at higher prices
+  - Multiple laundering increases effectiveness
+
+**What to Do**:
+1. Select ship at port
+2. Load cargo (buy oil)
+3. Optionally launder oil to reduce heat
+4. Sell cargo when at destination port
+5. Manage proceeds (reinvest or save)
+
+---
+
+### Navigation Screen (N)
+
+**Purpose**: Plot routes and plan ship movements.
+
+**Display Elements**:
+```
+--- NAVIGATE MENU ---
+(P) Plot Ghost Path
 (B) Back
 
 Enter command:
@@ -144,53 +187,14 @@ Enter command:
   - Choose from available ports (Russian export terminals, STS locations, destination ports)
   - Select route type: Direct (fast, risky) or Indirect (slow, safer)
   - Distance affects fuel consumption and time
-  
-- **(L) Load Cargo**: Assign cargo to docked ships
-  - Select ship at port
-  - Choose cargo type (crude oil, refined products)
-  - Specify quantity (limited by ship capacity)
+  - Ship departs on next turn
 
 **What to Do**:
 1. Select a docked ship
 2. Choose destination port or STS (Ship-to-Ship) transfer location
 3. Decide on route type and evasion tactics
-4. Load cargo if not already loaded
-5. Ship departs on next turn
-
----
-
-### Trade Operations Screen (T)
-
-**Purpose**: Sell oil and launder proceeds.
-
-**Display Elements**:
-```
---- TRADE MENU ---
-(S) Sell
-(L) Launder Oil
-(B) Back
-
-Enter command:
-```
-
-**Submenu Actions**:
-- **(S) Sell**: Sell oil cargo at current port
-  - View current market price (varies by location and demand)
-  - Choose quantity to sell
-  - Receive payment in rubles
-  - Increases heat based on volume and location
-  
-- **(L) Launder Oil**: Use shell companies and transfers to obscure origin
-  - Costs money but reduces heat
-  - Allows selling at higher prices
-  - Multiple laundering increases effectiveness
-
-**What to Do**:
-1. Check current oil prices
-2. Select ship with cargo at port
-3. Decide whether to sell directly or launder first
-4. Execute sale
-5. Manage proceeds (reinvest or save)
+4. Confirm route to queue ship for departure
+5. Ship departs when turn advances
 
 ---
 
@@ -914,12 +918,13 @@ Future development will add turn processing, complete event system, save/load fu
 
 **Main Menu**:
 - F = Fleet management
-- R = Route planning
-- T = Trade operations
+- P = Port operations
+- N = Navigate (route planning)
 - E = Evasion tactics
 - V = Events (pending dilemmas)
 - M = Market information
 - S = Status overview
+- T = end Turn
 - ? = Help
 - Q = Quit
 
