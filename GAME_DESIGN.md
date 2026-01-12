@@ -945,10 +945,19 @@ Future development will add turn processing, complete event system, save/load fu
 
 **Risk Levels**:
 - None = No active threats
-- LOW = Minimal scrutiny
-- MED = Moderate attention, evasion recommended
-- HIGH = Active surveillance, dangerous
-- CRITICAL = Imminent seizure risk
+- LOW = Minimal scrutiny (1-2 threat points)
+- MED = Moderate attention, evasion recommended (3-4 threat points)
+- HIGH = Active surveillance, dangerous (5+ threat points)
+
+**Threat Types** (each contributes to overall risk):
+- AIS Scrutiny (1 point) = Authorities monitoring AIS signals
+- NATO Patrol (1 point) = Active NATO naval patrols in area
+- Satellite Surveillance (1 point) = Overhead satellite monitoring
+- Coast Guard (1 point) = Coast guard vessels in vicinity
+- Port Inspection (2 points) = High probability of inspection at port
+- Sanctions Enforcement (2 points) = Active sanctions enforcement operations
+
+Ships display both the calculated risk level and active threats for better situational awareness.
 
 ### Market Locations
 

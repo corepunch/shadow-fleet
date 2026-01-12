@@ -92,3 +92,7 @@ make test
 - **Simple Interface** - Sequential text output with colored formatting
 - **Terminal Framework** - Comprehensive ANSI terminal control
 - **Widget System** - Reusable UI components for building interfaces
+- **Threat System** - Detailed threat tracking with risk calculation based on multiple threat types
+  - 6 threat types: NATO Patrol, Satellite Surveillance, AIS Scrutiny, Coast Guard, Port Inspection, Sanctions Enforcement
+  - Risk levels (None/Low/Medium/High) calculated from active threats
+  - Ships display both risk level and specific threats for better decision-making
