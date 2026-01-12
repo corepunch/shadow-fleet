@@ -188,6 +188,7 @@ local function handle_context(context)
     end
     
     local context_keymap = get_context_keymap(context)
+    local command_labels = require("command_labels")
     
     while true do
         local choice = read_char()
@@ -200,7 +201,14 @@ local function handle_context(context)
         local command_id = context_keymap[choice]
         
         if command_id then
-            echo("\n")
+            -- Echo the command label
+            local label = command_labels[command_id]
+            if label then
+                echo(label .. "\n")
+            else
+                echo("\n")
+            end
+            
             local result = commands.run(command_id, game, context)
             
             if result then
@@ -252,7 +260,15 @@ local function main()
                 local command_id = keymap.main[choice]
                 
                 if command_id then
-                    echo("\n")
+                    -- Echo the command label
+                    local command_labels = require("command_labels")
+                    local label = command_labels[command_id]
+                    if label then
+                        echo(label .. "\n")
+                    else
+                        echo("\n")
+                    end
+                    
                     local result = commands.run(command_id, game, current_context)
                     
                     if result then
