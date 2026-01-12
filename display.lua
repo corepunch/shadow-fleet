@@ -8,6 +8,7 @@
 
 local gamestate = require("game")
 local widgets = require("ui")
+local world = require("game.world")
 
 local display = {}
 
@@ -51,8 +52,14 @@ function display.fleet_status(game, echo_fn)
         {title = "Fuel", value_fn = function(ship) return ship.fuel .. "%" end, width = 5},
         {title = "Status", value_fn = function(ship) return ship.status end, width = 10},
         {title = "Cargo", value_fn = function(ship) return ship.cargo end, width = 17},
-        {title = "Origin", value_fn = function(ship) return ship.origin end, width = 21},
-        {title = "Destination", value_fn = function(ship) return ship.destination end, width = 23},
+        {title = "Origin", value_fn = function(ship)
+            local port = world.get_port(ship.origin_id)
+            return port and port.name or ship.origin_id or ""
+        end, width = 21},
+        {title = "Destination", value_fn = function(ship)
+            local port = world.get_port(ship.destination_id)
+            return port and port.name or ship.destination_id or ""
+        end, width = 23},
         {title = "ETA", value_fn = function(ship) return ship.eta end, width = 7},
         {title = "Risk", value_fn = function(ship) return ship.risk end, width = 4}
     }

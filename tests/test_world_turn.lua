@@ -98,7 +98,6 @@ print("✓ Test 11: Ship arrives at destination after correct number of turns")
 ship.status = "At Sea"
 ship.days_remaining = 1
 ship.destination_id = "malta_sts"
-ship.destination = "STS off Malta"
 
 local events = turn.process(game)
 assert(#events > 0, "Should generate arrival event")
