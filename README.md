@@ -63,12 +63,13 @@ lua5.3 main.lua
 **Controls:**
 - Use hotkeys to navigate menu options:
   - **F** - Fleet management
-  - **R** - Route planning
-  - **T** - Trade operations
+  - **P** - Port operations
+  - **N** - Navigate (route planning)
   - **E** - Evade tactics
   - **V** - eVents
   - **M** - Market operations
   - **S** - Status information
+  - **T** - end Turn
   - **?** - Help
 - Press the corresponding hotkey for submenu options
 - Press **B** to go back from a submenu
@@ -87,7 +88,7 @@ make test
 
 ## Features
 
-- **Hotkey Navigation** - Quick BBS Door-style navigation using hotkeys (F/R/T/E/V/M/S/?)
+- **Hotkey Navigation** - Quick BBS Door-style navigation using hotkeys (F/P/N/E/V/M/S/T/?)
 - **Simple Interface** - Sequential text output with colored formatting
 - **Terminal Framework** - Comprehensive ANSI terminal control
 - **Widget System** - Reusable UI components for building interfaces
