@@ -61,18 +61,18 @@ lua5.3 main.lua
 ```
 
 **Controls:**
-- Use hotkeys to navigate menu options:
-  - **F** - Fleet management
-  - **P** - Port operations
-  - **N** - Navigate (route planning)
+- Use hotkeys to navigate menu options (aligned with Ports of Call):
+  - **S** - Shipyard (buy/sell/repair ships)
+  - **H** - Harbor (load/unload cargo)
+  - **A** - Sea (sail to ports)
   - **E** - Evade tactics
   - **V** - eVents
-  - **M** - Market operations
-  - **S** - Status information
+  - **F** - Freight (market operations)
+  - **O** - Office (statistics/information)
   - **T** - end Turn
   - **?** - Help
 - Press the corresponding hotkey for submenu options
-- Press **B** to go back from a submenu
+- Press **B** to go back from a submenu (or **X** in Shipyard)
 - Press **Q** to quit
 
 **Run demos:**
@@ -88,7 +88,7 @@ make test
 
 ## Features
 
-- **Hotkey Navigation** - Quick BBS Door-style navigation using hotkeys (F/P/N/E/V/M/S/T/?)
+- **Hotkey Navigation** - Quick BBS Door-style navigation using hotkeys (S/H/A/E/V/F/O/T/?) aligned with Ports of Call conventions
 - **Simple Interface** - Sequential text output with colored formatting
 - **Terminal Framework** - Comprehensive ANSI terminal control
 - **Widget System** - Reusable UI components for building interfaces

@@ -7,27 +7,27 @@ The game now includes a full gameplay loop with ship movement, cargo trading, an
 ## How to Play
 
 ### 1. View Your Fleet
-Press **F** to see your fleet status:
+Press **S** (Shipyard) to see your fleet status:
 - **GHOST-01**: Currently docked at Ust-Luga
 - **SHADOW-03**: At sea, carrying 500k barrels to Malta STS
 
 ### 2. Load Cargo
-1. Press **R** for Route menu
-2. Press **L** to Load Cargo
+1. Press **H** for Harbor menu
+2. Press **L** to Load cargo
 3. Select a ship (must be docked at an export terminal)
 4. Enter cargo amount in thousands of barrels (e.g., `50` for 50k barrels)
 5. Confirm purchase (costs vary by port, typically $60/bbl at Russian terminals)
 
 ### 3. Plot a Route
-1. Press **R** for Route menu
-2. Press **P** to Plot Ghost Path
+1. Press **A** for Sea menu
+2. Press **S** to Sail
 3. Select a ship to depart
 4. Choose destination from available routes
 5. Review departure summary (distance, risk, cargo)
 6. Confirm departure
 
 ### 4. Advance Time
-Press **N** to end turn and advance time by one day:
+Press **T** to end turn and advance time by one day:
 - Ships at sea move closer to destinations
 - Fuel and hull degrade gradually
 - Market prices fluctuate
@@ -38,8 +38,8 @@ Press **N** to end turn and advance time by one day:
 
 ### 5. Sell Cargo
 When a ship arrives at its destination:
-1. Press **T** for Trade menu
-2. Press **S** to Sell cargo
+1. Press **H** for Harbor menu
+2. Press **U** to Unload cargo
 3. Select ship with cargo
 4. Review sale details (price varies by destination)
 5. Confirm sale to receive payment
@@ -86,12 +86,12 @@ When a ship arrives at its destination:
 ## Example Gameplay Session
 
 ```
-1. Check fleet (F) - see GHOST-01 docked at Ust-Luga
-2. Load cargo (R → L → 1 → 50 → Y) - load 50k barrels for 3M rubles
-3. Plot route (R → P → 1 → 2 → Y) - send to Skaw STS (2 days)
-4. Wait 2 turns (N → [any key] → N → [any key])
+1. Check fleet (S) - see GHOST-01 docked at Ust-Luga
+2. Load cargo (H → L → 1 → 50 → Y) - load 50k barrels for 3M rubles
+3. Plot route (A → S → 1 → 2 → Y) - send to Skaw STS (2 days)
+4. Wait 2 turns (T → [any key] → T → [any key])
 5. Ship arrives! Event shows: "GHOST-01 has arrived at Skaw STS"
-6. Sell cargo (T → S → 1 → Y) - sell for ~68/bbl = 3.4M rubles
+6. Sell cargo (H → U → 1 → Y) - sell for ~68/bbl = 3.4M rubles
 7. Profit: 400k rubles! (Heat increased to 1/10)
 ```
 

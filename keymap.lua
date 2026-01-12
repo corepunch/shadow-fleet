@@ -11,41 +11,41 @@
 
 local keymap = {}
 
--- Main menu keymap
+-- Main menu keymap (aligned with Ports of Call conventions)
 keymap.main = {
-    F = "menu.open_fleet",
-    P = "menu.open_port",
-    N = "menu.open_navigate",
-    E = "menu.open_evade",
-    V = "menu.open_events",
-    M = "menu.open_market",
-    S = "menu.open_status",
-    T = "turn.end",
-    ["?"] = "help.open",
-    Q = "app.quit"
+    S = "menu.open_fleet",       -- S for Shipyard
+    H = "menu.open_port",         -- H for Harbor
+    A = "menu.open_navigate",     -- A for sAil/Sea
+    E = "menu.open_evade",        -- E for Evade
+    V = "menu.open_events",       -- V for eVents
+    F = "menu.open_market",       -- F for Freight
+    O = "menu.open_status",       -- O for Office
+    T = "turn.end",               -- T for end Turn
+    ["?"] = "help.open",          -- ? for Help
+    Q = "app.quit"                -- Q for Quit
 }
 
--- Fleet submenu keymap
+-- Shipyard submenu keymap (aligned with Ports of Call conventions)
 keymap.fleet = {
-    V = "fleet.view",
-    Y = "fleet.buy",
-    U = "fleet.upgrade",
-    S = "fleet.scrap",
-    B = "menu.back"
+    V = "fleet.view",      -- V for View
+    B = "fleet.buy",       -- B for Buy
+    R = "fleet.upgrade",   -- R for Repair
+    S = "fleet.scrap",     -- S for Sell
+    X = "menu.back"        -- X for eXit/back (B is now Buy)
 }
 
--- Port submenu keymap
+-- Harbor submenu keymap (aligned with Ports of Call conventions)
 keymap.port = {
-    L = "port.load",
-    S = "port.sell",
-    U = "port.launder",
-    B = "menu.back"
+    L = "port.load",       -- L for Load
+    U = "port.sell",       -- U for Unload
+    N = "port.launder",    -- N for lauNder (keeping unique letter)
+    B = "menu.back"        -- B for Back
 }
 
--- Navigate submenu keymap
+-- Sea submenu keymap (aligned with Ports of Call conventions)
 keymap.navigate = {
-    P = "navigate.plot",
-    B = "menu.back"
+    S = "navigate.plot",   -- S for Sail
+    B = "menu.back"        -- B for Back
 }
 
 -- Evade submenu keymap
@@ -62,19 +62,19 @@ keymap.events = {
     B = "menu.back"
 }
 
--- Market submenu keymap
+-- Freight submenu keymap (aligned with Ports of Call conventions)
 keymap.market = {
-    C = "market.check_prices",
-    P = "market.speculate",
-    A = "market.auction",
-    B = "menu.back"
+    P = "market.check_prices",  -- P for Prices
+    S = "market.speculate",     -- S for Speculate
+    A = "market.auction",       -- A for Auction
+    B = "menu.back"             -- B for Back
 }
 
--- Status submenu keymap
+-- Office submenu keymap (aligned with Ports of Call conventions)
 keymap.status = {
-    R = "status.recap",
-    N = "status.news",
-    B = "menu.back"
+    S = "status.recap",    -- S for Statistics
+    N = "status.news",     -- N for News
+    B = "menu.back"        -- B for Back
 }
 
 -- Help submenu keymap
