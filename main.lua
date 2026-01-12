@@ -183,19 +183,10 @@ local function get_context_name(context)
     end
 end
 
--- Handle context display and input
-local function handle_context(context)
-    echo("\n")
-    
-    -- Special cases for different menus
-    if context == "broker" then
-        -- Ship Broker menu - show fleet status
-        display.header(echo)
-        display.status(game, echo)
-        display.fleet_status(game, echo)
-        menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-    elseif context == "port" then
-        -- Stop Action menu - show fleet status
+-- Render context screen based on context type
+local function render_context_screen(context)
+    if context == "broker" or context == "port" then
+        -- Ship Broker and Stop Action menus - show fleet status
         display.header(echo)
         display.status(game, echo)
         display.fleet_status(game, echo)
@@ -208,8 +199,15 @@ local function handle_context(context)
         display.active_events(game, echo)
         menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
     else
+        -- Other menus - just show the menu
         menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
     end
+end
+
+-- Handle context display and input
+local function handle_context(context)
+    echo("\n")
+    render_context_screen(context)
     
     local context_keymap = get_context_keymap(context)
     
@@ -244,25 +242,7 @@ local function handle_context(context)
             -- Redraw submenu after action (unless we're switching context)
             if not result or not result.change_context then
                 echo("\n")
-                if context == "broker" then
-                    display.header(echo)
-                    display.status(game, echo)
-                    display.fleet_status(game, echo)
-                    menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-                elseif context == "port" then
-                    display.header(echo)
-                    display.status(game, echo)
-                    display.fleet_status(game, echo)
-                    menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-                elseif context == "office" then
-                    display.header(echo)
-                    display.status(game, echo)
-                    display.market_snapshot(game, echo)
-                    display.active_events(game, echo)
-                    menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-                else
-                    menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-                end
+                render_context_screen(context)
             end
         end
     end
