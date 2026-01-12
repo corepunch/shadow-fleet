@@ -32,6 +32,16 @@ local function render_dashboard()
     menu.print_from_keymap("QUICK ACTIONS", keymap.main, echo)
 end
 
+-- Echo command label after user input
+local function echo_command_label(command_id)
+    local label = command_labels[command_id]
+    if label then
+        echo(label .. "\n")
+    else
+        echo("\n")
+    end
+end
+
 -- Handle vessel upgrade flow
 local function handle_vessel_upgrade()
     echo("\n")
@@ -202,12 +212,7 @@ local function handle_context(context)
         
         if command_id then
             -- Echo the command label
-            local label = command_labels[command_id]
-            if label then
-                echo(label .. "\n")
-            else
-                echo("\n")
-            end
+            echo_command_label(command_id)
             
             local result = commands.run(command_id, game, context)
             
@@ -261,12 +266,7 @@ local function main()
                 
                 if command_id then
                     -- Echo the command label
-                    local label = command_labels[command_id]
-                    if label then
-                        echo(label .. "\n")
-                    else
-                        echo("\n")
-                    end
+                    echo_command_label(command_id)
                     
                     local result = commands.run(command_id, game, current_context)
                     

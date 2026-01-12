@@ -11,6 +11,10 @@ local terminal = {}
 -- Raw mode state tracking
 local raw_mode_active = false
 
+-- Control character constants
+local BACKSPACE = "\127"  -- DEL character (127)
+local BACKSPACE_ALT = "\008"  -- BS character (8)
+
 --- Set terminal to raw mode for single-character input
 function terminal.set_raw_mode()
     if not raw_mode_active then
@@ -81,7 +85,7 @@ function terminal.read_line(echo_input)
         end
         
         -- Handle backspace
-        if char == "\127" or char == "\008" then  -- DEL or BS
+        if char == BACKSPACE or char == BACKSPACE_ALT then
             if #chars > 0 then
                 table.remove(chars)
                 if echo_input then
