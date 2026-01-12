@@ -72,16 +72,16 @@ function terminal.read_line(echo_input)
     -- Build the line character by character
     local chars = {}
     
-    -- Handle first character (could be backspace)
-    if char == BACKSPACE or char == BACKSPACE_ALT then
-        -- Ignore backspace at start of line
-    else
+    -- Process first character
+    if not (char == BACKSPACE or char == BACKSPACE_ALT) then
+        -- First character is not backspace, add it
         table.insert(chars, char)
         if echo_input then
             io.write(char)
             io.flush()
         end
     end
+    -- If first character IS backspace, ignore it (nothing to delete)
     
     -- Read until we hit another newline
     while true do
