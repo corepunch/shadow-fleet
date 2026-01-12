@@ -25,13 +25,11 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
     
     -- Main Menu Commands (Context Switching)
     local menu_contexts = {
-        {"menu.open_fleet", "fleet"},
         {"menu.open_port", "port"},
         {"menu.open_navigate", "navigate"},
+        {"menu.open_office", "office"},
+        {"menu.open_broker", "broker"},
         {"menu.open_evade", "evade"},
-        {"menu.open_events", "events"},
-        {"menu.open_market", "market"},
-        {"menu.open_status", "status"},
         {"help.open", "help"}
     }
     
@@ -79,44 +77,59 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
         return { change_context = "main" }
     end)
     
-    -- Fleet Commands
-    commands.register("fleet.view", function()
-        return nil  -- View is implicit when entering fleet menu
+    -- Ship Broker Commands
+    commands.register("broker.view", function()
+        return nil  -- View is implicit when entering broker menu
     end)
     
-    commands.register("fleet.buy", function()
-        handle_submenu_action("Fleet", "Buy")
+    commands.register("broker.buy", function()
+        handle_submenu_action("Ship Broker", "Buy")
         return nil
     end)
     
-    commands.register("fleet.upgrade", function()
-        handle_vessel_upgrade()
+    commands.register("broker.sell", function()
+        handle_submenu_action("Ship Broker", "Sell")
         return nil
     end)
     
-    commands.register("fleet.scrap", function()
-        handle_submenu_action("Fleet", "Scrap")
+    -- Port Commands (Stop Action menu)
+    commands.register("port.repair", function()
+        handle_submenu_action("Stop Action", "Repair")
         return nil
     end)
     
-    -- Port Commands
+    commands.register("port.refuel", function()
+        handle_submenu_action("Stop Action", "Refuel")
+        return nil
+    end)
+    
+    commands.register("port.charter", function()
+        handle_submenu_action("Stop Action", "Charter")
+        return nil
+    end)
+    
     commands.register("port.load", function(game)
         routes_presenter.load_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("port.sell", function(game)
+    commands.register("port.unload", function(game)
         routes_presenter.sell_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("port.launder", function()
-        handle_submenu_action("Port", "Launder Oil")
+    commands.register("port.layup", function()
+        handle_submenu_action("Stop Action", "Lay Up")
         return nil
     end)
     
-    -- Navigate Commands
-    commands.register("navigate.plot", function(game)
+    -- Navigate Commands (Globe menu)
+    commands.register("navigate.view", function()
+        handle_submenu_action("Globe", "View Map")
+        return nil
+    end)
+    
+    commands.register("navigate.sail", function(game)
         routes_presenter.plot_route(game, echo, read_char, read_line)
         return nil
     end)
@@ -157,14 +170,24 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
         end)
     end
     
-    -- Status Commands
-    commands.register("status.recap", function()
-        handle_submenu_action("Status", "Quick Recap")
+    -- Office Commands
+    commands.register("office.statistics", function()
+        handle_submenu_action("Office", "Statistics")
         return nil
     end)
     
-    commands.register("status.news", function()
-        handle_submenu_action("Status", "News Refresh")
+    commands.register("office.fleet", function()
+        handle_submenu_action("Office", "Fleet Overview")
+        return nil
+    end)
+    
+    commands.register("office.news", function()
+        handle_submenu_action("Office", "News")
+        return nil
+    end)
+    
+    commands.register("office.market", function()
+        handle_submenu_action("Office", "Market Prices")
         return nil
     end)
     

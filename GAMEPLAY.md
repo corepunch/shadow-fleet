@@ -4,22 +4,42 @@
 
 The game now includes a full gameplay loop with ship movement, cargo trading, and turn-based mechanics!
 
+The menu structure has been updated to match the classic "Ports of Call" game for a more authentic experience.
+
+## Main Screen
+
+The main screen now displays:
+- **Money / Weeks / Years** - Your current capital and game time (e.g., "5,000,000 / 0 Weeks / 0 Yrs.")
+- **Stop Action** - Port operations (repair, refuel, charter routes, load/unload cargo)
+- **Globe** - Navigation and route planning
+- **Office** - View statistics, news, market prices, and fleet overview
+- **Ship Broker** - Buy and sell ships
+
 ## How to Play
 
 ### 1. View Your Fleet
-Press **S** (Shipyard) to see your fleet status:
+Press **S** (Stop Action) or **B** (Ship Broker) to see your fleet status:
 - **GHOST-01**: Currently docked at Ust-Luga
 - **SHADOW-03**: At sea, carrying 500k barrels to Malta STS
 
-### 2. Load Cargo
-1. Press **H** for Harbor menu
+### 2. Manage Ships at Port (Stop Action Menu)
+Press **S** for Stop Action menu, which provides port operations:
+- **R** - Repair (fix hull damage)
+- **F** - Refuel (buy fuel)
+- **C** - Charter (set up routes and cargo contracts)
+- **L** - Load (execute loading cargo - takes time)
+- **U** - Unload (sell cargo at destination)
+- **Y** - Lay Up (mothball ship to save costs)
+
+### 3. Load Cargo
+1. Press **S** for Stop Action menu
 2. Press **L** to Load cargo
 3. Select a ship (must be docked at an export terminal)
 4. Enter cargo amount in thousands of barrels (e.g., `50` for 50k barrels)
 5. Confirm purchase (costs vary by port, typically $60/bbl at Russian terminals)
 
-### 3. Plot a Route
-1. Press **A** for Sea menu
+### 4. Plot a Route
+1. Press **G** for Globe menu
 2. Press **S** to Sail
 3. Select a ship to depart
 4. Choose destination from available routes
@@ -33,18 +53,58 @@ Press **T** to end turn and advance time by one day:
 - Market prices fluctuate
 - Heat naturally decreases
 - Date advances
+- Weeks and Years counters update (7 days = 1 week, 52 weeks = 1 year)
 
 **Note**: After each turn, press any key to acknowledge and continue.
 
 ### 5. Sell Cargo
 When a ship arrives at its destination:
-1. Press **H** for Harbor menu
+1. Press **S** for Stop Action menu
 2. Press **U** to Unload cargo
 3. Select ship with cargo
 4. Review sale details (price varies by destination)
 5. Confirm sale to receive payment
 
 **Warning**: Selling cargo increases heat level!
+
+## Menu Structure
+
+### Main Menu
+- **S** - Stop Action (port operations)
+- **G** - Globe (navigation)
+- **O** - Office (information and statistics)
+- **B** - Ship Broker (buy/sell ships)
+- **E** - Evade (shadow fleet tactics)
+- **T** - end Turn
+- **?** - Help
+- **Q** - Quit
+
+### Stop Action Menu (Port Operations)
+- **R** - Repair ships
+- **F** - Refuel ships
+- **C** - Charter (set up routes)
+- **L** - Load cargo
+- **U** - Unload cargo (sell)
+- **Y** - Lay Up (mothball ship)
+- **X** - Back to main menu
+
+### Globe Menu (Navigation)
+- **V** - View Map
+- **S** - Sail (plot and execute routes)
+- **X** - Back to main menu
+
+### Office Menu (Information)
+- **S** - Statistics
+- **F** - Fleet Overview
+- **N** - News
+- **M** - Market Prices
+- **X** - Back to main menu
+
+### Ship Broker Menu
+- **V** - View Ships
+- **B** - Buy ships
+- **S** - Sell ships
+- **X** - Back to main menu
 
 ## Ports and Routes
 
@@ -86,12 +146,12 @@ When a ship arrives at its destination:
 ## Example Gameplay Session
 
 ```
-1. Check fleet (S) - see GHOST-01 docked at Ust-Luga
-2. Load cargo (H → L → 1 → 50 → Y) - load 50k barrels for 3M rubles
-3. Plot route (A → S → 1 → 2 → Y) - send to Skaw STS (2 days)
+1. Check fleet (B for Ship Broker or S for Stop Action) - see GHOST-01 docked at Ust-Luga
+2. Load cargo (S → L → 1 → 50 → Y) - load 50k barrels for 3M rubles
+3. Plot route (G → S → 1 → 2 → Y) - send to Skaw STS (2 days)
 4. Wait 2 turns (T → [any key] → T → [any key])
 5. Ship arrives! Event shows: "GHOST-01 has arrived at Skaw STS"
-6. Sell cargo (H → U → 1 → Y) - sell for ~68/bbl = 3.4M rubles
+6. Sell cargo (S → U → 1 → Y) - sell for ~68/bbl = 3.4M rubles
 7. Profit: 400k rubles! (Heat increased to 1/10)
 ```
 

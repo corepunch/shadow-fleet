@@ -26,10 +26,7 @@ local function render_dashboard()
     echo("\n")  -- Add spacing between screens
     display.header(echo)
     display.status(game, echo)
-    display.market_snapshot(game, echo)
-    display.active_events(game, echo)
-    display.heat_meter(game, echo)
-    menu.print_from_keymap("QUICK ACTIONS", keymap.main, echo)
+    menu.print_from_keymap("MAIN MENU", keymap.main, echo)
 end
 
 -- Echo command label after user input
@@ -162,7 +159,8 @@ end
 
 -- Handle submenu action
 local function handle_submenu_action(menu_name, action)
-    if menu_name == "Fleet" and action == "Upgrade" then
+    -- Legacy upgrade handler (not currently in menu)
+    if menu_name == "Ship Broker" and action == "Upgrade" then
         handle_vessel_upgrade()
         return
     end
@@ -186,19 +184,33 @@ local function get_context_name(context)
     end
 end
 
--- Handle context display and input
-local function handle_context(context)
-    echo("\n")
+-- Render context screen based on context type
+local function render_context_screen(context)
+    local menu_title = get_context_name(context):upper() .. " MENU"
     
-    -- Special case for Fleet menu - show fleet status
-    if context == "fleet" then
+    if context == "broker" or context == "port" then
+        -- Ship Broker and Stop Action menus - show fleet status
         display.header(echo)
         display.status(game, echo)
         display.fleet_status(game, echo)
-        menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
+        menu.print_from_keymap(menu_title, get_context_keymap(context), echo)
+    elseif context == "office" then
+        -- Office menu - show status and overview
+        display.header(echo)
+        display.status(game, echo)
+        display.market_snapshot(game, echo)
+        display.active_events(game, echo)
+        menu.print_from_keymap(menu_title, get_context_keymap(context), echo)
     else
-        menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
+        -- Other menus - just show the menu
+        menu.print_from_keymap(menu_title, get_context_keymap(context), echo)
     end
+end
+
+-- Handle context display and input
+local function handle_context(context)
+    echo("\n")
+    render_context_screen(context)
     
     local context_keymap = get_context_keymap(context)
     
@@ -233,14 +245,7 @@ local function handle_context(context)
             -- Redraw submenu after action (unless we're switching context)
             if not result or not result.change_context then
                 echo("\n")
-                if context == "fleet" then
-                    display.header(echo)
-                    display.status(game, echo)
-                    display.fleet_status(game, echo)
-                    menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-                else
-                    menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
-                end
+                render_context_screen(context)
             end
         end
     end
