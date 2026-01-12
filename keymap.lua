@@ -13,39 +13,40 @@ local keymap = {}
 
 -- Main menu keymap (aligned with Ports of Call conventions)
 keymap.main = {
-    S = "menu.open_fleet",       -- S for Shipyard
-    H = "menu.open_port",         -- H for Harbor
-    A = "menu.open_navigate",     -- A for sAil/Sea
-    E = "menu.open_evade",        -- E for Evade
-    V = "menu.open_events",       -- V for eVents
-    F = "menu.open_market",       -- F for Freight
-    O = "menu.open_status",       -- O for Office
+    S = "menu.open_port",         -- S for Stop Action (port operations)
+    G = "menu.open_navigate",     -- G for Globe (navigation)
+    O = "menu.open_office",       -- O for Office (statistics/info)
+    B = "menu.open_broker",       -- B for Ship Broker (buy/sell ships)
+    E = "menu.open_evade",        -- E for Evade (shadow fleet specific)
     T = "turn.end",               -- T for end Turn
     ["?"] = "help.open",          -- ? for Help
     Q = "app.quit"                -- Q for Quit
 }
 
--- Shipyard submenu keymap (aligned with Ports of Call conventions)
-keymap.fleet = {
-    V = "fleet.view",      -- V for View
-    B = "fleet.buy",       -- B for Buy
-    R = "fleet.upgrade",   -- R for Repair
-    S = "fleet.scrap",     -- S for Sell
-    X = "menu.back"        -- X for eXit/back (B is now Buy)
+-- Ship Broker submenu keymap (aligned with Ports of Call conventions)
+keymap.broker = {
+    V = "broker.view",     -- V for View ships
+    B = "broker.buy",      -- B for Buy
+    S = "broker.sell",     -- S for Sell
+    X = "menu.back"        -- X for eXit/back
 }
 
--- Harbor submenu keymap (aligned with Ports of Call conventions)
+-- Stop Action submenu keymap (aligned with Ports of Call conventions - port operations)
 keymap.port = {
-    L = "port.load",       -- L for Load
-    U = "port.sell",       -- U for Unload
-    N = "port.launder",    -- N for lauNder (keeping unique letter)
-    B = "menu.back"        -- B for Back
+    R = "port.repair",     -- R for Repair
+    F = "port.refuel",     -- F for Refuel
+    C = "port.charter",    -- C for Charter (route setup)
+    L = "port.load",       -- L for Load (execute loading)
+    U = "port.unload",     -- U for Unload (sell cargo)
+    Y = "port.layup",      -- Y for laY up (mothball ship)
+    X = "menu.back"        -- X for eXit/back
 }
 
--- Sea submenu keymap (aligned with Ports of Call conventions)
+-- Globe submenu keymap (aligned with Ports of Call conventions - navigation)
 keymap.navigate = {
-    S = "navigate.plot",   -- S for Sail
-    B = "menu.back"        -- B for Back
+    V = "navigate.view",   -- V for View routes/map
+    S = "navigate.sail",   -- S for Sail (plot route)
+    X = "menu.back"        -- X for eXit/back
 }
 
 -- Evade submenu keymap
@@ -53,13 +54,13 @@ keymap.evade = {
     A = "evade.spoof_ais",
     F = "evade.flag_swap",
     I = "evade.bribe",
-    B = "menu.back"
+    X = "menu.back"
 }
 
 -- Events submenu keymap
 keymap.events = {
     R = "events.resolve",
-    B = "menu.back"
+    X = "menu.back"
 }
 
 -- Freight submenu keymap (aligned with Ports of Call conventions)
@@ -67,20 +68,22 @@ keymap.market = {
     P = "market.check_prices",  -- P for Prices
     S = "market.speculate",     -- S for Speculate
     A = "market.auction",       -- A for Auction
-    B = "menu.back"             -- B for Back
+    X = "menu.back"             -- X for eXit/back
 }
 
 -- Office submenu keymap (aligned with Ports of Call conventions)
-keymap.status = {
-    S = "status.recap",    -- S for Statistics
-    N = "status.news",     -- N for News
-    B = "menu.back"        -- B for Back
+keymap.office = {
+    S = "office.statistics",  -- S for Statistics
+    F = "office.fleet",       -- F for Fleet overview
+    N = "office.news",        -- N for News
+    M = "office.market",      -- M for Market prices
+    X = "menu.back"           -- X for eXit/back
 }
 
 -- Help submenu keymap
 keymap.help = {
     C = "help.details",
-    B = "menu.back"
+    X = "menu.back"
 }
 
 return keymap

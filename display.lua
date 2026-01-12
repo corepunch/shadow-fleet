@@ -30,11 +30,17 @@ end
 function display.status(game, echo_fn)
     local heat_desc = gamestate.get_heat_description(game)
     
+    -- Calculate weeks and years from turn number (assuming 1 turn = 1 day, 7 days = 1 week, 52 weeks = 1 year)
+    local total_days = game.turn
+    local weeks = math.floor(total_days / 7)
+    local years = math.floor(weeks / 52)
+    local remaining_weeks = weeks % 52
+    
     local parts = {
+        widgets.format_number(game.rubles), " / ", tostring(remaining_weeks), " Weeks / ", tostring(years), " Yrs.\n",
         "[", "Dark Terminal v0.1", "] - ", "Rogue Operator Mode",
         " | Heat: ", heat_desc, "\n",
-        game.location, " - ", game.date, " | Rubles: ",
-        widgets.format_number(game.rubles), " | Oil Stock: ",
+        game.location, " - ", game.date, " | Oil Stock: ",
         game.oil_stock, "k bbls\n\n"
     }
     

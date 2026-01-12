@@ -10,30 +10,37 @@
 
 local command_labels = {
     -- Main menu command labels (aligned with Ports of Call)
-    ["menu.open_fleet"] = "Shipyard",
-    ["menu.open_port"] = "Harbor",
-    ["menu.open_navigate"] = "Sea",
+    ["menu.open_port"] = "Stop Action",
+    ["menu.open_navigate"] = "Globe",
+    ["menu.open_office"] = "Office",
+    ["menu.open_broker"] = "Ship Broker",
     ["menu.open_evade"] = "Evade",
-    ["menu.open_events"] = "Events",
-    ["menu.open_market"] = "Freight",
-    ["menu.open_status"] = "Office",
     ["turn.end"] = "end Turn",
     ["help.open"] = "Help",
     ["app.quit"] = "Quit",
     
-    -- Shipyard submenu labels (aligned with Ports of Call)
-    ["fleet.view"] = "View",
-    ["fleet.buy"] = "Buy",
-    ["fleet.upgrade"] = "Repair",
-    ["fleet.scrap"] = "Sell",
+    -- Ship Broker submenu labels (aligned with Ports of Call)
+    ["broker.view"] = "View Ships",
+    ["broker.buy"] = "Buy",
+    ["broker.sell"] = "Sell",
     
-    -- Harbor submenu labels (aligned with Ports of Call)
+    -- Stop Action submenu labels (aligned with Ports of Call)
+    ["port.repair"] = "Repair",
+    ["port.refuel"] = "Refuel",
+    ["port.charter"] = "Charter",
     ["port.load"] = "Load",
-    ["port.sell"] = "Unload",
-    ["port.launder"] = "Launder",
+    ["port.unload"] = "Unload",
+    ["port.layup"] = "Lay Up",
     
-    -- Sea submenu labels (aligned with Ports of Call)
-    ["navigate.plot"] = "Sail",
+    -- Globe submenu labels (aligned with Ports of Call)
+    ["navigate.view"] = "View Map",
+    ["navigate.sail"] = "Sail",
+    
+    -- Office submenu labels (aligned with Ports of Call)
+    ["office.statistics"] = "Statistics",
+    ["office.fleet"] = "Fleet Overview",
+    ["office.news"] = "News",
+    ["office.market"] = "Market Prices",
     
     -- Evade submenu labels
     ["evade.spoof_ais"] = "Spoof AIS",
@@ -43,14 +50,10 @@ local command_labels = {
     -- Events submenu labels
     ["events.resolve"] = "Resolve Pending Dilemmas",
     
-    -- Freight submenu labels (aligned with Ports of Call)
+    -- Market submenu labels (kept for potential future use)
     ["market.check_prices"] = "Prices",
     ["market.speculate"] = "Speculate",
     ["market.auction"] = "Auction",
-    
-    -- Office submenu labels (aligned with Ports of Call)
-    ["status.recap"] = "Statistics",
-    ["status.news"] = "News",
     
     -- Help submenu labels
     ["help.details"] = "Command Details",
