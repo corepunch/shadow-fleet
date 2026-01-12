@@ -32,15 +32,13 @@ function gamestate.new()
                 hull = 65,
                 fuel = 80,
                 capacity = 500,  -- 500k barrels capacity
-                cargo_amount = 0,
-                cargo_type = nil,
-                status = "Docked",
+                status = "docked",
                 origin_id = "ust_luga",
-                cargo = "Empty",
+                cargo = nil,
                 destination_id = nil,
                 days_remaining = nil,
                 eta = nil,
-                risk = "None"
+                risk = "none"
             },
             {
                 name = "SHADOW-03",
@@ -48,15 +46,13 @@ function gamestate.new()
                 hull = 72,
                 fuel = 45,
                 capacity = 500,
-                cargo_amount = 500,
-                cargo_type = "Crude",
-                status = "At Sea",
+                status = "at_sea",
                 origin_id = "ust_luga",
-                cargo = "500k bbls Crude",
+                cargo = {crude = 500},
                 destination_id = "malta_sts",
                 days_remaining = 2,
-                eta = "2 days",
-                risk = "MED (AIS Spoof Active)"
+                eta = 2,
+                risk = "medium"
             }
         },
         

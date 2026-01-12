@@ -8,6 +8,42 @@
 
 local world = {}
 
+--- Cargo type definitions
+world.cargo = {
+    crude = {
+        name = "Crude",
+        unit = "bbl"
+    }
+}
+
+--- Risk level definitions
+world.risks = {
+    none = {
+        name = "None",
+        level = 0
+    },
+    low = {
+        name = "LOW",
+        level = 1
+    },
+    medium = {
+        name = "MED",
+        level = 2,
+        description = "AIS Spoof Active"
+    },
+    high = {
+        name = "HIGH",
+        level = 3
+    }
+}
+
+--- Ship status definitions
+world.status = {
+    docked = "Docked",
+    in_port = "In Port",
+    at_sea = "At Sea"
+}
+
 --- Port definitions
 --- Each port has a name, region, and type (export terminal, STS point, or market)
 world.ports = {
@@ -235,6 +271,95 @@ function world.find_port_id(name)
         end
     end
     return nil
+end
+
+--- Get risk level data by ID
+--- @param risk_id string Risk identifier
+--- @return table|nil Risk data or nil if not found
+function world.get_risk(risk_id)
+    return world.risks[risk_id]
+end
+
+--- Format risk display string
+--- @param risk_id string Risk identifier
+--- @return string Formatted risk string
+function world.format_risk(risk_id)
+    local risk = world.get_risk(risk_id)
+    if not risk then
+        return "Unknown"
+    end
+    if risk.description then
+        return string.format("%s (%s)", risk.name, risk.description)
+    end
+    return risk.name
+end
+
+--- Get cargo type data by ID
+--- @param cargo_id string Cargo type identifier
+--- @return table|nil Cargo data or nil if not found
+function world.get_cargo_type(cargo_id)
+    return world.cargo[cargo_id]
+end
+
+--- Format cargo display string
+--- @param cargo_table table Cargo table like {crude = 500}
+--- @return string Formatted cargo string like "500k bbls Crude"
+function world.format_cargo(cargo_table)
+    if not cargo_table or type(cargo_table) ~= "table" then
+        return "Empty"
+    end
+    
+    local parts = {}
+    for cargo_id, amount in pairs(cargo_table) do
+        local cargo_type = world.get_cargo_type(cargo_id)
+        if cargo_type then
+            table.insert(parts, string.format("%dk %ss %s", amount, cargo_type.unit, cargo_type.name))
+        end
+    end
+    
+    if #parts == 0 then
+        return "Empty"
+    end
+    
+    return table.concat(parts, ", ")
+end
+
+--- Get total cargo amount from cargo table
+--- @param cargo_table table Cargo table like {crude = 500}
+--- @return number Total amount in thousands
+function world.get_cargo_amount(cargo_table)
+    if not cargo_table or type(cargo_table) ~= "table" then
+        return 0
+    end
+    
+    local total = 0
+    for _, amount in pairs(cargo_table) do
+        total = total + amount
+    end
+    return total
+end
+
+--- Get status display name by ID
+--- @param status_id string Status identifier
+--- @return string Status display name
+function world.get_status(status_id)
+    return world.status[status_id] or status_id
+end
+
+--- Format ETA display string
+--- @param days number Days remaining
+--- @return string Formatted ETA string
+function world.format_eta(days)
+    if not days then
+        return nil
+    end
+    if days == 0 then
+        return "Arrived"
+    elseif days == 1 then
+        return "1 day"
+    else
+        return days .. " days"
+    end
 end
 
 return world

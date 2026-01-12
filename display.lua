@@ -50,12 +50,12 @@ function display.fleet_status(game, echo_fn)
         {title = "Age", value_fn = function(ship) return ship.age .. "y" end, width = 4},
         {title = "Hull", value_fn = function(ship) return ship.hull .. "%" end, width = 5},
         {title = "Fuel", value_fn = function(ship) return ship.fuel .. "%" end, width = 5},
-        {title = "Status", value_fn = function(ship) return ship.status end, width = 10},
-        {title = "Cargo", value_fn = function(ship) return ship.cargo end, width = 17},
+        {title = "Status", value_fn = function(ship) return world.get_status(ship.status) or "" end, width = 10},
+        {title = "Cargo", value_fn = function(ship) return world.format_cargo(ship.cargo) end, width = 17},
         {title = "Origin", value_fn = function(ship) return world.port_name(ship.origin_id) end, width = 21},
         {title = "Destination", value_fn = function(ship) return world.port_name(ship.destination_id) end, width = 23},
-        {title = "ETA", value_fn = function(ship) return ship.eta end, width = 7},
-        {title = "Risk", value_fn = function(ship) return ship.risk end, width = 4}
+        {title = "ETA", value_fn = function(ship) return world.format_eta(ship.eta) or "" end, width = 7},
+        {title = "Risk", value_fn = function(ship) return world.format_risk(ship.risk) or "" end, width = 25}
     }
     
     local footer_fn = function()
