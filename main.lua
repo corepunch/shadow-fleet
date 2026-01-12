@@ -186,22 +186,24 @@ end
 
 -- Render context screen based on context type
 local function render_context_screen(context)
+    local menu_title = get_context_name(context):upper() .. " MENU"
+    
     if context == "broker" or context == "port" then
         -- Ship Broker and Stop Action menus - show fleet status
         display.header(echo)
         display.status(game, echo)
         display.fleet_status(game, echo)
-        menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
+        menu.print_from_keymap(menu_title, get_context_keymap(context), echo)
     elseif context == "office" then
         -- Office menu - show status and overview
         display.header(echo)
         display.status(game, echo)
         display.market_snapshot(game, echo)
         display.active_events(game, echo)
-        menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
+        menu.print_from_keymap(menu_title, get_context_keymap(context), echo)
     else
         -- Other menus - just show the menu
-        menu.print_from_keymap(get_context_name(context):upper() .. " MENU", get_context_keymap(context), echo)
+        menu.print_from_keymap(menu_title, get_context_keymap(context), echo)
     end
 end
 

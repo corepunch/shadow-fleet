@@ -12,6 +12,10 @@ local world = require("game.world")
 
 local display = {}
 
+-- Time calculation constants
+local DAYS_PER_WEEK = 7
+local WEEKS_PER_YEAR = 52
+
 --- Print separator line
 function display.separator(echo_fn)
     echo_fn(string.rep("=", 80) .. "\n")
@@ -30,11 +34,11 @@ end
 function display.status(game, echo_fn)
     local heat_desc = gamestate.get_heat_description(game)
     
-    -- Calculate weeks and years from turn number (assuming 1 turn = 1 day, 7 days = 1 week, 52 weeks = 1 year)
+    -- Calculate weeks and years from turn number (1 turn = 1 day)
     local total_days = game.turn
-    local weeks = math.floor(total_days / 7)
-    local years = math.floor(weeks / 52)
-    local remaining_weeks = weeks % 52
+    local weeks = math.floor(total_days / DAYS_PER_WEEK)
+    local years = math.floor(weeks / WEEKS_PER_YEAR)
+    local remaining_weeks = weeks % WEEKS_PER_YEAR
     
     local parts = {
         widgets.format_number(game.rubles), " / ", tostring(remaining_weeks), " Weeks / ", tostring(years), " Yrs.\n",
