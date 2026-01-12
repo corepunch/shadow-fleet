@@ -16,7 +16,8 @@ local routes_model = {}
 function routes_model.get_docked_ships(game)
     local docked_ships = {}
     for i, ship in ipairs(game.fleet) do
-        if ship.status == "Docked" or ship.status == "In Port" then
+        local status_name = world.get_status(ship.status)
+        if status_name == "Docked" or status_name == "In Port" then
             table.insert(docked_ships, {index = i, ship = ship})
         end
     end
@@ -29,7 +30,8 @@ end
 function routes_model.get_ships_for_loading(game)
     local available_ships = {}
     for i, ship in ipairs(game.fleet) do
-        if ship.status == "Docked" or ship.status == "In Port" then
+        local status_name = world.get_status(ship.status)
+        if status_name == "Docked" or status_name == "In Port" then
             local port = world.get_port(ship.origin_id)
             if port and port.type == "export" then
                 table.insert(available_ships, {index = i, ship = ship, port = port})
@@ -45,7 +47,9 @@ end
 function routes_model.get_ships_for_selling(game)
     local ships_with_cargo = {}
     for i, ship in ipairs(game.fleet) do
-        if ship.status == "In Port" and ship.cargo_amount and ship.cargo_amount > 0 then
+        local status_name = world.get_status(ship.status)
+        local cargo_amount = world.get_cargo_amount(ship.cargo)
+        if status_name == "In Port" and cargo_amount > 0 then
             local port = world.get_port(ship.destination_id)
             if port and (port.type == "market" or port.type == "sts") then
                 table.insert(ships_with_cargo, {index = i, ship = ship, port = port})
@@ -91,7 +95,8 @@ function routes_model.validate_cargo_load(ship, amount, cost, rubles)
         return false, "Invalid amount"
     end
     
-    local cargo_space = ship.capacity - (ship.cargo_amount or 0)
+    local current_cargo = world.get_cargo_amount(ship.cargo)
+    local cargo_space = ship.capacity - current_cargo
     if amount > cargo_space then
         return false, string.format("Cannot load %dk bbls - only %dk space available", amount, cargo_space)
     end
@@ -109,9 +114,13 @@ end
 --- @param amount number Amount in thousands of barrels
 --- @param cost number Cost to deduct
 function routes_model.load_cargo(game, ship, amount, cost)
-    ship.cargo_amount = (ship.cargo_amount or 0) + amount
-    ship.cargo_type = "Crude"
-    ship.cargo = string.format("%dk bbls Crude", ship.cargo_amount)
+    -- Initialize cargo table if needed
+    if not ship.cargo then
+        ship.cargo = {}
+    end
+    
+    -- Add to crude oil cargo
+    ship.cargo.crude = (ship.cargo.crude or 0) + amount
     game.rubles = game.rubles - cost
 end
 
@@ -121,9 +130,7 @@ end
 --- @param revenue number Revenue to add
 function routes_model.sell_cargo(game, ship, revenue)
     game.rubles = game.rubles + revenue
-    ship.cargo_amount = 0
-    ship.cargo_type = nil
-    ship.cargo = "Empty"
+    ship.cargo = nil
     
     -- Small heat increase for selling
     game.heat = math.min(game.heat_max, game.heat + 1)
@@ -134,15 +141,11 @@ end
 --- @param destination table Destination port
 --- @param route table Route data
 function routes_model.depart_ship(ship, destination, route)
-    ship.status = "At Sea"
+    ship.status = "at_sea"
     ship.destination_id = destination.id
     ship.days_remaining = route.days
-    if route.days == 1 then
-        ship.eta = "1 day"
-    else
-        ship.eta = route.days .. " days"
-    end
-    ship.risk = route.risk:upper()
+    ship.eta = route.days
+    ship.risk = route.risk
 end
 
 return routes_model

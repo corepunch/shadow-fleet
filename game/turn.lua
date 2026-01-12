@@ -49,7 +49,8 @@ function turn.process_ship(ship, game)
     local events = {}
     
     -- Only process ships at sea
-    if ship.status ~= "At Sea" then
+    local status_name = world.get_status(ship.status)
+    if status_name ~= "At Sea" then
         return events
     end
     
@@ -57,14 +58,8 @@ function turn.process_ship(ship, game)
     if ship.days_remaining and ship.days_remaining > 0 then
         ship.days_remaining = ship.days_remaining - 1
         
-        -- Update ETA display
-        if ship.days_remaining == 0 then
-            ship.eta = "Arrived"
-        elseif ship.days_remaining == 1 then
-            ship.eta = "1 day"
-        else
-            ship.eta = ship.days_remaining .. " days"
-        end
+        -- Update ETA (numeric value)
+        ship.eta = ship.days_remaining
         
         -- Consume fuel (roughly 1% per day, more for older ships)
         local fuel_consumption = 1 + (ship.age / 100)
@@ -76,7 +71,7 @@ function turn.process_ship(ship, game)
         
         -- Check if ship arrived
         if ship.days_remaining == 0 then
-            ship.status = "In Port"
+            ship.status = "in_port"
             
             -- Get destination port info
             local port = world.get_port(ship.destination_id)

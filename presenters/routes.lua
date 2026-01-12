@@ -36,9 +36,10 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     echo_fn("Select ship to depart:\n\n")
     for i, entry in ipairs(docked_ships) do
         local origin_name = world.port_name(entry.ship.origin_id)
+        local cargo_display = world.format_cargo(entry.ship.cargo)
         echo_fn(string.format("(%d) %s - %s, Fuel: %d%%, Cargo: %s\n",
             i, entry.ship.name, origin_name, entry.ship.fuel,
-            entry.ship.cargo or "Empty"))
+            cargo_display))
     end
     echo_fn("\n(B) Back\n\nEnter ship number: ")
     
@@ -125,13 +126,14 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     end
     
     -- Present departure summary and confirmation
+    local cargo_display = world.format_cargo(ship.cargo)
     echo_fn(string.format("\nDeparture Summary:\n"))
     echo_fn(string.format("Ship: %s\n", ship.name))
     echo_fn(string.format("From: %s\n", current_port_name))
     echo_fn(string.format("To: %s\n", destination.port.name))
     echo_fn(string.format("Distance: %d days\n", destination.route.days))
     echo_fn(string.format("Risk: %s\n", destination.route.risk:upper()))
-    echo_fn(string.format("Cargo: %s\n\n", ship.cargo or "Empty"))
+    echo_fn(string.format("Cargo: %s\n\n", cargo_display))
     echo_fn("Confirm departure? (Y/N): ")
     
     choice = read_char()
@@ -147,8 +149,9 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     -- Execute departure using model
     routes_model.depart_ship(ship, destination.port, destination.route)
     
+    local eta_display = world.format_eta(ship.eta)
     echo_fn(string.format("\n%s has departed for %s. ETA: %s\nPress any key to continue...",
-        ship.name, destination.port.name, ship.eta))
+        ship.name, destination.port.name, eta_display))
     read_char()
     echo_fn("\n")
     
@@ -178,7 +181,8 @@ function routes_presenter.load_cargo(game, echo_fn, read_char, read_line)
     -- Present ship selection
     echo_fn("Select ship to load:\n\n")
     for i, entry in ipairs(available_ships) do
-        local cargo_space = entry.ship.capacity - (entry.ship.cargo_amount or 0)
+        local current_cargo = world.get_cargo_amount(entry.ship.cargo)
+        local cargo_space = entry.ship.capacity - current_cargo
         local origin_name = world.port_name(entry.ship.origin_id)
         echo_fn(string.format("(%d) %s - %s, Capacity: %dk bbls (%dk available)\n",
             i, entry.ship.name, origin_name, entry.ship.capacity, cargo_space))
@@ -205,7 +209,8 @@ function routes_presenter.load_cargo(game, echo_fn, read_char, read_line)
     local port = selected_entry.port
     
     -- Calculate available space
-    local cargo_space = ship.capacity - (ship.cargo_amount or 0)
+    local current_cargo = world.get_cargo_amount(ship.cargo)
+    local cargo_space = ship.capacity - current_cargo
     
     if cargo_space <= 0 then
         echo_fn("Ship is already at full capacity.\nPress any key to continue...")
@@ -294,8 +299,9 @@ function routes_presenter.sell_cargo(game, echo_fn, read_char, read_line)
     echo_fn("Select ship to sell cargo from:\n\n")
     for i, entry in ipairs(ships_with_cargo) do
         local dest_name = world.port_name(entry.ship.destination_id)
+        local cargo_display = world.format_cargo(entry.ship.cargo)
         echo_fn(string.format("(%d) %s - %s, Cargo: %s\n",
-            i, entry.ship.name, dest_name, entry.ship.cargo))
+            i, entry.ship.name, dest_name, cargo_display))
     end
     echo_fn("\n(B) Back\n\nEnter ship number: ")
     
@@ -319,14 +325,16 @@ function routes_presenter.sell_cargo(game, echo_fn, read_char, read_line)
     local port = selected_entry.port
     
     -- Calculate sale revenue using model
-    local revenue = routes_model.calculate_cargo_revenue(ship.cargo_amount, port.oil_price)
+    local cargo_amount = world.get_cargo_amount(ship.cargo)
+    local revenue = routes_model.calculate_cargo_revenue(cargo_amount, port.oil_price)
     
     -- Present sale summary
     local dest_name = world.port_name(ship.destination_id)
+    local cargo_display = world.format_cargo(ship.cargo)
     echo_fn("\n--- CARGO SALE ---\n\n")
     echo_fn(string.format("Ship: %s\n", ship.name))
     echo_fn(string.format("Location: %s\n", dest_name))
-    echo_fn(string.format("Cargo: %dk barrels of %s\n", ship.cargo_amount, ship.cargo_type))
+    echo_fn(string.format("Cargo: %s\n", cargo_display))
     echo_fn(string.format("Market price: $%d/bbl\n", port.oil_price))
     echo_fn(string.format("Total revenue: %s Rubles\n\n", widgets.format_number(revenue)))
     

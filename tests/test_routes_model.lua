@@ -68,21 +68,19 @@ print("✓ Test 9: validate_cargo_load rejects capacity overflow")
 -- Test 10: Load cargo (mutates state)
 local initial_rubles = game.rubles
 routes_model.load_cargo(game, ship, 50, 3000000)
-assert(ship.cargo_amount == 50, "Ship should have 50k barrels")
-assert(ship.cargo_type == "Crude", "Cargo type should be Crude")
-assert(ship.cargo == "50k bbls Crude", "Cargo description should be formatted")
+assert(ship.cargo ~= nil, "Ship should have cargo table")
+assert(ship.cargo.crude == 50, "Ship should have 50k barrels of crude")
 assert(game.rubles == initial_rubles - 3000000, "Rubles should be deducted")
 print("✓ Test 10: load_cargo updates state correctly")
 
 -- Test 11: Sell cargo (mutates state)
 -- First set ship to "In Port" with cargo
-ship.status = "In Port"
+ship.status = "in_port"
 ship.destination_id = "malta_sts"
 local initial_rubles2 = game.rubles
 local initial_heat = game.heat
 routes_model.sell_cargo(game, ship, 3500000)
-assert(ship.cargo_amount == 0, "Ship should have no cargo after sale")
-assert(ship.cargo == "Empty", "Cargo should be Empty")
+assert(ship.cargo == nil, "Ship should have no cargo after sale")
 assert(game.rubles == initial_rubles2 + 3500000, "Rubles should increase")
 assert(game.heat == initial_heat + 1, "Heat should increase by 1")
 print("✓ Test 11: sell_cargo updates state correctly")
@@ -90,12 +88,13 @@ print("✓ Test 11: sell_cargo updates state correctly")
 -- Test 12: Depart ship (mutates state)
 local test_destination = {id = "skaw_sts", name = "Skaw STS"}
 local test_route2 = {days = 2, risk = "low"}
-ship.status = "Docked"
+ship.status = "docked"
 routes_model.depart_ship(ship, test_destination, test_route2)
-assert(ship.status == "At Sea", "Ship should be At Sea")
+assert(ship.status == "at_sea", "Ship should be at_sea")
 assert(ship.destination_id == "skaw_sts", "Destination ID should be set")
 assert(ship.days_remaining == 2, "Days remaining should be 2")
-assert(ship.eta == "2 days", "ETA should be '2 days'")
+assert(ship.eta == 2, "ETA should be 2")
+assert(ship.risk == "low", "Risk should be low")
 print("✓ Test 12: depart_ship updates state correctly")
 
 -- Test 13: Model is pure (no UI dependencies)

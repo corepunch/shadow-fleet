@@ -69,7 +69,8 @@ local game = gamestate.new()
 
 -- Set up a ship in transit
 local ship = game.fleet[2]  -- SHADOW-03
-assert(ship.status == "At Sea", "Test ship should be at sea")
+local status_name = world.get_status(ship.status)
+assert(status_name == "At Sea", "Test ship should be at sea")
 assert(ship.days_remaining == 2, "Test ship should have 2 days remaining")
 
 local initial_fuel = ship.fuel
@@ -89,13 +90,14 @@ print("✓ Test 10: Turn processing advances ships correctly")
 -- Test 11: Ship arrival
 turn.process(game)  -- Process second turn
 assert(ship.days_remaining == 0, "Ship should have arrived")
-assert(ship.status == "In Port", "Ship should be in port")
-assert(ship.eta == "Arrived", "Ship ETA should show arrived")
+local status_name2 = world.get_status(ship.status)
+assert(status_name2 == "In Port", "Ship should be in port")
+assert(ship.eta == 0, "Ship ETA should be 0")
 print("✓ Test 11: Ship arrives at destination after correct number of turns")
 
 -- Test 12: Arrival event generation
 -- Reset ship for arrival test
-ship.status = "At Sea"
+ship.status = "at_sea"
 ship.days_remaining = 1
 ship.destination_id = "malta_sts"
 
