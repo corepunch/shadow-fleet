@@ -11,6 +11,7 @@ local commands_init = require("commands_init")
 local terminal = require("terminal")
 local menu = require("menu")
 local display = require("display")
+local command_labels = require("command_labels")
 
 -- Initialize game state
 local game = gamestate.new()
@@ -188,7 +189,6 @@ local function handle_context(context)
     end
     
     local context_keymap = get_context_keymap(context)
-    local command_labels = require("command_labels")
     
     while true do
         local choice = read_char()
@@ -261,7 +261,6 @@ local function main()
                 
                 if command_id then
                     -- Echo the command label
-                    local command_labels = require("command_labels")
                     local label = command_labels[command_id]
                     if label then
                         echo(label .. "\n")
