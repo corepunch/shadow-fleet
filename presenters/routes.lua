@@ -220,7 +220,7 @@ function routes_presenter.load_cargo(game, echo_fn, read_char, read_line)
     echo_fn(string.format("Oil price: $%d/bbl\n\n", port.oil_price))
     
     echo_fn("Enter cargo amount (in thousands of barrels): ")
-    local input = read_line()
+    local input = read_line(true)  -- Echo input as user types
     echo_fn("\n")
     
     if not input then

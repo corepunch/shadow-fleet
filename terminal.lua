@@ -11,6 +11,11 @@ local terminal = {}
 -- Raw mode state tracking
 local raw_mode_active = false
 
+-- Control character constants
+local BACKSPACE = "\127"  -- DEL character (127)
+local BACKSPACE_ALT = "\008"  -- BS character (8)
+local BACKSPACE_SEQUENCE = "\008 \008"  -- Erase sequence: backspace, space, backspace
+
 --- Set terminal to raw mode for single-character input
 function terminal.set_raw_mode()
     if not raw_mode_active then
@@ -28,21 +33,30 @@ function terminal.restore_normal_mode()
 end
 
 --- Read a single character without waiting for Enter
+--- @param echo_input boolean Optional - if true, echo the character to screen (default: false)
 --- @return string|nil Character read, or nil on EOF
-function terminal.read_char()
+function terminal.read_char(echo_input)
     terminal.set_raw_mode()
     local char
     -- Skip newlines/carriage returns
     repeat
         char = io.read(1)
     until not char or (char ~= "\r" and char ~= "\n")
+    
+    -- Echo the character if requested
+    if echo_input and char then
+        io.write(char)
+        io.flush()
+    end
+    
     return char
 end
 
 --- Read a full line of text (in raw mode, reads chars until newline)
 --- Skips any leading newlines first
+--- @param echo_input boolean Optional - if true, echo characters to screen (default: false)
 --- @return string|nil Line read, or nil on EOF
-function terminal.read_line()
+function terminal.read_line(echo_input)
     terminal.set_raw_mode()
     
     -- Skip leading newlines
@@ -55,8 +69,19 @@ function terminal.read_line()
         return nil  -- EOF
     end
     
-    -- Start building the line with the first non-newline character
-    local chars = {char}
+    -- Build the line character by character
+    local chars = {}
+    
+    -- Process first character
+    if not (char == BACKSPACE or char == BACKSPACE_ALT) then
+        -- First character is not backspace, add it
+        table.insert(chars, char)
+        if echo_input then
+            io.write(char)
+            io.flush()
+        end
+    end
+    -- If first character IS backspace, ignore it (nothing to delete)
     
     -- Read until we hit another newline
     while true do
@@ -64,7 +89,24 @@ function terminal.read_line()
         if not char or char == "\r" or char == "\n" then
             break
         end
-        table.insert(chars, char)
+        
+        -- Handle backspace
+        if char == BACKSPACE or char == BACKSPACE_ALT then
+            if #chars > 0 then
+                table.remove(chars)
+                if echo_input then
+                    -- Move cursor back, write space, move back again
+                    io.write(BACKSPACE_SEQUENCE)
+                    io.flush()
+                end
+            end
+        else
+            table.insert(chars, char)
+            if echo_input then
+                io.write(char)
+                io.flush()
+            end
+        end
     end
     
     return table.concat(chars)

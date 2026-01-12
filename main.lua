@@ -11,6 +11,7 @@ local commands_init = require("commands_init")
 local terminal = require("terminal")
 local menu = require("menu")
 local display = require("display")
+local command_labels = require("command_labels")
 
 -- Initialize game state
 local game = gamestate.new()
@@ -29,6 +30,18 @@ local function render_dashboard()
     display.active_events(game, echo)
     display.heat_meter(game, echo)
     menu.print_from_keymap("QUICK ACTIONS", keymap.main, echo)
+end
+
+-- Echo command label after user input
+-- Always outputs a newline to maintain consistent spacing,
+-- even when no label is found (e.g., for invalid commands)
+local function echo_command_label(command_id)
+    local label = command_labels[command_id]
+    if label then
+        echo(label .. "\n")
+    else
+        echo("\n")
+    end
 end
 
 -- Handle vessel upgrade flow
@@ -200,7 +213,9 @@ local function handle_context(context)
         local command_id = context_keymap[choice]
         
         if command_id then
-            echo("\n")
+            -- Echo the command label
+            echo_command_label(command_id)
+            
             local result = commands.run(command_id, game, context)
             
             if result then
@@ -252,7 +267,9 @@ local function main()
                 local command_id = keymap.main[choice]
                 
                 if command_id then
-                    echo("\n")
+                    -- Echo the command label
+                    echo_command_label(command_id)
+                    
                     local result = commands.run(command_id, game, current_context)
                     
                     if result then
