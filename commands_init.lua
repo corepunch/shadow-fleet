@@ -26,8 +26,8 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
     -- Main Menu Commands (Context Switching)
     local menu_contexts = {
         {"menu.open_fleet", "fleet"},
-        {"menu.open_route", "route"},
-        {"menu.open_trade", "trade"},
+        {"menu.open_port", "port"},
+        {"menu.open_navigate", "navigate"},
         {"menu.open_evade", "evade"},
         {"menu.open_events", "events"},
         {"menu.open_market", "market"},
@@ -99,25 +99,25 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
         return nil
     end)
     
-    -- Route Commands
-    commands.register("route.plot", function(game)
-        routes_presenter.plot_route(game, echo, read_char, read_line)
-        return nil
-    end)
-    
-    commands.register("route.load", function(game)
+    -- Port Commands
+    commands.register("port.load", function(game)
         routes_presenter.load_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
-    -- Trade Commands
-    commands.register("trade.sell", function(game)
+    commands.register("port.sell", function(game)
         routes_presenter.sell_cargo(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("trade.launder", function()
-        handle_submenu_action("Trade", "Launder Oil")
+    commands.register("port.launder", function()
+        handle_submenu_action("Port", "Launder Oil")
+        return nil
+    end)
+    
+    -- Navigate Commands
+    commands.register("navigate.plot", function(game)
+        routes_presenter.plot_route(game, echo, read_char, read_line)
         return nil
     end)
     

@@ -46,13 +46,14 @@ The game presents a dashboard showing:
 
 Use hotkeys to navigate:
 1. **F** - Fleet - Manage your ships (view, buy, upgrade, scrap)
-2. **R** - Route - Plan routes and load cargo
-3. **T** - Trade - Sell and launder oil
+2. **P** - Port - Port activities (load cargo, sell cargo, launder oil)
+3. **N** - Navigate - Plan routes (plot ghost path)
 4. **E** - Evade - Use evasion tactics (AIS spoofing, flag swaps, bribes)
 5. **V** - eVents - Resolve pending situations
 6. **M** - Market - Check prices and auction opportunities
 7. **S** - Status - Quick overview and news
-8. **?** - Help - Command details
+8. **T** - end Turn - Advance the game turn
+9. **?** - Help - Command details
 
 Press **B** to go back from any submenu.
 Press **Q** to quit the game.
