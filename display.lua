@@ -55,7 +55,7 @@ function display.fleet_status(game, echo_fn)
         {title = "Origin", value_fn = function(ship) return world.port_name(ship.origin_id) end, width = 21},
         {title = "Destination", value_fn = function(ship) return world.port_name(ship.destination_id) end, width = 23},
         {title = "ETA", value_fn = function(ship) return world.format_eta(ship.eta) or "" end, width = 7},
-        {title = "Risk", value_fn = function(ship) return world.format_risk(ship.risk) or "" end, width = 25}
+        {title = "Risk", value_fn = function(ship) return world.format_risk_with_threats(ship.risk, ship.threats) or "" end, width = 40}
     }
     
     local footer_fn = function()

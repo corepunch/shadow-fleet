@@ -38,7 +38,8 @@ function gamestate.new()
                 destination_id = nil,
                 days_remaining = nil,
                 eta = nil,
-                risk = "none"
+                risk = "none",
+                threats = nil
             },
             {
                 name = "SHADOW-03",
@@ -52,7 +53,11 @@ function gamestate.new()
                 destination_id = "malta_sts",
                 days_remaining = 2,
                 eta = 2,
-                risk = "medium"
+                risk = "medium",
+                threats = {
+                    nato_patrol = true,
+                    satellite_surveillance = true
+                }
             }
         },
         
