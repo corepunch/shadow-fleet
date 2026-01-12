@@ -14,6 +14,7 @@ local raw_mode_active = false
 -- Control character constants
 local BACKSPACE = "\127"  -- DEL character (127)
 local BACKSPACE_ALT = "\008"  -- BS character (8)
+local BACKSPACE_SEQUENCE = "\008 \008"  -- Erase sequence: backspace, space, backspace
 
 --- Set terminal to raw mode for single-character input
 function terminal.set_raw_mode()
@@ -68,13 +69,18 @@ function terminal.read_line(echo_input)
         return nil  -- EOF
     end
     
-    -- Start building the line with the first non-newline character
-    local chars = {char}
+    -- Build the line character by character
+    local chars = {}
     
-    -- Echo first character if requested
-    if echo_input then
-        io.write(char)
-        io.flush()
+    -- Handle first character (could be backspace)
+    if char == BACKSPACE or char == BACKSPACE_ALT then
+        -- Ignore backspace at start of line
+    else
+        table.insert(chars, char)
+        if echo_input then
+            io.write(char)
+            io.flush()
+        end
     end
     
     -- Read until we hit another newline
@@ -90,7 +96,7 @@ function terminal.read_line(echo_input)
                 table.remove(chars)
                 if echo_input then
                     -- Move cursor back, write space, move back again
-                    io.write("\008 \008")
+                    io.write(BACKSPACE_SEQUENCE)
                     io.flush()
                 end
             end

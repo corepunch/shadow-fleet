@@ -33,6 +33,8 @@ local function render_dashboard()
 end
 
 -- Echo command label after user input
+-- Always outputs a newline to maintain consistent spacing,
+-- even when no label is found (e.g., for invalid commands)
 local function echo_command_label(command_id)
     local label = command_labels[command_id]
     if label then
