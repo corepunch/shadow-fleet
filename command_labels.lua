@@ -6,34 +6,34 @@
 --
 -- Usage:
 --   local command_labels = require("command_labels")
---   local label = command_labels["menu.open_fleet"]  -- Returns "Fleet"
+--   local label = command_labels["menu.open_fleet"]  -- Returns "Shipyard"
 
 local command_labels = {
-    -- Main menu command labels
-    ["menu.open_fleet"] = "Fleet",
-    ["menu.open_port"] = "Port",
-    ["menu.open_navigate"] = "Navigate",
+    -- Main menu command labels (aligned with Ports of Call)
+    ["menu.open_fleet"] = "Shipyard",
+    ["menu.open_port"] = "Harbor",
+    ["menu.open_navigate"] = "Sea",
     ["menu.open_evade"] = "Evade",
     ["menu.open_events"] = "Events",
-    ["menu.open_market"] = "Market",
-    ["menu.open_status"] = "Status",
+    ["menu.open_market"] = "Freight",
+    ["menu.open_status"] = "Office",
     ["turn.end"] = "end Turn",
     ["help.open"] = "Help",
     ["app.quit"] = "Quit",
     
-    -- Fleet submenu labels
+    -- Shipyard submenu labels (aligned with Ports of Call)
     ["fleet.view"] = "View",
     ["fleet.buy"] = "Buy",
-    ["fleet.upgrade"] = "Upgrade",
-    ["fleet.scrap"] = "Scrap",
+    ["fleet.upgrade"] = "Repair",
+    ["fleet.scrap"] = "Sell",
     
-    -- Port submenu labels
-    ["port.load"] = "Load Cargo",
-    ["port.sell"] = "Sell Cargo",
-    ["port.launder"] = "Launder Oil",
+    -- Harbor submenu labels (aligned with Ports of Call)
+    ["port.load"] = "Load",
+    ["port.sell"] = "Unload",
+    ["port.launder"] = "Launder",
     
-    -- Navigate submenu labels
-    ["navigate.plot"] = "Plot Ghost Path",
+    -- Sea submenu labels (aligned with Ports of Call)
+    ["navigate.plot"] = "Sail",
     
     -- Evade submenu labels
     ["evade.spoof_ais"] = "Spoof AIS",
@@ -43,14 +43,14 @@ local command_labels = {
     -- Events submenu labels
     ["events.resolve"] = "Resolve Pending Dilemmas",
     
-    -- Market submenu labels
-    ["market.check_prices"] = "Check Prices",
+    -- Freight submenu labels (aligned with Ports of Call)
+    ["market.check_prices"] = "Prices",
     ["market.speculate"] = "Speculate",
-    ["market.auction"] = "Auction Dive",
+    ["market.auction"] = "Auction",
     
-    -- Status submenu labels
-    ["status.recap"] = "Quick Recap",
-    ["status.news"] = "News Refresh",
+    -- Office submenu labels (aligned with Ports of Call)
+    ["status.recap"] = "Statistics",
+    ["status.news"] = "News",
     
     -- Help submenu labels
     ["help.details"] = "Command Details",
