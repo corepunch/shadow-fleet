@@ -37,6 +37,41 @@ world.risks = {
     }
 }
 
+--- Threat type definitions
+--- Each threat contributes to the overall risk calculation
+world.threats = {
+    nato_patrol = {
+        name = "NATO Patrol",
+        risk_contribution = 1,
+        description = "Active NATO naval patrols in area"
+    },
+    satellite_surveillance = {
+        name = "Satellite Surveillance",
+        risk_contribution = 1,
+        description = "Overhead satellite monitoring"
+    },
+    port_inspection = {
+        name = "Port Inspection",
+        risk_contribution = 2,
+        description = "High probability of inspection at port"
+    },
+    ais_scrutiny = {
+        name = "AIS Scrutiny",
+        risk_contribution = 1,
+        description = "Authorities monitoring AIS signals"
+    },
+    sanctions_enforcement = {
+        name = "Sanctions Enforcement",
+        risk_contribution = 2,
+        description = "Active sanctions enforcement operations"
+    },
+    coast_guard = {
+        name = "Coast Guard",
+        risk_contribution = 1,
+        description = "Coast guard vessels in vicinity"
+    }
+}
+
 --- Ship status definitions
 world.status = {
     docked = "Docked",
@@ -360,6 +395,93 @@ function world.format_eta(days)
     else
         return days .. " days"
     end
+end
+
+--- Get threat data by ID
+--- @param threat_id string Threat identifier
+--- @return table|nil Threat data or nil if not found
+function world.get_threat(threat_id)
+    return world.threats[threat_id]
+end
+
+--- Calculate risk level from threats table
+--- @param threats table Table of threat IDs (e.g., {nato_patrol = true, satellite_surveillance = true})
+--- @return string Risk level ID ("none", "low", "medium", "high")
+function world.calculate_risk_from_threats(threats)
+    if not threats or type(threats) ~= "table" then
+        return "none"
+    end
+    
+    local total_risk = 0
+    for threat_id, active in pairs(threats) do
+        if active then
+            local threat = world.get_threat(threat_id)
+            if threat then
+                total_risk = total_risk + threat.risk_contribution
+            end
+        end
+    end
+    
+    -- Map total risk to risk levels
+    if total_risk == 0 then
+        return "none"
+    elseif total_risk <= 2 then
+        return "low"
+    elseif total_risk <= 4 then
+        return "medium"
+    else
+        return "high"
+    end
+end
+
+--- Format threats as a comma-separated list
+--- @param threats table Table of threat IDs
+--- @return string Formatted threat list or "None"
+function world.format_threats(threats)
+    if not threats or type(threats) ~= "table" then
+        return "None"
+    end
+    
+    local threat_names = {}
+    for threat_id, active in pairs(threats) do
+        if active then
+            local threat = world.get_threat(threat_id)
+            if threat then
+                table.insert(threat_names, threat.name)
+            end
+        end
+    end
+    
+    if #threat_names == 0 then
+        return "None"
+    end
+    
+    return table.concat(threat_names, ", ")
+end
+
+--- Format risk display with threats
+--- @param risk_id string Risk identifier
+--- @param threats table Optional threats table
+--- @return string Formatted risk string with threats
+function world.format_risk_with_threats(risk_id, threats)
+    local risk = world.get_risk(risk_id)
+    if not risk then
+        return "Unknown"
+    end
+    
+    -- If threats are provided, show them
+    if threats and type(threats) == "table" then
+        local threat_list = world.format_threats(threats)
+        if threat_list ~= "None" then
+            return string.format("%s (%s)", risk.name, threat_list)
+        end
+    end
+    
+    -- Fall back to original format_risk behavior
+    if risk.description then
+        return string.format("%s (%s)", risk.name, risk.description)
+    end
+    return risk.name
 end
 
 return world

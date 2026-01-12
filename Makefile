@@ -12,6 +12,7 @@ test:
 	@lua5.3 tests/test_upgrades.lua
 	@lua5.3 tests/test_world_turn.lua
 	@lua5.3 tests/test_routes_model.lua
+	@lua5.3 tests/test_threats.lua
 	@echo ""
 	@echo "All tests completed successfully!"
 

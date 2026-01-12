@@ -146,6 +146,27 @@ function routes_model.depart_ship(ship, destination, route)
     ship.days_remaining = route.days
     ship.eta = route.days
     ship.risk = route.risk
+    
+    -- Set threats based on route risk level
+    -- This provides more detailed information about what makes the route risky
+    if route.risk == "low" then
+        ship.threats = {
+            ais_scrutiny = true
+        }
+    elseif route.risk == "medium" then
+        ship.threats = {
+            nato_patrol = true,
+            satellite_surveillance = true
+        }
+    elseif route.risk == "high" then
+        ship.threats = {
+            nato_patrol = true,
+            satellite_surveillance = true,
+            sanctions_enforcement = true
+        }
+    else
+        ship.threats = nil
+    end
 end
 
 return routes_model

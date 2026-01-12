@@ -12,15 +12,40 @@ The codebase follows the **Model-View-Presenter (MVP)** pattern to separate conc
 
 **Modules**:
 - `game/init.lua` - Game state definition and management
-- `game/world.lua` - Port and route data
+- `game/world.lua` - Port and route data, threat definitions and risk calculations
 - `game/turn.lua` - Turn processing logic
-- `game/routes_model.lua` - **NEW** Route and cargo business logic
+- `game/routes_model.lua` - Route and cargo business logic
 
 **Characteristics**:
 - ✅ No UI dependencies (no `echo_fn`, `read_char`, etc.)
 - ✅ Pure functions and state transformations
 - ✅ Fully testable without terminal/UI
 - ✅ Contains all business rules and calculations
+
+**Threat System** (`game/world.lua`):
+The threat system provides detailed risk assessment:
+```lua
+-- Threat definitions with risk contributions
+world.threats = {
+    nato_patrol = {
+        name = "NATO Patrol",
+        risk_contribution = 1,
+        description = "Active NATO naval patrols in area"
+    },
+    -- ... more threats
+}
+
+-- Calculate risk level from active threats
+function world.calculate_risk_from_threats(threats)
+    -- Sums risk contributions and maps to risk levels
+    -- 0 = none, 1-2 = low, 3-4 = medium, 5+ = high
+end
+
+-- Format threats for display
+function world.format_risk_with_threats(risk_id, threats)
+    -- Shows risk level with specific threat names
+end
+```
 
 **Example** (`game/routes_model.lua`):
 ```lua
