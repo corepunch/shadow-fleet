@@ -3,11 +3,11 @@
 --
 -- This module separates key bindings from command handlers, enabling
 -- rebindable hotkeys without modifying game logic. Each context
--- (main menu, fleet submenu, etc.) has its own keymap.
+-- (main menu, broker submenu, port submenu, etc.) has its own keymap.
 --
 -- Usage:
 --   local keymap = require("keymap")
---   local command_id = keymap.main["S"]  -- Returns "menu.open_fleet" (Shipyard)
+--   local command_id = keymap.main["S"]  -- Returns "menu.open_port" (Stop Action)
 
 local keymap = {}
 
