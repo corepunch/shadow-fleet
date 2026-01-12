@@ -7,7 +7,7 @@
 --
 -- Usage:
 --   local keymap = require("keymap")
---   local command_id = keymap.main["F"]  -- Returns "menu.open_fleet"
+--   local command_id = keymap.main["S"]  -- Returns "menu.open_fleet"
 
 local keymap = {}
 

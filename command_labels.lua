@@ -6,7 +6,7 @@
 --
 -- Usage:
 --   local command_labels = require("command_labels")
---   local label = command_labels["menu.open_fleet"]  -- Returns "Fleet"
+--   local label = command_labels["menu.open_fleet"]  -- Returns "Shipyard"
 
 local command_labels = {
     -- Main menu command labels (aligned with Ports of Call)
