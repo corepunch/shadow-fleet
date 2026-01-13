@@ -16,6 +16,8 @@ test:
 	@lua5.3 tests/test_routes_presenter.lua
 	@lua5.3 tests/test_threats.lua
 	@lua5.3 tests/test_display_panels.lua
+	@lua5.3 tests/test_broker_model.lua
+	@lua5.3 tests/test_ship_operations.lua
 	@echo ""
 	@echo "All tests completed successfully!"
 
