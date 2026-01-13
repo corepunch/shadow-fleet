@@ -38,40 +38,31 @@ The game is organized into multiple screens accessible via hotkey navigation. Ea
 ================================================================================
 PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE
 ================================================================================
+5,000,000 / 0 Weeks / 0 Yrs.
 [Dark Terminal v0.1] - Rogue Operator Mode | Heat: LOW (0/10)
-Moscow Safehouse - Jan 08, 2026 | Rubles: 5,000,000 | Oil Stock: 0k bbls
+Moscow Safehouse - Jan 08, 2026 | Oil Stock: 0k bbls
 
---- MARKET SNAPSHOT ---
-Crude Price Cap: $60/bbl | Shadow Markup: +25% ($75/bbl to India/China)
-Demand: HIGH (Baltic Exports: 4.1M bbls/day) | Sanctions Alert: EU Patrols Up 15%
-News Ticker: "NATO eyes 92 new blacklisted hulls. Stay dark, comrades."
+--- FLEET STATUS ---
+Name        Age  Hull  Fuel  Status     Cargo             Origin                Destination             ETA     Risk
+----------- ---- ----- ----- ---------- ----------------- --------------------- ----------------------- ------- ----------------------------------------
+GHOST-01    22y  65%   80%   Docked     Empty             Ust-Luga (RU)         -                               None
+SHADOW-03   18y  72%   45%   At Sea     500k bbls Crude   Ust-Luga (RU)         STS off Malta           2 days  MED (NATO Patrol, Satellite Surveillance)
 
---- ACTIVE EVENTS ---
-- Pending: Crew Mutiny Risk on GHOST-01 (Resolve? Y/N)
-- Opportunity: Shady Auction - Buy "RUST-07" (Age 28y, 1M bbls cap) for 2M Rubles?
+Total Fleet: 2/50 | Avg Age: 20y | Uninsured Losses: 0
 
---- HEAT METER ---
-[||||||||||] 0/10 - No eyes on you yet. One slip, and drones swarm.
-
---- QUICK ACTIONS ---
-(F) Fleet
-(P) Port
-(N) Navigate
-(E) Evade
-(V) Events
-(M) Market
-(S) Status
+MAIN MENU
+═══════════════
 (T) end Turn
-(?) Help
 (Q) Quit
+(B) Ship Broker
 
 Enter command:
 ```
 
 **User Actions**:
-- Press hotkey (F/P/N/E/V/M/S/T/?/Q) to navigate to submenus
+- Press hotkey (B/T/Q) to navigate to submenus or perform actions
 - Dashboard refreshes after returning from submenus
-- Turn advances through specific actions or explicit "end Turn" command
+- Turn advances through (T) end Turn command
 
 **Color Coding**:
 - Header: Bright Red
@@ -82,35 +73,30 @@ Enter command:
 
 ---
 
-### Fleet Management Screen (F)
+### Ship Broker Screen (B)
 
-**Purpose**: View and manage your fleet of tanker ships.
+**Purpose**: Buy and sell ships.
 
 **Display Elements**:
 ```
 --- FLEET STATUS ---
-Name        Age Hull  Fuel  Status     Cargo             Origin              Destination             ETA     Risk
---------------------------------------------------------------------------------
-GHOST-01    22y 65%   80%   Docked     Empty             Ust-Luga (RU)       -                       -       None
-SHADOW-03   18y 72%   45%   At Sea     500k bbls Crude   Ust-Luga            STS off Malta           2 days  MED (AIS Spoof Active)
+(Shows current fleet table)
 
-Total Fleet: 2/50 | Avg Age: 20y | Uninsured Losses: 0
-
---- FLEET MENU ---
+BROKER MENU
+═══════════════
 (V) View
-(Y) Buy
-(U) Upgrade
-(S) Scrap
-(B) Back
+(B) Buy
+(S) Sell
+(X) eXit
 
 Enter command:
 ```
 
 **Submenu Actions**:
-- **(V) View**: Detailed view of individual ship stats
-- **(Y) Buy**: Purchase new tankers (from market or black market auctions)
-- **(U) Upgrade**: Improve hull, fuel capacity, or add evasion equipment
-- **(S) Scrap**: Sell old ships for parts
+- **(V) View**: View ships (implicit - fleet shown on screen)
+- **(B) Buy**: Purchase new tankers (from market or black market auctions)
+- **(S) Sell**: Sell old ships for parts
+- **(X) eXit**: Return to main menu
 
 **What's Shown**:
 - Ship name, age, hull condition (%), fuel level (%)
@@ -126,279 +112,167 @@ Enter command:
 
 ---
 
-### Port Operations Screen (P)
+### Port Operations Screen (Not directly accessible from main menu)
 
-**Purpose**: Manage cargo and port-based activities for ships at port.
+**Purpose**: Manage ships at port - available after ship arrivals or via Ship Broker submenu.
 
 **Display Elements**:
 ```
---- PORT MENU ---
+--- SHIP ACTION: GHOST-01 AT UST-LUGA (RU) ---
+
+Hull: 65.00%  Fuel: 80.00%  Cargo: Empty
+
+--- ACTIONS ---
+(R) Repair
+(F) Refuel
+(C) Charter (Plot Route)
 (L) Load Cargo
-(S) Sell Cargo
-(U) Launder Oil
-(B) Back
+(U) Unload Cargo
+(D) Depart
+(X) Done
 
 Enter command:
 ```
 
 **Submenu Actions**:
-- **(L) Load Cargo**: Buy and load cargo onto docked ships
-  - Select ship at port
-  - Choose cargo type (crude oil, refined products)
-  - Specify quantity (limited by ship capacity)
-  - Pay for cargo at current market price
-  
-- **(S) Sell Cargo**: Sell oil cargo at current port
-  - Select ship with cargo at port
-  - View current market price (varies by location and demand)
-  - Choose quantity to sell
+- **(R) Repair**: Repair hull damage (not yet implemented)
+- **(F) Refuel**: Refuel the ship (not yet implemented)
+- **(C) Charter**: Plot route for ship (calls routes_presenter.plot_route)
+  - Select destination port
+  - Choose route (displays distance, risk)
+  - Confirm departure
+- **(L) Load Cargo**: Buy and load cargo onto ship (calls routes_presenter.load_cargo)
+  - Enter cargo amount in thousands of barrels
+  - Pay for cargo at current port oil price
+  - Limited by ship capacity
+- **(U) Unload Cargo**: Sell cargo at current port (calls routes_presenter.sell_cargo)
+  - Select ship with cargo
+  - View market price
+  - Confirm sale
   - Receive payment in rubles
-  - Increases heat based on volume and location
-  
-- **(U) Launder Oil**: Use shell companies and transfers to obscure cargo origin
-  - Costs money but reduces heat
-  - Allows selling at higher prices
-  - Multiple laundering increases effectiveness
-
-**What to Do**:
-1. Select ship at port
-2. Load cargo (buy oil)
-3. Optionally launder oil to reduce heat
-4. Sell cargo when at destination port
-5. Manage proceeds (reinvest or save)
+  - Increases heat
+- **(Y) laY up**: Mothball ship (not yet implemented)
+- **(D) Depart**: Plot route and immediately exit (same as Charter but exits after)
+- **(X) Done**: Return to previous screen
 
 ---
 
-### Navigation Screen (N)
+### Navigation Screen (Not in current implementation)
 
-**Purpose**: Plot routes and plan ship movements.
+**Note**: Navigation is currently handled through the Port Operations screen's Charter (C) and Depart (D) options, which call `routes_presenter.plot_route`.
 
-**Display Elements**:
-```
---- NAVIGATE MENU ---
-(P) Plot Ghost Path
-(B) Back
-
-Enter command:
-```
-
-**Submenu Actions**:
-- **(P) Plot Ghost Path**: Select ship, origin, destination, and evasion tactics
-  - Choose from available ports (Russian export terminals, STS locations, destination ports)
-  - Select route type: Direct (fast, risky) or Indirect (slow, safer)
-  - Distance affects fuel consumption and time
-  - Ship departs on next turn
-
-**What to Do**:
-1. Select a docked ship
-2. Choose destination port or STS (Ship-to-Ship) transfer location
-3. Decide on route type and evasion tactics
-4. Confirm route to queue ship for departure
-5. Ship departs when turn advances
+**When plotting a route** (via Charter or Depart in Port Operations):
+1. Select a docked ship from those available at port
+2. Choose destination port from available destinations
+3. View route details (distance in days, risk level)
+4. Check fuel requirements
+5. Confirm departure
+6. Ship departs immediately (status changes to "at_sea")
 
 ---
 
-### Evasion Tactics Screen (E)
+### Evasion Tactics Screen (Not currently accessible)
 
-**Purpose**: Use various methods to avoid detection and reduce heat.
+**Purpose**: Use various methods to avoid detection and reduce heat (planned feature).
 
-**Display Elements**:
-```
---- EVADE MENU ---
-(A) Spoof AIS
-(F) Flag Swap
-(I) Bribe
-(B) Back
+**Planned Actions**:
+- **(A) Spoof AIS**: Falsify ship's Automatic Identification System (not yet implemented)
+- **(F) Flag Swap**: Change ship's registered flag (not yet implemented)
+- **(I) Bribe**: Pay off officials for reduced scrutiny (not yet implemented)
 
-Enter command:
-```
-
-**Submenu Actions**:
-- **(A) Spoof AIS**: Falsify ship's Automatic Identification System
-  - Costs: 50k-100k rubles
-  - Duration: 1-3 turns
-  - Risk reduction: Medium
-  - Can backfire if detected
-  
-- **(F) Flag Swap**: Change ship's registered flag
-  - Costs: 100k-500k rubles
-  - Duration: Permanent until next swap
-  - Risk reduction: High
-  - Limits: Some flags more suspicious than others
-  
-- **(I) Bribe**: Pay off officials for reduced scrutiny
-  - Costs: Variable (100k-1M rubles)
-  - Effect: Reduces heat by 1-3 points
-  - Location dependent
-
-**What to Do**:
-1. Monitor heat level
-2. Choose appropriate evasion tactic based on situation
-3. Pay costs
-4. Apply to specific ships or general operations
-5. Effects apply on next turn
+**Note**: Evasion mechanics are registered in the command system but not yet implemented with actual functionality.
 
 ---
 
-### Events Screen (V)
+### Events Screen (Not currently accessible)
 
-**Purpose**: Handle random events and pending decisions.
+**Purpose**: Handle random events and pending decisions (planned feature).
 
-**Display Elements**:
-```
---- EVENTS MENU ---
-(R) Resolve Pending Dilemmas
-(B) Back
+**Planned Actions**:
+- **(R) Resolve Pending Dilemmas**: Handle pending events (not yet implemented)
 
-Enter command:
-```
-
-**Event Types**:
-1. **Pending Events**: Require player decision
-   - Crew mutiny (pay bonus or risk desertion)
-   - Equipment failure (repair or risk breakdown)
-   - Inspection warning (evade or bribe)
-   
-2. **Opportunity Events**: Optional choices
-   - Black market auctions
-   - Information about patrol routes
-   - Corrupt officials offering deals
-   
-3. **News Events**: Information only
-   - Market changes
-   - New sanctions
-   - Competition activity
-
-**What to Do**:
-1. Review all pending events
-2. Make decision for each (Y/N or multiple choice)
-3. Face consequences on next turn
-4. Some events have time limits
+**Note**: Event system is registered but not yet implemented with actual functionality. Events are displayed in initial game state but cannot be interacted with yet.
 
 ---
 
-### Market Screen (M)
+### Market Screen (Not currently accessible)
 
-**Purpose**: Check prices, speculate on futures, and find deals.
+**Purpose**: Check prices, speculate on futures, and find deals (planned feature).
 
-**Display Elements**:
-```
---- MARKET MENU ---
-(C) Check Prices
-(P) Speculate
-(A) Auction Dive
-(B) Back
+**Planned Actions**:
+- **(P) Prices**: View current oil prices by location (not yet implemented)
+- **(S) Speculate**: Bet on price movements (not yet implemented)
+- **(A) Auction**: Browse black market ship auctions (not yet implemented)
 
-Enter command:
-```
-
-**Submenu Actions**:
-- **(C) Check Prices**: View current oil prices by location
-  - Russian export terminals: Base price
-  - STS transfer points: +10-15%
-  - Final destination ports: +20-30%
-  - Price cap reference ($60/bbl)
-  - Shadow fleet markup (typically +25%)
-  
-- **(P) Speculate**: Bet on price movements (future feature)
-  - Buy/sell futures contracts
-  - Risk/reward mechanism
-  
-- **(A) Auction Dive**: Browse black market ship auctions
-  - Old tankers at discount prices
-  - Unknown condition (gamble)
-  - May have hidden issues
-
-**What's Shown**:
-- Current crude oil prices by market
-- Price trends (up/down/stable)
-- Demand levels (low/medium/high)
-- Sanctions alerts affecting prices
-- Available ships at auction
+**Note**: Market operations are registered but not yet implemented. Price information is shown in world data and used by the cargo loading/selling functions.
 
 ---
 
-### Status Screen (S)
+### Office Screen (Not currently accessible)
 
-**Purpose**: Quick overview and news updates.
+**Purpose**: View statistics, fleet overview, news, and market information (planned feature).
 
-**Display Elements**:
-```
---- STATUS MENU ---
-(R) Quick Recap
-(N) News Refresh
-(B) Back
+**Planned Actions**:
+- **(S) Statistics**: View game statistics (not yet implemented)
+- **(F) Fleet**: Fleet overview (not yet implemented)
+- **(N) News**: Latest news updates (not yet implemented)
+- **(M) Market**: Market prices (not yet implemented)
 
-Enter command:
-```
-
-**Submenu Actions**:
-- **(R) Quick Recap**: Summary of your current position
-  - Total assets (rubles + ship values + cargo)
-  - Fleet statistics
-  - Recent profit/loss
-  - Heat level and trend
-  
-- **(N) News Refresh**: Latest developments
-  - Market news
-  - Sanctions updates
-  - Competitor activity
-  - Patrol warnings
-
-**What's Shown**:
-- Financial summary
-- Fleet health overview
-- Recent transactions
-- News ticker items
-- Warnings and alerts
+**Note**: Office functions are registered but not yet implemented. Status information is shown on the main dashboard.
 
 ---
 
-### Help Screen (?)
+### Help Screen (Not currently accessible)
 
-**Purpose**: Explain game mechanics and commands.
+**Purpose**: Explain game mechanics and commands (planned feature).
 
-**Display Elements**:
-```
---- HELP MENU ---
-(C) Command Details
-(B) Back
+**Planned Actions**:
+- **(C) Command Details**: Show help information (not yet implemented)
 
-Enter command:
-```
-
-**Content**:
-- Explanation of all hotkeys
-- Gameplay mechanics overview
-- Tips for successful operations
-- Risk management advice
-- Heat meter explanation
+**Note**: Help system is registered but not yet implemented.
 
 ---
 
 ## "End Turn" Mechanics
 
-Unlike traditional turn-based games, Shadow Fleet uses **action-based turn progression**. The turn advances automatically when certain actions are taken, simulating the passage of time.
+Shadow Fleet uses an **explicit turn-based system** where the player must press (T) to end the turn and advance time.
 
-### Turn-Advancing Actions
+### Turn Progression
 
-The following actions advance the game turn:
+The turn advances when the player presses **(T) end Turn** from the main menu. This triggers the `turn.process()` function which:
 
-1. **Ship Departures**: When a ship departs from port
-2. **Cargo Sales**: When oil is sold
-3. **Evasion Tactics**: Some tactics (bribes, flag swaps) advance time
-4. **Event Resolutions**: Resolving certain events progresses the turn
-5. **Explicit Wait**: (Future feature) Player can choose to "wait" and skip turn
+1. **Ship Movement**: Ships at sea move closer to destination
+   - Days remaining decreases by 1
+   - ETA updates
+   - Ships arriving at destination change status to "in_port"
+   
+2. **Resource Consumption**:
+   - Fuel consumption: `1 + (ship.age / 100)` percent per day
+   - Hull degradation: `0.1 + (ship.age / 200)` percent per day
+   
+3. **Market Updates**:
+   - Oil prices fluctuate (-3% to +3%)
+   - Demand levels change randomly (20% chance)
+   - Baltic export volume varies slightly
+   
+4. **Heat Management**:
+   - Natural heat decay: -1 per turn (if heat > 0)
+   
+5. **Date Advancement**:
+   - Game date advances by 1 day
+   - Turn counter increments
+   
+6. **Event Generation**:
+   - Ship arrival events generated when ships reach destination
+   - Player is shown ship action screen to handle arrived ships
 
-### Non-Advancing Actions
+### Ship Arrival Handling
 
-These actions do **not** advance the turn:
-
-- Viewing screens and menus
-- Checking prices and status
-- Reading news
-- Plotting routes (without execution)
-- Browsing auctions (without purchase)
+When a ship arrives at port after turn processing:
+- An arrival event is generated
+- The ship action screen appears automatically
+- Player can load/unload cargo, repair, refuel, or plot next route
+- After handling the ship, control returns to main menu
 
 ### What Happens During Turn Processing
 
@@ -917,21 +791,33 @@ Future development will add turn processing, complete event system, save/load fu
 ### Hotkey Quick Reference
 
 **Main Menu**:
-- F = Fleet management
-- P = Port operations
-- N = Navigate (route planning)
-- E = Evasion tactics
-- V = Events (pending dilemmas)
-- M = Market information
-- S = Status overview
+- B = Ship Broker (buy/sell ships)
 - T = end Turn
-- ? = Help
 - Q = Quit
 
-**Submenus**:
-- B = Back to main menu
-- Q = Back to main menu (alternative)
-- Letter keys = Submenu-specific actions
+**Ship Broker Submenu**:
+- V = View (implicit - fleet shown on screen)
+- B = Buy ships
+- S = Sell ships
+- X = eXit/back to main menu
+
+**Port Operations Screen** (triggered by ship arrival events):
+- R = Repair (not yet implemented)
+- F = Refuel (not yet implemented)
+- C = Charter (Plot Route) - calls routes_presenter.plot_route
+- L = Load Cargo (buy oil) - calls routes_presenter.load_cargo
+- U = Unload Cargo (sell cargo) - calls routes_presenter.sell_cargo
+- Y = laY up (mothball ship, not yet implemented)
+- D = Depart (plot route and exit)
+- X = Done/back
+
+**Planned Submenus** (registered but not yet accessible):
+- Navigate: V (View), S (Sail - plot route), X (eXit)
+- Evade: A (Spoof AIS), F (Flag Swap), I (brIbe), X (eXit)
+- Events: R (Resolve), X (eXit)
+- Market: P (Prices), S (Speculate), A (Auction), X (eXit)
+- Office: S (Statistics), F (Fleet), N (News), M (Market), X (eXit)
+- Help: C (Command details), X (eXit)
 
 ### Ship Status Values
 
