@@ -18,10 +18,11 @@ local commands_init = {}
 -- Register all game commands
 -- @param handle_vessel_upgrade function - The vessel upgrade handler from main.lua
 -- @param handle_submenu_action function - The generic submenu action handler from main.lua
+-- @param handle_ship_action_screen function - The ship action screen handler from main.lua
 -- @param echo function - The echo/output function
 -- @param read_char function - The character read function
 -- @param read_line function - The line read function
-function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char, read_line)
+function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, handle_ship_action_screen, echo, read_char, read_line)
     
     -- Main Menu Commands (Context Switching)
     local menu_contexts = {
@@ -60,8 +61,6 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
             echo("--- TURN EVENTS ---\n\n")
             for _, event in ipairs(events) do
                 echo(string.format("* %s: %s\n", event.type, event.description))
-                -- Add event to game events list for later resolution
-                table.insert(game.events, event)
             end
             echo("\n")
         end
@@ -69,6 +68,25 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
         echo("Press any key to continue...")
         read_char()
         echo("\n")
+        
+        -- Handle ship arrival events by showing action screen
+        for _, event in ipairs(events) do
+            if event.type == "Ship Arrival" then
+                -- Find the ship that arrived
+                local arrived_ship = nil
+                for _, ship in ipairs(game.fleet) do
+                    if ship.name == event.ship then
+                        arrived_ship = ship
+                        break
+                    end
+                end
+                
+                if arrived_ship then
+                    handle_ship_action_screen(arrived_ship, event.port)
+                end
+            end
+        end
+        
         return nil
     end)
     

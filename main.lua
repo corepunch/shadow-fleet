@@ -26,6 +26,7 @@ local function render_dashboard()
     echo("\n")  -- Add spacing between screens
     display.header(echo)
     display.status(game, echo)
+    display.fleet_status(game, echo)  -- Always show fleet status
     menu.print_from_keymap("MAIN MENU", keymap.main, echo)
 end
 
@@ -170,6 +171,58 @@ local function handle_submenu_action(menu_name, action)
     echo("\n")
 end
 
+-- Handle ship action screen (triggered by events like arrival)
+local function handle_ship_action_screen(ship, port_name)
+    local routes_presenter = require("presenters.routes")
+    
+    while true do
+        echo("\n")
+        display.header(echo)
+        display.status(game, echo)
+        
+        echo(string.format("--- SHIP ACTION: %s AT %s ---\n\n", ship.name, port_name))
+        echo(string.format("Hull: %d%%  Fuel: %d%%  Cargo: %s\n\n",
+            ship.hull, ship.fuel, 
+            ship.cargo and ship.cargo.crude and (ship.cargo.crude .. "k bbls Crude") or "Empty"))
+        
+        echo("--- ACTIONS ---\n")
+        echo("(R) Repair\n")
+        echo("(F) Refuel\n")
+        echo("(C) Charter (Plot Route)\n")
+        echo("(L) Load Cargo\n")
+        echo("(U) Unload Cargo\n")
+        echo("(D) Depart\n")
+        echo("(X) Done\n\n")
+        echo("Enter command: ")
+        
+        local choice = read_char()
+        
+        if not choice then
+            return
+        end
+        
+        choice = choice:upper()
+        echo("\n")
+        
+        if choice == "R" then
+            handle_submenu_action("Ship Action", "Repair")
+        elseif choice == "F" then
+            handle_submenu_action("Ship Action", "Refuel")
+        elseif choice == "C" then
+            routes_presenter.plot_route(game, echo, read_char, read_line)
+        elseif choice == "L" then
+            routes_presenter.load_cargo(game, echo, read_char, read_line)
+        elseif choice == "U" then
+            routes_presenter.sell_cargo(game, echo, read_char, read_line)
+        elseif choice == "D" then
+            routes_presenter.plot_route(game, echo, read_char, read_line)
+            return  -- Exit after plotting route
+        elseif choice == "X" then
+            return  -- Exit action screen
+        end
+    end
+end
+
 -- Get the keymap for a given context
 local function get_context_keymap(context)
     return keymap[context] or keymap.main
@@ -253,7 +306,7 @@ end
 
 -- Main game loop
 local function main()
-    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, echo, read_char, read_line)
+    commands_init.register_all(handle_vessel_upgrade, handle_submenu_action, handle_ship_action_screen, echo, read_char, read_line)
     
     local current_context = "main"
     
