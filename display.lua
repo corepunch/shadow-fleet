@@ -51,21 +51,27 @@ function display.status(game, echo_fn)
     echo_fn(table.concat(parts))
 end
 
---- Print fleet status table
+--- Print fleet status table (condensed for 80-char display)
 --- @param game table Game state
 --- @param echo_fn function Output function
 function display.fleet_status(game, echo_fn)
+    -- Condensed view: Name (11) Age (4) Hull (5) Fuel (5) Status (8) Dest (20) ETA (7)
+    -- Total: 11 + 4 + 5 + 5 + 8 + 20 + 7 + 6 spaces = 66 chars (fits in 80)
     local columns = {
         {title = "Name", value_fn = function(ship) return ship.name end, width = 11},
         {title = "Age", value_fn = function(ship) return ship.age .. "y" end, width = 4},
-        {title = "Hull", value_fn = function(ship) return ship.hull .. "%" end, width = 5},
-        {title = "Fuel", value_fn = function(ship) return ship.fuel .. "%" end, width = 5},
-        {title = "Status", value_fn = function(ship) return world.get_status(ship.status) or "" end, width = 10},
-        {title = "Cargo", value_fn = function(ship) return world.format_cargo(ship.cargo) end, width = 17},
-        {title = "Origin", value_fn = function(ship) return world.port_name(ship.origin_id) end, width = 21},
-        {title = "Destination", value_fn = function(ship) return world.port_name(ship.destination_id) end, width = 23},
-        {title = "ETA", value_fn = function(ship) return world.format_eta(ship.eta) or "" end, width = 7},
-        {title = "Risk", value_fn = function(ship) return world.format_risk_with_threats(ship.risk, ship.threats) or "" end, width = 40}
+        {title = "Hull", value_fn = function(ship) return math.floor(ship.hull) .. "%" end, width = 5},
+        {title = "Fuel", value_fn = function(ship) return math.floor(ship.fuel) .. "%" end, width = 5},
+        {title = "Status", value_fn = function(ship) return world.get_status(ship.status) or "" end, width = 8},
+        {title = "Destination", value_fn = function(ship) 
+            local dest = world.port_name(ship.destination_id)
+            -- Truncate long destination names
+            if dest and #dest > 20 then
+                return dest:sub(1, 17) .. "..."
+            end
+            return dest or "-"
+        end, width = 20},
+        {title = "ETA", value_fn = function(ship) return world.format_eta(ship.eta) or "" end, width = 7}
     }
     
     local footer_fn = function()
@@ -79,6 +85,24 @@ function display.fleet_status(game, echo_fn)
         footer_fn = footer_fn,
         output_fn = echo_fn
     })
+end
+
+--- Print detailed ship information (for event/action screens)
+--- @param ship table Ship data
+--- @param echo_fn function Output function
+function display.ship_details(ship, echo_fn)
+    echo_fn("--- SHIP DETAILS ---\n")
+    widgets.ship_detail_panel(ship, echo_fn)
+    echo_fn("\n")
+end
+
+--- Print detailed port information
+--- @param port_id string Port identifier
+--- @param echo_fn function Output function
+function display.port_details(port_id, echo_fn)
+    echo_fn("--- PORT DETAILS ---\n")
+    widgets.port_detail_panel(port_id, echo_fn)
+    echo_fn("\n")
 end
 
 --- Print market snapshot

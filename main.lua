@@ -174,15 +174,30 @@ end
 
 -- Handle ship action screen (triggered by events like arrival)
 local function handle_ship_action_screen(ship, port_name)
+    -- Get port_id from port_name if it's provided, otherwise use ship's current location
+    local port_id = ship.origin_id
+    if port_name then
+        local world = require("game.world")
+        local found_id = world.find_port_id(port_name)
+        if found_id then
+            port_id = found_id
+        end
+    end
+    
     while true do
         echo("\n")
         display.header(echo)
         display.status(game, echo)
         
-        echo(string.format("--- SHIP ACTION: %s AT %s ---\n\n", ship.name, port_name))
-        echo(string.format("%s  Cargo: %s\n\n",
-            widgets.format_hull_fuel(ship.hull, ship.fuel),
-            ship.cargo and ship.cargo.crude and (ship.cargo.crude .. "k bbls Crude") or "Empty"))
+        echo(string.format("--- SHIP ACTION: %s ---\n\n", ship.name))
+        
+        -- Show detailed ship information panel
+        display.ship_details(ship, echo)
+        
+        -- Show detailed port information if available
+        if port_id then
+            display.port_details(port_id, echo)
+        end
         
         echo("--- ACTIONS ---\n")
         echo("(R) Repair\n")

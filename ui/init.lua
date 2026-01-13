@@ -195,4 +195,73 @@ function widgets.table_generator(columns, data, options)
     end
 end
 
+-- Widget: Detailed ship information panel (Ports of Call style)
+-- Shows comprehensive ship data in a vertical format
+-- @param ship table - Ship data
+-- @param output_fn function - Output function (default: io.write)
+function widgets.ship_detail_panel(ship, output_fn)
+    output_fn = output_fn or io.write
+    local world = require("game.world")
+    
+    local lines = {}
+    table.insert(lines, string.format("Schiff: %s\n", ship.name))
+    table.insert(lines, string.format("vOn: %s\n", world.port_name(ship.origin_id) or "-"))
+    table.insert(lines, string.format("mit: %s\n", world.format_cargo(ship.cargo)))
+    table.insert(lines, string.format("Zustand: %s\n", widgets.format_percentage(ship.hull)))
+    table.insert(lines, string.format("Bunker: %s\n", widgets.format_percentage(ship.fuel)))
+    table.insert(lines, string.format("Alter: %dy\n", ship.age))
+    table.insert(lines, string.format("Kapazität: %dk bbls\n", ship.capacity or 0))
+    
+    if ship.destination_id then
+        table.insert(lines, string.format("Nach: %s\n", world.port_name(ship.destination_id)))
+        table.insert(lines, string.format("ETA: %s\n", world.format_eta(ship.eta) or "-"))
+    end
+    
+    if ship.risk and ship.risk ~= "none" then
+        table.insert(lines, string.format("Risiko: %s\n", world.format_risk_with_threats(ship.risk, ship.threats)))
+    end
+    
+    output_fn(table.concat(lines))
+    
+    -- Flush only if using default io.write
+    if output_fn == io.write then
+        io.flush()
+    end
+end
+
+-- Widget: Detailed port information panel (Ports of Call style)
+-- Shows comprehensive port data
+-- @param port_id string - Port identifier
+-- @param output_fn function - Output function (default: io.write)
+function widgets.port_detail_panel(port_id, output_fn)
+    output_fn = output_fn or io.write
+    local world = require("game.world")
+    
+    local port = world.get_port(port_id)
+    if not port then
+        output_fn("Port not found\n")
+        if output_fn == io.write then
+            io.flush()
+        end
+        return
+    end
+    
+    local lines = {}
+    table.insert(lines, string.format("%s\n", port.name))
+    table.insert(lines, string.format("Region: %s\n", port.region))
+    table.insert(lines, string.format("Typ: %s\n", port.type))
+    table.insert(lines, string.format("Ölpreis: $%d/bbl\n", port.oil_price))
+    
+    -- Get available routes from this port
+    local destinations = world.get_destinations(port.id)
+    table.insert(lines, string.format("Routen: %d\n", #destinations))
+    
+    output_fn(table.concat(lines))
+    
+    -- Flush only if using default io.write
+    if output_fn == io.write then
+        io.flush()
+    end
+end
+
 return widgets
