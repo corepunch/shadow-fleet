@@ -11,15 +11,10 @@
 
 local keymap = {}
 
--- Main menu keymap (aligned with Ports of Call conventions)
+-- Main menu keymap (simplified - Ports of Call style)
 keymap.main = {
-    S = "menu.open_port",         -- S for Stop Action (port operations)
-    G = "menu.open_navigate",     -- G for Globe (navigation)
-    O = "menu.open_office",       -- O for Office (statistics/info)
     B = "menu.open_broker",       -- B for Ship Broker (buy/sell ships)
-    E = "menu.open_evade",        -- E for Evade (shadow fleet specific)
     T = "turn.end",               -- T for end Turn
-    ["?"] = "help.open",          -- ? for Help
     Q = "app.quit"                -- Q for Quit
 }
 

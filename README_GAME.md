@@ -36,27 +36,32 @@ Or if you made it executable:
 ## How to Play
 
 The game presents a dashboard showing:
-- **Your Resources**: Capital (rubles) and oil stock
-- **Fleet Status**: Your tanker ships, their condition, cargo, and routes
+- **Your Resources**: Capital (rubles), weeks, and years played
+- **Fleet Status**: Your tanker ships, their condition, cargo, and routes (always visible on main screen)
 - **Market Info**: Oil prices, demand, and sanctions alerts
-- **Events**: Opportunities and challenges requiring decisions
 - **Heat Meter**: Track how much attention you're attracting from authorities
 
-### Controls
+### Main Menu Controls
 
-Use hotkeys to navigate:
-1. **F** - Fleet - Manage your ships (view, buy, upgrade, scrap)
-2. **P** - Port - Port activities (load cargo, sell cargo, launder oil)
-3. **N** - Navigate - Plan routes (plot ghost path)
-4. **E** - Evade - Use evasion tactics (AIS spoofing, flag swaps, bribes)
-5. **V** - eVents - Resolve pending situations
-6. **M** - Market - Check prices and auction opportunities
-7. **S** - Status - Quick overview and news
-8. **T** - end Turn - Advance the game turn
-9. **?** - Help - Command details
+The main menu uses a simplified "Ports of Call" style interface:
+- **B** - Ship Broker - Buy and sell ships
+- **T** - end Turn - Advance the game turn
+- **Q** - Quit - Exit the game
 
-Press **B** to go back from any submenu.
-Press **Q** to quit the game.
+### Action Screens (Event-Driven)
+
+Unlike traditional menu-driven games, Shadow Fleet uses **event-driven action screens** inspired by classic "Ports of Call". Action screens appear automatically when significant events occur:
+
+**Ship Arrival**: When a ship arrives at its destination, an action screen appears with options:
+- **R** - Repair - Fix hull damage
+- **F** - Refuel - Buy fuel
+- **C** - Charter - Plot a new route
+- **L** - Load - Load cargo at port
+- **U** - Unload - Sell cargo
+- **D** - Depart - Set sail (plots route and departs)
+- **X** - Done - Exit action screen
+
+You can perform multiple actions on a ship before choosing "Done" to return to the main menu.
 
 ## Game Features
 
