@@ -12,6 +12,7 @@ local terminal = require("terminal")
 local menu = require("menu")
 local display = require("display")
 local command_labels = require("command_labels")
+local routes_presenter = require("presenters.routes")
 
 -- Initialize game state
 local game = gamestate.new()
@@ -173,8 +174,6 @@ end
 
 -- Handle ship action screen (triggered by events like arrival)
 local function handle_ship_action_screen(ship, port_name)
-    local routes_presenter = require("presenters.routes")
-    
     while true do
         echo("\n")
         display.header(echo)
@@ -215,6 +214,9 @@ local function handle_ship_action_screen(ship, port_name)
         elseif choice == "U" then
             routes_presenter.sell_cargo(game, echo, read_char, read_line)
         elseif choice == "D" then
+            -- Depart: plot route and automatically exit action screen
+            -- Note: Currently uses the same route plotting UI as Charter (C)
+            -- The difference is that Depart exits the action screen after plotting
             routes_presenter.plot_route(game, echo, read_char, read_line)
             return  -- Exit after plotting route
         elseif choice == "X" then
