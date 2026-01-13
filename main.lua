@@ -63,8 +63,8 @@ local function handle_vessel_upgrade()
     local vessel_parts = {}
     for i, ship in ipairs(game.fleet) do
         table.insert(vessel_parts, string.format(
-            "(%d) %-11s - Age: %dy, Hull: %d%%, Fuel: %d%%, Status: %s\n",
-            i, ship.name, ship.age, ship.hull, ship.fuel, ship.status))
+            "(%d) %-11s - %s\n",
+            i, ship.name, widgets.format_ship_info(ship)))
     end
     table.insert(vessel_parts, "\n(B) Back\n\nEnter vessel number: ")
     echo(table.concat(vessel_parts))
@@ -98,8 +98,8 @@ local function handle_vessel_upgrade()
     echo("\n")
     display.header(echo)
     display.status(game, echo)
-    echo(string.format("--- UPGRADE %s ---\n\nCurrent: Age %dy, Hull %d%%, Fuel %d%%\n\nAvailable Upgrades:\n\n",
-        selected_ship.name, selected_ship.age, selected_ship.hull, selected_ship.fuel))
+    echo(string.format("--- UPGRADE %s ---\n\nCurrent: Age %dy, %s\n\nAvailable Upgrades:\n\n",
+        selected_ship.name, selected_ship.age, widgets.format_hull_fuel(selected_ship.hull, selected_ship.fuel)))
     
     local upgrade_parts = {}
     for i, upgrade in ipairs(available_upgrades) do
@@ -180,8 +180,8 @@ local function handle_ship_action_screen(ship, port_name)
         display.status(game, echo)
         
         echo(string.format("--- SHIP ACTION: %s AT %s ---\n\n", ship.name, port_name))
-        echo(string.format("Hull: %d%%  Fuel: %d%%  Cargo: %s\n\n",
-            ship.hull, ship.fuel, 
+        echo(string.format("%s  Cargo: %s\n\n",
+            widgets.format_hull_fuel(ship.hull, ship.fuel),
             ship.cargo and ship.cargo.crude and (ship.cargo.crude .. "k bbls Crude") or "Empty"))
         
         echo("--- ACTIONS ---\n")

@@ -107,6 +107,38 @@ function widgets.format_number(num)
     return formatted
 end
 
+-- Utility: Format percentage value (handles both integers and floats)
+-- @param value number - The percentage value (0-100)
+-- @return string - Formatted percentage string (e.g., "65.00%" or "71.81%")
+function widgets.format_percentage(value)
+    -- Format with 2 decimal places for consistency
+    return string.format("%.2f%%", value)
+end
+
+-- Utility: Format ship info string
+-- @param ship table - Ship data with name, age, hull, fuel, status
+-- @return string - Formatted ship info line
+function widgets.format_ship_info(ship)
+    return string.format(
+        "Age: %dy, Hull: %s, Fuel: %s, Status: %s",
+        ship.age,
+        widgets.format_percentage(ship.hull),
+        widgets.format_percentage(ship.fuel),
+        ship.status
+    )
+end
+
+-- Utility: Format hull and fuel status
+-- @param hull number - Hull percentage value
+-- @param fuel number - Fuel percentage value
+-- @return string - Formatted hull/fuel status string
+function widgets.format_hull_fuel(hull, fuel)
+    return string.format("Hull: %s  Fuel: %s",
+        widgets.format_percentage(hull),
+        widgets.format_percentage(fuel)
+    )
+end
+
 -- Widget: Generic table generator
 -- Renders a table with headers, separators, and data rows
 -- @param columns table - Array of column definitions: {{title="Name", value_fn=function(row), width=11}, ...}

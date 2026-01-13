@@ -14,7 +14,8 @@ assert(type(widgets) == "table", "widgets should be a table")
 local required_functions = {
     "separator", "title", "status_bar", "section_header",
     "labeled_value", "percentage_bar", "heat_meter", "menu_item",
-    "format_number", "table_generator"
+    "format_number", "format_percentage", "format_ship_info", "format_hull_fuel",
+    "table_generator"
 }
 
 for _, func_name in ipairs(required_functions) do
