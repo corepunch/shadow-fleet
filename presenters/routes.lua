@@ -38,7 +38,7 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
         local origin_name = world.port_name(entry.ship.origin_id)
         local cargo_display = world.format_cargo(entry.ship.cargo)
         echo_fn(string.format("(%d) %s - %s, Fuel: %d%%, Cargo: %s\n",
-            i, entry.ship.name, origin_name, entry.ship.fuel,
+            i, entry.ship.name, origin_name, math.floor(entry.ship.fuel),
             cargo_display))
     end
     echo_fn("\n(B) Back\n\nEnter ship number: ")
@@ -116,7 +116,7 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     local has_fuel, fuel_needed = routes_model.check_fuel(ship, destination.route)
     if not has_fuel then
         echo_fn(string.format("WARNING: Low fuel! Ship has %d%% fuel, route needs ~%d%%.\n", 
-            ship.fuel, fuel_needed))
+            math.floor(ship.fuel), fuel_needed))
         echo_fn("Continue anyway? (Y/N): ")
         choice = read_char()
         echo_fn("\n")
