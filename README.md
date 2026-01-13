@@ -3,49 +3,25 @@ A text based strategy game about Russian Shadow Fleet
 
 ## Project Structure
 
-The codebase is organized into logical folders:
+The codebase is organized into logical folders following the Model-View-Presenter (MVP) pattern:
 
-- **`terminal/`** - Terminal framework for cursor control and color management
-- **`ui/`** - UI widgets and components for building text-based interfaces  
-- **`game/`** - Game state management and logic
-- **`main.lua`** - Main game entry point
-- **Demo files** - `terminal_demo.lua`, `game_ui_example.lua` for examples
+- **`game/`** - Model layer: Pure business logic (game state, world data, turn processing)
+- **`presenters/`** - Presenter layer: UI interaction and coordination
+- **`ui/`** - View layer: Reusable UI widgets and components
+- **`display.lua`** - View layer: Screen rendering functions
+- **`terminal.lua`** - Terminal I/O abstraction (raw mode, formatted output)
+- **`commands.lua`** - Command registry system
+- **`keymap.lua`** - Hotkey to command mappings
+- **`main.lua`** - Application entry point and game loop
+
+**See [CODE_ORGANIZATION.md](CODE_ORGANIZATION.md) for complete architecture documentation including design patterns, data flow, and inspirations.**
 
 ## Components
 
-### Terminal Framework (`terminal/`)
-A comprehensive cursor control and color management library for building text-based UIs.
-
-Features:
-- Screen clearing and cursor positioning
-- 32 predefined colors (16 foreground + 16 background)
-- Predefined color schemes for common UI elements
-- Box drawing and text styling
-- Full ANSI escape code support
-- Keyboard input handling with arrow key support
-
-See [TERMINAL.md](TERMINAL.md) for complete documentation.
-
-**Quick Start:**
-```lua
-local terminal = require("terminal")
-terminal.init()
-terminal.write_at(1, 1, "Shadow Fleet", "fg_bright_yellow", "bg_blue")
-terminal.cleanup()
-```
-
-### UI Widgets (`ui/`)
-Reusable UI components for terminal-based interfaces.
-
-**Quick Start:**
-```lua
-local widgets = require("ui")
-widgets.separator(1, 80)
-widgets.title(2, "MY TITLE", 80)
-```
+For detailed architecture documentation, see [CODE_ORGANIZATION.md](CODE_ORGANIZATION.md).
 
 ### Game State (`game/`)
-Central game state management.
+Pure business logic with no UI dependencies.
 
 **Quick Start:**
 ```lua
