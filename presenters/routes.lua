@@ -37,7 +37,8 @@ function routes_presenter.plot_route(game, echo_fn, read_char, read_line)
     for i, entry in ipairs(docked_ships) do
         local origin_name = world.port_name(entry.ship.origin_id)
         local cargo_display = world.format_cargo(entry.ship.cargo)
-        echo_fn(string.format("(%d) %s - %s, Fuel: %d%%, Cargo: %s\n",
+
+        echo_fn(string.format("(%d) %s - %s, Fuel: %.0f%%, Cargo: %s\n",
             i, entry.ship.name, origin_name, entry.ship.fuel,
             cargo_display))
     end
