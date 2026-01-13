@@ -184,6 +184,9 @@ local function handle_ship_action_screen(ship, port_name)
         end
     end
     
+    -- Load presenters for ship operations
+    local ship_operations_presenter = require("presenters.ship_operations")
+    
     while true do
         echo("\n")
         display.header(echo)
@@ -219,9 +222,9 @@ local function handle_ship_action_screen(ship, port_name)
         echo("\n")
         
         if choice == "R" then
-            handle_submenu_action("Ship Action", "Repair")
+            ship_operations_presenter.repair_ship(game, echo, read_char, read_line, ship)
         elseif choice == "F" then
-            handle_submenu_action("Ship Action", "Refuel")
+            ship_operations_presenter.refuel_ship(game, echo, read_char, read_line, ship)
         elseif choice == "C" then
             routes_presenter.plot_route(game, echo, read_char, read_line)
         elseif choice == "L" then
