@@ -85,6 +85,9 @@ function mock_io.create_environment(char_inputs, line_inputs)
 end
 
 --- Assert that output contains a specific string
+--- Note: Concatenates all captured output for searching, which may use
+--- significant memory for very large outputs. For most testing scenarios
+--- this is acceptable and provides convenient searching.
 --- @param captured table Array of captured output strings
 --- @param expected string String to search for
 --- @param error_msg string Optional error message
@@ -97,6 +100,9 @@ function mock_io.assert_output_contains(captured, expected, error_msg)
 end
 
 --- Assert that output does not contain a specific string
+--- Note: Concatenates all captured output for searching, which may use
+--- significant memory for very large outputs. For most testing scenarios
+--- this is acceptable and provides convenient searching.
 --- @param captured table Array of captured output strings
 --- @param unexpected string String that should not appear
 --- @param error_msg string Optional error message

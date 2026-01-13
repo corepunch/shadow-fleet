@@ -26,7 +26,10 @@ function output.reset()
 end
 
 --- Write output using the configured output function
---- @param ... Arguments passed to the output function
+--- Accepts the same parameters as terminal.echo:
+--- - Single string argument, or
+--- - Format string with additional arguments (uses string.format)
+--- @param ... Arguments: either a single string or format string with values
 function output.write(...)
     default_output_fn(...)
 end

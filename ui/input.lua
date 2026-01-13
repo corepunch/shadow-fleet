@@ -34,14 +34,14 @@ function input.reset()
 end
 
 --- Read a single character
---- @param echo_input boolean Optional - if true, echo the character
+--- @param echo_input boolean Optional - if true, echoes the character to output
 --- @return string|nil Character read, or nil on EOF
 function input.read_char(echo_input)
     return default_read_char_fn(echo_input)
 end
 
 --- Read a full line of text
---- @param echo_input boolean Optional - if true, echo characters
+--- @param echo_input boolean Optional - if true, echoes each character as it's typed
 --- @return string|nil Line read, or nil on EOF
 function input.read_line(echo_input)
     return default_read_line_fn(echo_input)
