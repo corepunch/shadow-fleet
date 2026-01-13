@@ -43,10 +43,10 @@ PORTS OF CALL: SHADOW FLEET - TEXT PROTOTYPE
 Moscow Safehouse - Jan 08, 2026 | Oil Stock: 0k bbls
 
 --- FLEET STATUS ---
-Name        Age  Hull  Fuel  Status     Cargo             Origin                Destination             ETA     Risk
------------ ---- ----- ----- ---------- ----------------- --------------------- ----------------------- ------- ----------------------------------------
-GHOST-01    22y  65%   80%   Docked     Empty             Ust-Luga (RU)         -                               None
-SHADOW-03   18y  72%   45%   At Sea     500k bbls Crude   Ust-Luga (RU)         STS off Malta           2 days  MED (NATO Patrol, Satellite Surveillance)
+Name        Age  Hull  Fuel  Status   Destination          ETA    
+----------- ---- ----- ----- -------- -------------------- -------
+GHOST-01    22y  65%   80%   Docked   -                           
+SHADOW-03   18y  72%   45%   At Sea   STS off Malta        2 days 
 
 Total Fleet: 2/50 | Avg Age: 20y | Uninsured Losses: 0
 
@@ -58,6 +58,8 @@ MAIN MENU
 
 Enter command:
 ```
+
+**Note**: The fleet status table is condensed to fit within 80 characters (66 chars actual width). Full ship and cargo details are shown on ship action/event screens using detailed info panels.
 
 **User Actions**:
 - Press hotkey (B/T/Q) to navigate to submenus or perform actions
@@ -112,15 +114,33 @@ Enter command:
 
 ---
 
-### Port Operations Screen (Not directly accessible from main menu)
+### Port Operations Screen (Ship Action Screen)
 
 **Purpose**: Manage ships at port - available after ship arrivals or via Ship Broker submenu.
 
 **Display Elements**:
 ```
---- SHIP ACTION: GHOST-01 AT UST-LUGA (RU) ---
+--- SHIP ACTION: SHADOW-03 ---
 
-Hull: 65.00%  Fuel: 80.00%  Cargo: Empty
+--- SHIP DETAILS ---
+Firma: SHADOW-03
+Schiff: SHADOW-03
+vOn: Ust-Luga (RU)
+mit: 500k bbls Crude
+Zustand: 72.00%
+Bunker: 45.00%
+Alter: 18y
+Kapazität: 500k bbls
+Nach: STS off Malta
+ETA: 2 days
+Risiko: MED (Satellite Surveillance, NATO Patrol)
+
+--- PORT DETAILS ---
+STS off Malta
+Region: Mediterranean
+Typ: sts
+Ölpreis: $70/bbl
+Routen: 3
 
 --- ACTIONS ---
 (R) Repair
@@ -133,6 +153,8 @@ Hull: 65.00%  Fuel: 80.00%  Cargo: Empty
 
 Enter command:
 ```
+
+**Note**: This screen uses "Ports of Call" style detailed panels showing comprehensive ship and port information. All cargo, origin, destination, risk, and threat data that was removed from the condensed main fleet view is displayed here.
 
 **Submenu Actions**:
 - **(R) Repair**: Repair hull damage (not yet implemented)
