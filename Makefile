@@ -18,6 +18,9 @@ test:
 	@lua5.3 tests/test_display_panels.lua
 	@lua5.3 tests/test_broker_model.lua
 	@lua5.3 tests/test_ship_operations.lua
+	@lua5.3 tests/test_broker_presenter.lua
+	@lua5.3 tests/test_ship_operations_presenter.lua
+	@lua5.3 tests/test_gameplay_integration.lua
 	@echo ""
 	@echo "All tests completed successfully!"
 
