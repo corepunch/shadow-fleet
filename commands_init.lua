@@ -11,6 +11,8 @@
 
 local commands = require("commands")
 local routes_presenter = require("presenters.routes")
+local broker_presenter = require("presenters.broker")
+local ship_operations_presenter = require("presenters.ship_operations")
 local turn_processor = require("game.turn")
 
 local commands_init = {}
@@ -100,24 +102,24 @@ function commands_init.register_all(handle_vessel_upgrade, handle_submenu_action
         return nil  -- View is implicit when entering broker menu
     end)
     
-    commands.register("broker.buy", function()
-        handle_submenu_action("Ship Broker", "Buy")
+    commands.register("broker.buy", function(game)
+        broker_presenter.buy_ship(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("broker.sell", function()
-        handle_submenu_action("Ship Broker", "Sell")
+    commands.register("broker.sell", function(game)
+        broker_presenter.sell_ship(game, echo, read_char, read_line)
         return nil
     end)
     
     -- Port Commands (Stop Action menu)
-    commands.register("port.repair", function()
-        handle_submenu_action("Stop Action", "Repair")
+    commands.register("port.repair", function(game)
+        ship_operations_presenter.repair_ship(game, echo, read_char, read_line)
         return nil
     end)
     
-    commands.register("port.refuel", function()
-        handle_submenu_action("Stop Action", "Refuel")
+    commands.register("port.refuel", function(game)
+        ship_operations_presenter.refuel_ship(game, echo, read_char, read_line)
         return nil
     end)
     
