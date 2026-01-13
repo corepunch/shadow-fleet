@@ -45,7 +45,7 @@ local test_cases_float = {
     {input = 43.82, expected = "43.82%"},
     {input = 99.99, expected = "99.99%"},
     {input = 0.01, expected = "0.01%"},
-    {input = 65.123, expected = "65.12%"},  -- Should round to 2 decimals
+    {input = 65.123, expected = "65.12%"},  -- Should round to 2 decimal places
 }
 
 for _, test in ipairs(test_cases_float) do
