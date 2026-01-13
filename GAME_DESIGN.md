@@ -123,7 +123,6 @@ Enter command:
 --- SHIP ACTION: SHADOW-03 ---
 
 --- SHIP DETAILS ---
-Firma: SHADOW-03
 Schiff: SHADOW-03
 vOn: Ust-Luga (RU)
 mit: 500k bbls Crude

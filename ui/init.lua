@@ -204,7 +204,6 @@ function widgets.ship_detail_panel(ship, output_fn)
     local world = require("game.world")
     
     local lines = {}
-    table.insert(lines, string.format("Firma: %s\n", ship.name))
     table.insert(lines, string.format("Schiff: %s\n", ship.name))
     table.insert(lines, string.format("vOn: %s\n", world.port_name(ship.origin_id) or "-"))
     table.insert(lines, string.format("mit: %s\n", world.format_cargo(ship.cargo)))

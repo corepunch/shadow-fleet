@@ -47,7 +47,6 @@ output = {}
 widgets.ship_detail_panel(ship, echo_fn)
 
 local panel_output = table.concat(output)
-assert(panel_output:find("Firma:"), "Should contain Firma field")
 assert(panel_output:find("Schiff:"), "Should contain Schiff field")
 assert(panel_output:find("Zustand:"), "Should contain Zustand (hull) field")
 assert(panel_output:find("Bunker:"), "Should contain Bunker (fuel) field")
@@ -75,7 +74,7 @@ display.ship_details(ship, echo_fn)
 
 local details_output = table.concat(output)
 assert(details_output:find("SHIP DETAILS"), "Should contain header")
-assert(details_output:find("Firma:"), "Should contain ship data")
+assert(details_output:find("Schiff:"), "Should contain ship data")
 print("✓ Test 6: display.ship_details works correctly")
 print()
 
